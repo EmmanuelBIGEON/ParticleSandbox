@@ -1,8 +1,12 @@
 #include <iostream>
 
+#include "common/Application.h"
+
 int main()
 {
-    std::cout << "Hello World!" << std::endl;
+    Application* app = new Application();
+    app->Run();
+
     return 0;
 }
 
