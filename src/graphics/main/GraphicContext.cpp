@@ -1,4 +1,4 @@
-#include "GraphicsContext.h"
+#include "GraphicContext.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -8,25 +8,25 @@
 
 #include "Shader.h"
 
-GraphicsContext::GraphicsContext() : okRendering(false)
+GraphicContext::GraphicContext() : okRendering(false)
 {
 }
 
-GraphicsContext::~GraphicsContext()
+GraphicContext::~GraphicContext()
 {
 }
 
-void GraphicsContext::Init()
+void GraphicContext::Init()
 {
     // Set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
     float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+        // positions          // colors           
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -48,17 +48,16 @@ void GraphicsContext::Init()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
 
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(4 * sizeof(float)));
 
     // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
+    // glEnableVertexAttribArray(2);
 
     // Shader
     Shader shader("shaders/basic.vs", "shaders/basic.fs");
@@ -69,7 +68,7 @@ void GraphicsContext::Init()
     okRendering = true;
 }
 
-void GraphicsContext::Render()
+void GraphicContext::Render()
 {
     if(!okRendering)
         return;
@@ -82,6 +81,6 @@ void GraphicsContext::Render()
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void GraphicsContext::Update()
+void GraphicContext::Update()
 {
 }

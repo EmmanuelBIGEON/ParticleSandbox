@@ -3,7 +3,7 @@
 #include "EventHandler.h"
 #include "Signal.h"
 
-#include "../graphics/main/GraphicsContext.h"
+#include "../graphics/main/GraphicContext.h"
 
 class Window
 {
@@ -13,7 +13,7 @@ class Window
 
         //! \brief Display the window.
         //! Render the graphics context.
-        void Display(GraphicsContext* graphicsContext);
+        void Display(GraphicContext* GraphicContext);
 
         
         Signal<> OnWindowReady;

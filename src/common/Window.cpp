@@ -23,7 +23,7 @@ Window::~Window()
 {
 }
 
-void Window::Display(GraphicsContext* graphicsContext)
+void Window::Display(GraphicContext* GraphicContext)
 {
     if (!glfwInit())
     {
@@ -60,7 +60,7 @@ void Window::Display(GraphicsContext* graphicsContext)
     OnWindowReady.Emit();
     while (!glfwWindowShouldClose(window))
     {
-        graphicsContext->Render();
+        GraphicContext->Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

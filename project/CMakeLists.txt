@@ -19,7 +19,8 @@ set(SOURCES
     ../src/common/Window.cpp
     ../src/common/EventHandler.cpp
 
-    ../src/graphics/main/GraphicsContext.cpp
+    ../src/graphics/main/GraphicContext.cpp
+    ../src/graphics/main/GraphicObject.cpp
     ../src/graphics/main/Shader.cpp
 )
 

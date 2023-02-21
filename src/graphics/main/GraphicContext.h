@@ -1,11 +1,11 @@
 #pragma once
 
-//! \class GraphicsContext
-class GraphicsContext
+//! \class GraphicContext
+class GraphicContext
 {
     public: 
-        GraphicsContext();
-        virtual ~GraphicsContext();
+        GraphicContext();
+        virtual ~GraphicContext();
 
         virtual void Init();
         virtual void Render();

@@ -1,9 +1,9 @@
 #include "Application.h"
 #include "Window.h"
 
-#include "../graphics/main/GraphicsContext.h"
+#include "../graphics/main/GraphicContext.h"
 
-Application::Application() : m_Window(nullptr), m_GraphicsContext(nullptr)
+Application::Application() : m_Window(nullptr), m_GraphicContext(nullptr)
 {
 }
 
@@ -13,10 +13,10 @@ Application::~Application()
 
 void Application::Run()
 {
-    m_GraphicsContext = new GraphicsContext();
+    m_GraphicContext = new GraphicContext();
     CreateWindow();
     
-    m_GraphicsContext->Init();
+    m_GraphicContext->Init();
 }
 
 void Application::CreateWindow()
@@ -25,8 +25,8 @@ void Application::CreateWindow()
 
     window->OnWindowReady.Connect([this](void)
     {
-        m_GraphicsContext->Init();
+        m_GraphicContext->Init();
     });
-    
-    window->Display(m_GraphicsContext);
+
+    window->Display(m_GraphicContext);
 }
