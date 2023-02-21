@@ -1,6 +1,6 @@
 #pragma once
 
-
+class GraphicsContext;
 class Window;
 
 class Application
@@ -17,5 +17,6 @@ class Application
 
     private: 
         Window* m_Window;
+        GraphicsContext* m_GraphicsContext;
 
 };

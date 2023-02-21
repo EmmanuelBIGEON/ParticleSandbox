@@ -23,7 +23,7 @@ Window::~Window()
 {
 }
 
-void Window::Display()
+void Window::Display(GraphicsContext* graphicsContext)
 {
     if (!glfwInit())
     {
@@ -62,8 +62,7 @@ void Window::Display()
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.8f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        graphicsContext->Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
