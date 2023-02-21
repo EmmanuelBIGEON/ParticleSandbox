@@ -13,6 +13,7 @@ set(SOURCES
     
     ../src/common/Application.cpp
     ../src/common/Window.cpp
+    ../src/common/EventHandler.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES})

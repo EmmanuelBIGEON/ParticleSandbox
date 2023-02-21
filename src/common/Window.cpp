@@ -5,11 +5,18 @@
 
 #include <iostream>
 
+#include "Event.h"
+
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
+double lastMouseX = 0, lastMouseY = 0;
 Window::Window()
 {
+    // Setup the event handler 
+    global_EventHandler = new EventHandler_Test();
 }
 
 Window::~Window()
@@ -40,6 +47,12 @@ void Window::Display()
     // callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    
+
+    EventHandler_Test* eventHandler = new EventHandler_Test();
+    
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -68,4 +81,61 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // On créé l'événement
+    // keypressed
+    if(action == GLFW_PRESS)
+    {
+        KeyPressedEvent event(key);
+        global_EventHandler->HandleEvent(event);
+    }else if(action == GLFW_RELEASE)
+    {
+        KeyReleasedEvent event(key);
+        global_EventHandler->HandleEvent(event);
+    }
+}
+
+static void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    MouseMovedEvent event(xpos, ypos);
+    global_EventHandler->HandleEvent(event);   
+
+    lastMouseX = xpos;
+    lastMouseY = ypos;
+}
+
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if(action == GLFW_PRESS)
+    {
+        if(button == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            MousePressedEvent event(lastMouseX, lastMouseY, MouseButton::MOUSE_BUTTON_LEFT);
+            global_EventHandler->HandleEvent(event);
+        }else if(button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            MousePressedEvent event(lastMouseX, lastMouseY, MouseButton::MOUSE_BUTTON_RIGHT);
+            global_EventHandler->HandleEvent(event);
+        }else if(button == GLFW_MOUSE_BUTTON_MIDDLE)
+        {
+            MousePressedEvent event(lastMouseX, lastMouseY, MouseButton::MOUSE_BUTTON_MIDDLE);
+            global_EventHandler->HandleEvent(event);
+        }
+    
+    }else if(action == GLFW_RELEASE)
+    {
+        if(button == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            MouseReleasedEvent event(lastMouseX, lastMouseY, MouseButton::MOUSE_BUTTON_LEFT);
+            global_EventHandler->HandleEvent(event);
+        }else if(button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            MouseReleasedEvent event(lastMouseX, lastMouseY, MouseButton::MOUSE_BUTTON_RIGHT);
+            global_EventHandler->HandleEvent(event);
+        }else if(button == GLFW_MOUSE_BUTTON_MIDDLE)
+        {
+            MouseReleasedEvent event(lastMouseX, lastMouseY, MouseButton::MOUSE_BUTTON_MIDDLE);
+            global_EventHandler->HandleEvent(event);
+        }
+    }
 }

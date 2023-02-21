@@ -1,5 +1,6 @@
 #pragma once
 
+
 class Window;
 
 class Application
@@ -16,4 +17,5 @@ class Application
 
     private: 
         Window* m_Window;
+
 };

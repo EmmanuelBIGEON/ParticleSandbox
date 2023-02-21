@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EventHandler.h"
+
 class Window
 {
     public:
@@ -8,4 +10,6 @@ class Window
 
         void Display();
 
+    protected:
+        EventHandler* m_EventHandler;
 };
