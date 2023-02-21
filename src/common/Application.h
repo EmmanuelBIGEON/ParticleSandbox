@@ -11,6 +11,7 @@ class Application
 
         void Run();
 
+
     protected:
         
         virtual void CreateWindow();

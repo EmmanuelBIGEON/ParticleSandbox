@@ -15,10 +15,18 @@ void Application::Run()
 {
     m_GraphicsContext = new GraphicsContext();
     CreateWindow();
+    
+    m_GraphicsContext->Init();
 }
 
 void Application::CreateWindow()
 {
     Window* window = new Window();
+
+    window->OnWindowReady.Connect([this](void)
+    {
+        m_GraphicsContext->Init();
+    });
+    
     window->Display(m_GraphicsContext);
 }

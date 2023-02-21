@@ -1,4 +1,4 @@
-setlocal enabledelayedexpansion
+@echo off
 
 set CURRENT_DIR=%~dp0
 cd project 
@@ -75,6 +75,7 @@ echo [CMake] Generating project
 if not exist %PROJECT_BUILD_DIR% mkdir %PROJECT_BUILD_DIR%
 cmake -S %PROJECT_DIR% -B %PROJECT_BUILD_DIR% -G %PROJECT_BUILD_GENERATOR% -A %PROJECT_BUILD_ARCH% -DCMAKE_BUILD_TYPE=%PROJECT_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=%PROJECT_BIN_DIR%^
     -DPROJECT_INCLUDE_DIR=%PROJECT_INCLUDE_DIR%^
+    -DMAIN_DIR=%MAIN_DIR%^
     -DGLFW_DIR=%GLFW_DIR%
 cd %PROJECT_BUILD_DIR%
 echo [CMake] Building project

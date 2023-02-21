@@ -6,6 +6,10 @@ include_directories(
     ${PROJECT_INCLUDE_DIR}
 )
 
+# replace \ by / in ${MAIN_DIR} to avoid cmake error
+string(REPLACE "\\" "/" MAIN_DIR ${MAIN_DIR})
+
+
 set(SOURCES
     ../src/glad/glad.c
 
@@ -16,6 +20,7 @@ set(SOURCES
     ../src/common/EventHandler.cpp
 
     ../src/graphics/main/GraphicsContext.cpp
+    ../src/graphics/main/Shader.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES})
@@ -26,3 +31,8 @@ target_link_libraries(ParticleSandbox
 
 
 install(TARGETS ParticleSandbox DESTINATION ${CMAKE_INSTALL_PREFIX})
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/ParticleSandbox.pdb DESTINATION ${CMAKE_INSTALL_PREFIX})
+endif()
+# install shaders
+install(DIRECTORY ${MAIN_DIR}/src/graphics/shaders DESTINATION ${CMAKE_INSTALL_PREFIX})

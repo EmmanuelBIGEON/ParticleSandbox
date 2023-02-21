@@ -49,10 +49,6 @@ void Window::Display(GraphicsContext* graphicsContext)
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-    
-
-    EventHandler_Test* eventHandler = new EventHandler_Test();
-    
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -60,6 +56,8 @@ void Window::Display(GraphicsContext* graphicsContext)
         return;
     }
 
+
+    OnWindowReady.Emit();
     while (!glfwWindowShouldClose(window))
     {
         graphicsContext->Render();
