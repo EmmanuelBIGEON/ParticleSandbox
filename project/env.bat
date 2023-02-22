@@ -10,4 +10,5 @@ set PROJECT_BIN_DIR=%MAIN_DIR%/bin
 set PROJECT_INCLUDE_DIR=%MAIN_DIR%/include
 
 set GLFW_DIR=%MAIN_DIR%/lib/GLFW
+set FREETYPE_DIR=%MAIN_DIR%/lib/freetype
 

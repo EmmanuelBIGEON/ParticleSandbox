@@ -31,6 +31,7 @@ add_executable(ParticleSandbox ${SOURCES})
 
 target_link_libraries(ParticleSandbox
     ${GLFW_DIR}/glfw3.lib
+    ${FREETYPE_DIR}/
 )
 
 
