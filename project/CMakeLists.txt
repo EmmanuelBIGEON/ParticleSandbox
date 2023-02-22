@@ -24,6 +24,7 @@ set(SOURCES
     ../src/graphics/main/Shader.cpp
 
     ../src/graphics/adapters/TriangleAdapter.cpp
+    ../src/graphics/adapters/RectangleAdapter.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES})

@@ -8,6 +8,7 @@
 
 #include "Shader.h"
 #include "../adapters/TriangleAdapter.h"
+#include "../adapters/RectangleAdapter.h"
 
 GraphicContext::GraphicContext() : okRendering(false), m_Objects(), needUpdate(true)
 {
@@ -41,7 +42,7 @@ GraphicContext::~GraphicContext()
 void GraphicContext::Init()
 {
     TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    
+    RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
     // SHADER_BASIC
     shader_basic = new Shader("shaders/basic.vs", "shaders/basic.fs");
     // shader.Use();
