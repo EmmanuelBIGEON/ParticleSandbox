@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/ext.hpp>
 
 class Point;
 class Point3D;
@@ -13,6 +14,9 @@ class Point3D
         Point3D() { x = 0; y = 0; z = 0; }
         Point3D(const Point3D& point) { x = point.x; y = point.y; z = point.z; }
         virtual ~Point3D() {}
+
+        glm::vec3 ToVec3() const { return glm::vec3(x, y, z); }
+
 
         float x;
         float y;
@@ -29,6 +33,8 @@ class Point
         Point(const Point& point) { x = point.x; y = point.y; }
         Point(const Point3D& point) { x = point.x; y = point.y; }
         virtual ~Point() {}
+        
+        glm::vec3 ToVec3() const { return glm::vec3(x, y, 1.0f); }
     
         float x;
         float y;

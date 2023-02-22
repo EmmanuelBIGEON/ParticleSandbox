@@ -2,6 +2,7 @@
 
 #include "Point.h"
 
+
 //! \class Triangle
 class Triangle
 {
@@ -17,6 +18,7 @@ class Triangle
         void SetP1(const Point& p1) { m_P1 = p1;}
         void SetP2(const Point& p2) { m_P2 = p2;}
         void SetP3(const Point& p3) { m_P3 = p3;}
+
 
     private:
         Point m_P1;

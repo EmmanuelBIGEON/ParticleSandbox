@@ -12,7 +12,7 @@ EventHandler::~EventHandler()
 
 void EventHandler_Test::HandleEvent(const Event& event)
 {
-    // return; // silent;
+    return; // silent;
     std::cout << "EventHandler_Test::HandleEvent()" << std::endl;
     switch(event.GetEventType())
     {

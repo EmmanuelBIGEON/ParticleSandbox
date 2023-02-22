@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <glm/ext.hpp>
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
     std::string vertexCode;
@@ -63,6 +65,12 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED" << std::endl << infoLog << std::endl;
     }
 
+    SetMat4("model", glm::mat4(1.0f));
+    SetMat4("projection", glm::mat4(1.0f));
+    SetMat4("view", glm::mat4(1.0f));
+    // Needs to be updated.
+
+
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }
@@ -78,7 +86,22 @@ void Shader::Use()
 }
 
 
-void Shader::BindVao()
+void Shader::SetBool(const char* name, bool value) const
 {
-    glBindVertexArray(m_Vao);
+    glUniform1i(glGetUniformLocation(m_ShaderID, name), (int)value);
+}
+
+void Shader::SetInt(const char* name, int value) const
+{
+    glUniform1i(glGetUniformLocation(m_ShaderID, name), value);
+}
+
+void Shader::SetFloat(const char* name, float value) const
+{
+    glUniform1f(glGetUniformLocation(m_ShaderID, name), value);
+}
+
+void Shader::SetMat4(const char* name, const glm::mat4& value) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(m_ShaderID, name), 1, GL_FALSE, glm::value_ptr(value));
 }

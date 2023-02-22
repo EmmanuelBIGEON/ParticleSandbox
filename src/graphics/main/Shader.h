@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/ext.hpp>
+
 class Shader
 {
     public:
@@ -8,8 +10,10 @@ class Shader
 
         void Use();
 
-        // Prevent all graphic objects from always redefining the attributes
-        void BindVao();
+        void SetBool(const char* name, bool value) const;
+        void SetInt(const char* name, int value) const;
+        void SetFloat(const char* name, float value) const;
+        void SetMat4(const char* name, const glm::mat4& value) const;
 
     protected:
         unsigned int m_ShaderID;
