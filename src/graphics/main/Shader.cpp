@@ -73,7 +73,12 @@ Shader::~Shader()
 
 void Shader::Use()
 {
+    glBindVertexArray(m_Vao);
     glUseProgram(m_ShaderID);
 }
 
 
+void Shader::BindVao()
+{
+    glBindVertexArray(m_Vao);
+}

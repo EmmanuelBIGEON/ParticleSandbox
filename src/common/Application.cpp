@@ -26,6 +26,7 @@ void Application::CreateWindow()
     window->OnWindowReady.Connect([this](void)
     {
         m_GraphicContext->Init();
+        
     });
 
     window->Display(m_GraphicContext);

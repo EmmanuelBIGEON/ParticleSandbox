@@ -7,8 +7,9 @@
 #include <iostream>
 
 #include "Shader.h"
+#include "../adapters/TriangleAdapter.h"
 
-GraphicContext::GraphicContext() : okRendering(false)
+GraphicContext::GraphicContext() : okRendering(false), m_Objects()
 {
 }
 
@@ -18,54 +19,19 @@ GraphicContext::~GraphicContext()
 
 void GraphicContext::Init()
 {
-    // Set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-
-    float vertices[] = {
-        // positions          // colors           
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f, 1.0f
-    };
-
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
-
-    // color attribute
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(4 * sizeof(float)));
-
-    // texture coord attribute
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    // glEnableVertexAttribArray(2);
-
-    // Shader
-    Shader shader("shaders/basic.vs", "shaders/basic.fs");
-    shader.Use();
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.5, 0), Point(0.5, 0.5), Point(1, 1)));
+    
+    
+    // SHADER_BASIC
+    shader_basic = new Shader("shaders/basic.vs", "shaders/basic.fs");
+    // shader.Use();
 
     okRendering = true;
+}
+
+void GraphicContext::Register(GraphicObject* object)
+{
+    m_Objects.push_back(object);
 }
 
 void GraphicContext::Render()
@@ -75,12 +41,29 @@ void GraphicContext::Render()
 
     glClearColor(0.2f, 0.3f, 0.8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    for(auto object : m_Objects)
+    {
+        switch(object->GetShaderIndex())
+        {
+            case SHADER_BASIC:
+            {
+                shader_basic->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+        }
+
+        object->Draw();
+
+    }
     
-    std::cout << "Rendering" << std::endl;
-    
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // std::cout << "Rendering" << std::endl;
 }
 
 void GraphicContext::Update()
 {
+    // Do nothing..
 }
