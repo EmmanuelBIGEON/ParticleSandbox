@@ -65,7 +65,6 @@ void GraphicContext::Init()
     // RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
     // GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     GraphicImage* image = new GraphicImage(this, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
-    // GraphicImage* image = new GraphicImage(this, "data/img/test.jpg", 400.0f, 300.0f, 400.0f, 400.0f);
     // -----------------------------
     okRendering = true;
 }
