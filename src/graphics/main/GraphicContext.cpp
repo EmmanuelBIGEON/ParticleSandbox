@@ -10,6 +10,7 @@
 #include "../components/adapters/TriangleAdapter.h"
 #include "../components/adapters/RectangleAdapter.h"
 #include "../components/common/GraphicText.h"
+#include "../components/common/GraphicImage.h"
 
 #include "Font.h"
 
@@ -50,16 +51,21 @@ void GraphicContext::Init()
     shader_basic = new Shader("shaders/basic.vs", "shaders/basic.fs");
     // SHADER_TEXT
     shader_text = new Shader("shaders/text.vs", "shaders/text.fs");
+    // SHADER_TEXTURE
+    shader_texture = new Shader("shaders/texture.vs", "shaders/texture.fs");
     // shader.Use();
     // -----------------------------
 
     // ---------- Fonts ----------
     font_main = new Font("fonts/arial.ttf", 48);
     // ----------------------------
+
     // ---------- OBJECTS ----------
-    TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
-    GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+    // TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
+    // RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
+    // GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+    GraphicImage* image = new GraphicImage(this, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
+    // GraphicImage* image = new GraphicImage(this, "data/img/test.jpg", 400.0f, 300.0f, 400.0f, 400.0f);
     // -----------------------------
     okRendering = true;
 }
@@ -113,10 +119,16 @@ void GraphicContext::Render()
 
                 break;
             }
+            case SHADER_TEXTURE:
+            {
+                shader_texture->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
         }
-
         object->Draw();
-
     }
     
     // std::cout << "Rendering" << std::endl;
@@ -141,6 +153,14 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_text->SetMat4("model", m_ModelMatrix);
 
+    shader_texture->Use();
+    // Update the projection matrix
+    shader_texture->SetMat4("projection", m_ProjectionMatrix);
+    // Update the view matrix
+    shader_texture->SetMat4("view", m_ViewMatrix);
+    // Update the model matrix
+    shader_texture->SetMat4("model", m_ModelMatrix);
+
     needUpdate = false;
 }
 
@@ -153,5 +173,8 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
             return shader_basic;
         case SHADER_TEXT:
             return shader_text;
+        case SHADER_TEXTURE:
+            return shader_texture;
     }
+    return nullptr;
 }

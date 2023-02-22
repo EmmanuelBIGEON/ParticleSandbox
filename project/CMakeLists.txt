@@ -26,6 +26,7 @@ set(SOURCES
     ../src/graphics/components/adapters/TriangleAdapter.cpp
     ../src/graphics/components/adapters/RectangleAdapter.cpp
     ../src/graphics/components/common/GraphicText.cpp
+    ../src/graphics/components/common/GraphicImage.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES})
@@ -43,3 +44,4 @@ endif()
 # install shaders
 install(DIRECTORY ${MAIN_DIR}/src/graphics/shaders DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${MAIN_DIR}/fonts DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${MAIN_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})

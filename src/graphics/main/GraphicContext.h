@@ -11,7 +11,8 @@ class Font;
 enum AvailableShader
 {
     SHADER_BASIC = 0,
-    SHADER_TEXT
+    SHADER_TEXT,
+    SHADER_TEXTURE
 };
 
 //! \class GraphicContext
@@ -62,6 +63,7 @@ class GraphicContext
 
         Shader* shader_basic;
         Shader* shader_text;
+        Shader* shader_texture;
 
         Font* font_main;
 

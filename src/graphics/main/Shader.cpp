@@ -81,7 +81,6 @@ Shader::~Shader()
 
 void Shader::Use()
 {
-    glBindVertexArray(m_Vao);
     glUseProgram(shaderID);
 }
 

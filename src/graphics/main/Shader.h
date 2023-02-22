@@ -16,7 +16,5 @@ class Shader
         void SetMat4(const char* name, const glm::mat4& value) const;
 
         unsigned int shaderID;
-    protected:
-        unsigned int m_Vao;
 
 };
