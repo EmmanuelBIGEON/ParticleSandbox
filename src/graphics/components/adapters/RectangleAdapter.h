@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../main/GraphicContext.h"
-#include "../main/GraphicObject.h"
+#include "../../main/GraphicContext.h"
+#include "../../main/GraphicObject.h"
 
-#include "../../geometry/Rectangle.h"
+#include "../../../geometry/Rectangle.h"
 
 #include <glm/glm.hpp>
 

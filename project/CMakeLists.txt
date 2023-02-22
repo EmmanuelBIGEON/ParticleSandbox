@@ -12,7 +12,6 @@ string(REPLACE "\\" "/" MAIN_DIR ${MAIN_DIR})
 
 set(SOURCES
     ../src/glad/glad.c
-
     ../src/main.cpp
     
     ../src/common/Application.cpp
@@ -22,16 +21,18 @@ set(SOURCES
     ../src/graphics/main/GraphicContext.cpp
     ../src/graphics/main/GraphicObject.cpp
     ../src/graphics/main/Shader.cpp
+    ../src/graphics/main/Font.cpp
 
-    ../src/graphics/adapters/TriangleAdapter.cpp
-    ../src/graphics/adapters/RectangleAdapter.cpp
+    ../src/graphics/components/adapters/TriangleAdapter.cpp
+    ../src/graphics/components/adapters/RectangleAdapter.cpp
+    ../src/graphics/components/common/GraphicText.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES})
 
 target_link_libraries(ParticleSandbox
     ${GLFW_DIR}/glfw3.lib
-    ${FREETYPE_DIR}/
+    ${FREETYPE_DIR}/lib/freetyped.lib
 )
 
 
@@ -41,3 +42,4 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 # install shaders
 install(DIRECTORY ${MAIN_DIR}/src/graphics/shaders DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${MAIN_DIR}/fonts DESTINATION ${CMAKE_INSTALL_PREFIX})

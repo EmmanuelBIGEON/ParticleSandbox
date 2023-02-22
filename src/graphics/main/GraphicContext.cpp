@@ -7,8 +7,11 @@
 #include <iostream>
 
 #include "Shader.h"
-#include "../adapters/TriangleAdapter.h"
-#include "../adapters/RectangleAdapter.h"
+#include "../components/adapters/TriangleAdapter.h"
+#include "../components/adapters/RectangleAdapter.h"
+#include "../components/common/GraphicText.h"
+
+#include "Font.h"
 
 GraphicContext::GraphicContext() : okRendering(false), m_Objects(), needUpdate(true)
 {
@@ -42,12 +45,22 @@ GraphicContext::~GraphicContext()
 
 void GraphicContext::Init()
 {
-    TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
+    // ---------- SHADERS ----------
     // SHADER_BASIC
     shader_basic = new Shader("shaders/basic.vs", "shaders/basic.fs");
+    // SHADER_TEXT
+    shader_text = new Shader("shaders/text.vs", "shaders/text.fs");
     // shader.Use();
+    // -----------------------------
 
+    // ---------- Fonts ----------
+    font_main = new Font("fonts/arial.ttf", 48);
+    // ----------------------------
+    // ---------- OBJECTS ----------
+    TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
+    RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
+    GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+    // -----------------------------
     okRendering = true;
 }
 
@@ -92,6 +105,14 @@ void GraphicContext::Render()
 
                 break;
             }
+            case SHADER_TEXT:
+            {
+                shader_text->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
         }
 
         object->Draw();
@@ -112,5 +133,25 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_basic->SetMat4("model", m_ModelMatrix);
 
+    shader_text->Use();
+    // Update the projection matrix
+    shader_text->SetMat4("projection", m_ProjectionMatrix);
+    // Update the view matrix
+    shader_text->SetMat4("view", m_ViewMatrix);
+    // Update the model matrix
+    shader_text->SetMat4("model", m_ModelMatrix);
+
     needUpdate = false;
+}
+
+
+Shader* GraphicContext::GetShader(AvailableShader shader)
+{
+    switch(shader)
+    {
+        case SHADER_BASIC:
+            return shader_basic;
+        case SHADER_TEXT:
+            return shader_text;
+    }
 }

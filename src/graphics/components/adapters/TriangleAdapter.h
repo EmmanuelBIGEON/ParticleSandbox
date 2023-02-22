@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../geometry/Triangle.h"
-#include "../main/GraphicObject.h"
-#include "../main/GraphicContext.h"
+#include "../../../geometry/Triangle.h"
+#include "../../main/GraphicObject.h"
+#include "../../main/GraphicContext.h"
 
 #include <glm/vec3.hpp>
 

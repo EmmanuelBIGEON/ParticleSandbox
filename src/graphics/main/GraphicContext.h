@@ -6,10 +6,12 @@
 
 class GraphicObject;
 class Shader;
+class Font;
 
 enum AvailableShader
 {
-    SHADER_BASIC = 0
+    SHADER_BASIC = 0,
+    SHADER_TEXT
 };
 
 //! \class GraphicContext
@@ -47,6 +49,9 @@ class GraphicContext
         
         virtual void Update(); // placeholder function for now, might be used later
 
+        // For TextRendering
+        Shader* GetShader(AvailableShader shader);
+
     protected:
         bool okRendering;
         bool needUpdate;
@@ -56,6 +61,9 @@ class GraphicContext
         std::vector<GraphicObject*> m_Objects;
 
         Shader* shader_basic;
+        Shader* shader_text;
+
+        Font* font_main;
 
         //! \brief Projection matrix.
         //! Convert coordinates from world space to screen space.
