@@ -29,5 +29,11 @@ void Application::CreateWindow()
         
     });
 
-    window->Display(m_GraphicContext);
+    window->Display(this);
+}
+
+
+void Application::Render()
+{
+    m_GraphicContext->Render();
 }

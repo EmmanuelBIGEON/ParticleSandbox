@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "Application.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -23,7 +25,7 @@ Window::~Window()
 {
 }
 
-void Window::Display(GraphicContext* GraphicContext)
+void Window::Display(Application* app)
 {
     if (!glfwInit())
     {
@@ -67,7 +69,7 @@ void Window::Display(GraphicContext* GraphicContext)
     OnWindowReady.Emit();
     while (!glfwWindowShouldClose(window))
     {
-        GraphicContext->Render();
+        app->Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

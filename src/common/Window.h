@@ -5,6 +5,8 @@
 
 #include "../graphics/main/GraphicContext.h"
 
+class Application;
+
 class Window
 {
     public:
@@ -13,7 +15,7 @@ class Window
 
         //! \brief Display the window.
         //! Render the graphics context.
-        void Display(GraphicContext* GraphicContext);
+        void Display(Application* app);
 
         
         Signal<> OnWindowReady;
