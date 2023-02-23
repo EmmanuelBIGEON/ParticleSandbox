@@ -17,6 +17,7 @@ set(SOURCES
     ../src/common/Application.cpp
     ../src/common/Window.cpp
     ../src/common/EventHandler.cpp
+    ../src/common/Scene.cpp
 
     ../src/graphics/main/GraphicContext.cpp
     ../src/graphics/main/GraphicObject.cpp

@@ -2,8 +2,9 @@
 #include "Window.h"
 
 #include "../graphics/main/GraphicContext.h"
+#include "Scene.h"
 
-Application::Application() : m_Window(nullptr), m_GraphicContext(nullptr)
+Application::Application() : m_Window(nullptr), m_GraphicContext(nullptr), m_currentScene(nullptr)
 {
 }
 
@@ -14,9 +15,11 @@ Application::~Application()
 void Application::Run()
 {
     m_GraphicContext = new GraphicContext();
-    CreateWindow();
+    CreateWindow(); 
     
-    m_GraphicContext->Init();
+    // Unreachable code.
+    // The application loop is in the window.
+    // If needed, multithread is an option.
 }
 
 void Application::CreateWindow()
@@ -26,6 +29,10 @@ void Application::CreateWindow()
     window->OnWindowReady.Connect([this](void)
     {
         m_GraphicContext->Init();
+
+        // Load the scene.
+        LoadScene_1();
+        // LoadScene_2();
         
     });
 
@@ -35,5 +42,25 @@ void Application::CreateWindow()
 
 void Application::Render()
 {
-    m_GraphicContext->Render();
+    // m_GraphicContext->Render();
+    if(m_currentScene)
+    {
+        m_currentScene->Update();
+    }
+}
+
+void Application::LoadScene_1()
+{
+    if(m_currentScene)
+        delete(m_currentScene);
+
+    m_currentScene = Scene::CreateScene_1(m_GraphicContext);
+}
+
+void Application::LoadScene_2()
+{
+    if(m_currentScene)
+        delete(m_currentScene);
+
+    m_currentScene = Scene::CreateScene_2(m_GraphicContext);
 }

@@ -6,13 +6,9 @@
 
 #include <iostream>
 
+#include "GraphicObject.h"
+
 #include "Shader.h"
-#include "../components/adapters/TriangleAdapter.h"
-#include "../components/adapters/RectangleAdapter.h"
-#include "../components/adapters/AdvancedRectangle.h"
-#include "../components/adapters/CircleAdapter.h"
-#include "../components/common/GraphicText.h"
-#include "../components/common/GraphicImage.h"
 #include "Font.h"
 
 GraphicContext::GraphicContext() : okRendering(false), m_Objects(), needUpdate(true)
@@ -63,19 +59,6 @@ void GraphicContext::Init()
     font_main = new Font("fonts/arial.ttf", 48);
     // ----------------------------
 
-    // ---------- OBJECTS ----------
-    TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
-    // GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-    // CircleAdapter* circle = new CircleAdapter(this, Circle(Point(400.0f, 300.0f), 200.0f));
-    // circle->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    // AdvancedRectangle* rect = new AdvancedRectangle(this, Rectangle(Point(200.0f, 200.0f), Point(1400.0f, 1000.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
-    // CircleAdapter* circle2 = new CircleAdapter(this, Circle(Point(800.0f, 500.0f), 400.0f));
-    // CircleAdapter* circle3 = new CircleAdapter(this, Circle(Point(500.0f, 400.0f), 80.0f));
-    // circle3->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
-
-
-    // GraphicImage* image = new GraphicImage(this, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
     okRendering = true;
 }
 

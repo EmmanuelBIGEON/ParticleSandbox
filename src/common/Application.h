@@ -22,8 +22,8 @@ class Application
         // Might be useful later to load scenes from a file, for now it's not needed.
         // LoadScene(const std::string& theScenePath);
 
-        void LoadScene_1() {}
-        void LoadScene_2() {}
+        void LoadScene_1();
+        void LoadScene_2();
 
 
     protected:
