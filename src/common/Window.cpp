@@ -33,6 +33,7 @@ void Window::Display(GraphicContext* GraphicContext)
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     GLFWwindow* window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
     if (window == NULL)
@@ -60,6 +61,8 @@ void Window::Display(GraphicContext* GraphicContext)
     // Enable alpha blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+    // enable anti-aliasing (MSAA)
+    glEnable(GL_MULTISAMPLE);  
 
     OnWindowReady.Emit();
     while (!glfwWindowShouldClose(window))
