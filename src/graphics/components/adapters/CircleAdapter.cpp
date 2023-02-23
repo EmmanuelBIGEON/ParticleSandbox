@@ -59,15 +59,11 @@ void CircleAdapter::Update()
         m_vertices[i*7 + 4] = m_Color.g;
         m_vertices[i*7 + 5] = m_Color.b;
         m_vertices[i*7 + 6] = 1.0f;
-    std::cout << "CircleAdapter::Update() - i: " << i << std::endl;
     }
 
-    std::cout << "CircleAdapter::Update() - m_nbVertices: " << m_nbVertices << std::endl;
     // opengl
     glGenVertexArrays(1, &m_VAO);
-    std::cout << "CircleAdapter::glGenVertexArrays() - m_nbVertices: " << m_nbVertices << std::endl;
     glGenBuffers(1, &m_VBO);
-    std::cout << "CircleAdapter::glGenBuffers() - m_nbVertices: " << m_nbVertices << std::endl;
 
     glBindVertexArray(m_VAO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);

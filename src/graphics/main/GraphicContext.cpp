@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "../components/adapters/TriangleAdapter.h"
 #include "../components/adapters/RectangleAdapter.h"
+#include "../components/adapters/AdvancedRectangle.h"
 #include "../components/adapters/CircleAdapter.h"
 #include "../components/common/GraphicText.h"
 #include "../components/common/GraphicImage.h"
@@ -53,6 +54,8 @@ void GraphicContext::Init()
     shader_text = new Shader("shaders/text.vs", "shaders/text.fs");
     // SHADER_TEXTURE
     shader_texture = new Shader("shaders/texture.vs", "shaders/texture.fs");
+    // SHADER_LIGHTING
+    shader_lighting = new Shader("shaders/lighting.vs", "shaders/lighting.fs");
     // shader.Use();
     // -----------------------------
 
@@ -61,17 +64,18 @@ void GraphicContext::Init()
     // ----------------------------
 
     // ---------- OBJECTS ----------
-    TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
+    // TriangleAdapter* adapter = new TriangleAdapter(this, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
+    // RectangleAdapter* adapter2 = new RectangleAdapter(this, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
     // GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-    CircleAdapter* circle = new CircleAdapter(this, Circle(Point(400.0f, 300.0f), 200.0f));
-    circle->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    CircleAdapter* circle2 = new CircleAdapter(this, Circle(Point(800.0f, 500.0f), 400.0f));
-    CircleAdapter* circle3 = new CircleAdapter(this, Circle(Point(500.0f, 400.0f), 80.0f));
-    circle3->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
+    // CircleAdapter* circle = new CircleAdapter(this, Circle(Point(400.0f, 300.0f), 200.0f));
+    // circle->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
+    AdvancedRectangle* rect = new AdvancedRectangle(this, Rectangle(Point(200.0f, 200.0f), Point(1400.0f, 1000.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
+    // CircleAdapter* circle2 = new CircleAdapter(this, Circle(Point(800.0f, 500.0f), 400.0f));
+    // CircleAdapter* circle3 = new CircleAdapter(this, Circle(Point(500.0f, 400.0f), 80.0f));
+    // circle3->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
 
 
-    GraphicImage* image = new GraphicImage(this, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
+    // GraphicImage* image = new GraphicImage(this, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
     // -----------------------------
     okRendering = true;
 }
@@ -102,7 +106,7 @@ void GraphicContext::Render()
     if(!okRendering)
         return;
 
-    glClearColor(0.2f, 0.3f, 0.8f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for(auto object : m_Objects)
@@ -128,6 +132,14 @@ void GraphicContext::Render()
             case SHADER_TEXTURE:
             {
                 shader_texture->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_LIGHTING:
+            {
+                shader_lighting->Use();
                 if(!object->IsUpdated()) // if the object is not updated, update it
                     object->Update();   
 
@@ -166,6 +178,20 @@ void GraphicContext::Update()
     shader_texture->SetMat4("view", m_ViewMatrix);
     // Update the model matrix
     shader_texture->SetMat4("model", m_ModelMatrix);
+    
+    shader_lighting->Use();
+    // Update the projection matrix
+    shader_lighting->SetMat4("projection", m_ProjectionMatrix);
+    // Update the view matrix
+    shader_lighting->SetMat4("view", m_ViewMatrix);
+    // Update the model matrix
+    shader_lighting->SetMat4("model", m_ModelMatrix);
+
+    shader_lighting->setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    shader_lighting->setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+    shader_lighting->setVec3("lightPos",  glm::vec3(0.0f, 0.0f, 3.0f));
+    shader_lighting->setVec3("viewPos",  glm::vec3(0.0f, 0.0f, 3.0f));
+
 
     needUpdate = false;
 }
