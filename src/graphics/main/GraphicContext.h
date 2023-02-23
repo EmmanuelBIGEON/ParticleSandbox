@@ -40,7 +40,8 @@ class GraphicContext
         virtual void UpdateViewMatrix(const glm::mat4& viewMatrix) { m_ViewMatrix = viewMatrix; needUpdate = true;}
         const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
-
+        float Convert_glX_to_WorldX(float glX) const;
+        float Convert_glY_to_WorldY(float glY) const;
         
         //! \brief Main rendering function.
         //! It automacally calls the Update() method of the object.
@@ -80,5 +81,8 @@ class GraphicContext
         glm::mat4 m_ModelMatrix;
         glm::mat4 m_ViewMatrix;
         glm::mat4 m_ProjectionMatrix;
+
+        float m_ScreenWidth;
+        float m_ScreenHeight;
         
 };

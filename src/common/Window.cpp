@@ -15,6 +15,8 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 double lastMouseX = 0, lastMouseY = 0;
+int viewportWidth = 800, viewportHeight = 600;
+
 Window::Window()
 {
     // Setup the event handler 
@@ -81,6 +83,8 @@ void Window::Display(Application* app)
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    viewportWidth = width;
+    viewportHeight = height;
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

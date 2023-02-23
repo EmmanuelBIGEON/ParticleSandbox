@@ -69,6 +69,20 @@ void GraphicContext::Register(GraphicObject* object)
     m_Objects.push_back(object);
 }
 
+
+float GraphicContext::Convert_glX_to_WorldX(float x) const
+{
+    // [-1, 1] -> [0,1600]
+    return (x + 1.0f) * 800.0f;
+
+}
+
+float GraphicContext::Convert_glY_to_WorldY(float y) const
+{
+    // [-1, 1] -> [0,1200]
+    return (y + 1.0f) * 600.0f;
+}
+
 void GraphicContext::Render()
 {
     if(needUpdate)

@@ -2,6 +2,8 @@
 
 #include "../graphics/main/GraphicContext.h"
 
+#include "EventHandler.h"
+
 class Scene;
 
 //! \brief Scene
@@ -21,6 +23,10 @@ class Scene
         //! \brief Update the scene.
         //! Won't check if the scene is initialized.
         virtual void Update();
+        
+        //! \brief Connect a handler to the scene.
+        //! Notice: Destroy the previous Handler
+        void ConnectHandler(EventHandlerType handlerType);
 
         static Scene* CreateScene_1(GraphicContext* graphicContext);
         static Scene* CreateScene_2(GraphicContext* graphicContext);

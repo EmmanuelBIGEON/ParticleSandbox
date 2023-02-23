@@ -7,6 +7,9 @@
 
 class Application;
 
+extern int viewportWidth;
+extern int viewportHeight;
+
 class Window
 {
     public:

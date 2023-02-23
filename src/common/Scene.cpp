@@ -7,6 +7,8 @@
 #include "../graphics/components/common/GraphicText.h"
 #include "../graphics/components/common/GraphicImage.h"
 
+#include "EventHandler.h"
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -33,6 +35,7 @@ void Scene::Update()
 Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
+    scene->ConnectHandler(EVENT_HANDLER_TEST2);
     TriangleAdapter* adapter = new TriangleAdapter(graphicContext, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
     RectangleAdapter* adapter2 = new RectangleAdapter(graphicContext, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
     return scene;
@@ -54,4 +57,27 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 
     // GraphicImage* image = new GraphicImage(graphicContext, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
     return nullptr;
+}
+
+
+void Scene::ConnectHandler(EventHandlerType handlerType)
+{
+    if(global_EventHandler != nullptr)
+    {
+        EventHandler* tmp = global_EventHandler;
+        global_EventHandler = nullptr;
+        delete tmp;
+    }
+
+    switch(handlerType)
+    {
+        case EVENT_HANDLER_TEST2:
+        {
+            EventHandler_Test2* handler = new EventHandler_Test2(m_GraphicContext);
+            global_EventHandler = handler;
+            break;
+        }
+        default:
+            break;
+    }
 }
