@@ -69,14 +69,13 @@ void GraphicContext::Init()
     // GraphicText* text = new GraphicText(this, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     // CircleAdapter* circle = new CircleAdapter(this, Circle(Point(400.0f, 300.0f), 200.0f));
     // circle->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    AdvancedRectangle* rect = new AdvancedRectangle(this, Rectangle(Point(200.0f, 200.0f), Point(1400.0f, 1000.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
+    // AdvancedRectangle* rect = new AdvancedRectangle(this, Rectangle(Point(200.0f, 200.0f), Point(1400.0f, 1000.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
     // CircleAdapter* circle2 = new CircleAdapter(this, Circle(Point(800.0f, 500.0f), 400.0f));
     // CircleAdapter* circle3 = new CircleAdapter(this, Circle(Point(500.0f, 400.0f), 80.0f));
     // circle3->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
 
 
     // GraphicImage* image = new GraphicImage(this, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
-    // -----------------------------
     okRendering = true;
 }
 

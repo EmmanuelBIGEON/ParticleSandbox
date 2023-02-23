@@ -15,6 +15,8 @@ CircleAdapter::~CircleAdapter()
         m_nbVertices = 0;
         delete[] m_vertices;
     }
+    glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_VBO);
 }
 
 void CircleAdapter::Update()

@@ -9,6 +9,8 @@ AdvancedRectangle::AdvancedRectangle(GraphicContext* context, const Rectangle& r
 
 AdvancedRectangle::~AdvancedRectangle()
 {
+    glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_VBO);
 }
 
 void AdvancedRectangle::Update()

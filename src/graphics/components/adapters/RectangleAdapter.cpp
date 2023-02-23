@@ -9,6 +9,8 @@ RectangleAdapter::RectangleAdapter(GraphicContext* context, const Rectangle& rec
 
  RectangleAdapter::~RectangleAdapter()
 {
+    glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_VBO);
 }
 
 void RectangleAdapter::SetColor(const glm::vec3& color)
@@ -84,7 +86,7 @@ void RectangleAdapter::Update()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
+
     m_IsUpdated = true;
 }
 
