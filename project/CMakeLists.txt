@@ -25,6 +25,7 @@ set(SOURCES
 
     ../src/graphics/components/adapters/TriangleAdapter.cpp
     ../src/graphics/components/adapters/RectangleAdapter.cpp
+    ../src/graphics/components/adapters/CircleAdapter.cpp
     ../src/graphics/components/common/GraphicText.cpp
     ../src/graphics/components/common/GraphicImage.cpp
 )
