@@ -17,24 +17,13 @@ GraphicContext::GraphicContext() : okRendering(false), m_Objects(), needUpdate(t
     // translate for the center of the screen (because OpenGL is in [-1, 1])
     model = glm::translate(model, glm::vec3(-1.0f, -1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(1.0f/800.0f, 1.0f/600.0f, 1.0f));
-
-    m_ModelMatrix = model;
-
     glm::mat4 projection = glm::mat4(1.0f);
-    // projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
-
-    m_ProjectionMatrix = projection;
-
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, 0.0f)); 
 
+    m_ModelMatrix = model;
+    m_ProjectionMatrix = projection;
     m_ViewMatrix = view;
-
-    // test conversion 
-    glm::vec3 input = glm::vec3(400.0f, 300.0f, 0.0f);
-    glm::vec3 output = glm::vec3(m_ProjectionMatrix * m_ViewMatrix * m_ModelMatrix * glm::vec4(input, 1.0f));
-    std::cout << "output: " << output.x << " " << output.y << " " << output.z << std::endl;
-
 }
 
 GraphicContext::~GraphicContext()
@@ -130,13 +119,11 @@ void GraphicContext::Render()
         }
         object->Draw();
     }
-    
-    // std::cout << "Rendering" << std::endl;
 }
 
 void GraphicContext::Update()
 {
-    std::cout << "Updating" << std::endl;
+    // Shader_basic
     shader_basic->Use();
     // Update the projection matrix
     shader_basic->SetMat4("projection", m_ProjectionMatrix);
@@ -145,6 +132,7 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_basic->SetMat4("model", m_ModelMatrix);
 
+    // Shader_text
     shader_text->Use();
     // Update the projection matrix
     shader_text->SetMat4("projection", m_ProjectionMatrix);
@@ -153,6 +141,7 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_text->SetMat4("model", m_ModelMatrix);
 
+    // Shader_texture
     shader_texture->Use();
     // Update the projection matrix
     shader_texture->SetMat4("projection", m_ProjectionMatrix);
@@ -161,6 +150,7 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_texture->SetMat4("model", m_ModelMatrix);
     
+    // Shader_lighting [won't be reshapped, kept for testing purposes]
     shader_lighting->Use();
     // Update the projection matrix
     shader_lighting->SetMat4("projection", m_ProjectionMatrix);
@@ -168,12 +158,14 @@ void GraphicContext::Update()
     shader_lighting->SetMat4("view", m_ViewMatrix);
     // Update the model matrix
     shader_lighting->SetMat4("model", m_ModelMatrix);
-
+    // Update the objectColor
     shader_lighting->setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    // Update the lightColor
     shader_lighting->setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+    // Update the lightPos
     shader_lighting->setVec3("lightPos",  glm::vec3(0.0f, 0.0f, 3.0f));
+    // Update the viewPos
     shader_lighting->setVec3("viewPos",  glm::vec3(0.0f, 0.0f, 3.0f));
-
 
     needUpdate = false;
 }

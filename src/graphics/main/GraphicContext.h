@@ -65,7 +65,7 @@ class GraphicContext
         Shader* shader_basic;
         Shader* shader_text;
         Shader* shader_texture;
-        Shader* shader_lighting;
+        Shader* shader_lighting; // [won't be reshapped, kept for testing purposes]
 
         Font* font_main;
 
