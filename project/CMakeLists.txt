@@ -32,7 +32,7 @@ set(SOURCES
     ../src/graphics/components/common/GraphicImage.cpp
 )
 
-add_executable(ParticleSandbox ${SOURCES})
+add_executable(ParticleSandbox ${SOURCES} favicon.rc)
 
 target_link_libraries(ParticleSandbox
     ${GLFW_DIR}/glfw3.lib
