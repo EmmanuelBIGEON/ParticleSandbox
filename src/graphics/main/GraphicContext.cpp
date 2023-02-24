@@ -41,7 +41,8 @@ void GraphicContext::Init()
     shader_texture = new Shader("shaders/texture.vs", "shaders/texture.fs");
     // SHADER_LIGHTING
     shader_lighting = new Shader("shaders/lighting.vs", "shaders/lighting.fs");
-    // shader.Use();
+    // SHADER_LINE
+    shader_line = new Shader("shaders/line.vs", "shaders/line.fs");
     // -----------------------------
 
     // ---------- Fonts ----------
@@ -130,6 +131,14 @@ void GraphicContext::Render()
 
                 break;
             }
+            case SHADER_LINE:
+            {
+                shader_line->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
         }
         object->Draw();
     }
@@ -173,13 +182,22 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_lighting->SetMat4("model", m_ModelMatrix);
     // Update the objectColor
-    shader_lighting->setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    shader_lighting->SetVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
     // Update the lightColor
-    shader_lighting->setVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
+    shader_lighting->SetVec3("lightColor",  glm::vec3(1.0f, 1.0f, 1.0f));
     // Update the lightPos
-    shader_lighting->setVec3("lightPos",  glm::vec3(0.0f, 0.0f, 3.0f));
+    shader_lighting->SetVec3("lightPos",  glm::vec3(0.0f, 0.0f, 3.0f));
     // Update the viewPos
-    shader_lighting->setVec3("viewPos",  glm::vec3(0.0f, 0.0f, 3.0f));
+    shader_lighting->SetVec3("viewPos",  glm::vec3(0.0f, 0.0f, 3.0f));
+
+    // shader_line
+    shader_line->Use();
+    // Update the projection matrix
+    shader_line->SetMat4("projection", m_ProjectionMatrix);
+    // Update the view matrix
+    shader_line->SetMat4("view", m_ViewMatrix);
+    // Update the model matrix
+    shader_line->SetMat4("model", m_ModelMatrix);
 
     needUpdate = false;
 }
@@ -195,6 +213,10 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
             return shader_text;
         case SHADER_TEXTURE:
             return shader_texture;
+        case SHADER_LIGHTING:
+            return shader_lighting;
+        case SHADER_LINE:
+            return shader_line;
     }
     return nullptr;
 }

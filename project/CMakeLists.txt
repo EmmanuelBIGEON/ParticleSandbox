@@ -30,6 +30,8 @@ set(SOURCES
     ../src/graphics/components/adapters/CircleAdapter.cpp
     ../src/graphics/components/common/GraphicText.cpp
     ../src/graphics/components/common/GraphicImage.cpp
+    ../src/graphics/components/common/GraphicLine.cpp
+    ../src/graphics/components/common/BezierCurve.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES} favicon.rc)
