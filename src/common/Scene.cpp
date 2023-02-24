@@ -19,6 +19,8 @@ Scene::Scene(GraphicContext* graphicContext) : m_GraphicContext(graphicContext)
 
 Scene::~Scene()
 {
+    // Delete all the objects.
+    m_GraphicContext->Clear(true);
 }
 
 void Scene::Init()
