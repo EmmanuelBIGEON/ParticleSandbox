@@ -22,7 +22,6 @@ BezierCurve::~BezierCurve()
 void BezierCurve::SetColor(const glm::vec3& color)
 {
     m_Color = color;
-    m_IsUpdated=false;
 }
 
 void BezierCurve::SetLine(const Line& line)
@@ -49,22 +48,20 @@ void BezierCurve::Update()
     // Calculate the intermediate points
     // Change NUM_POINTS to change the quality of the curve
     const int NUM_POINTS = 100;
-
     m_vertices = new float[NUM_POINTS * 2];
-
     for(int i = 0; i < NUM_POINTS; i++) 
     {
         float t = static_cast<float>(i) / (NUM_POINTS - 1);
-        glm::vec3 position = (1 - t) * (1 - t) * (1 - t) * P0 +
-                             3 * (1 - t) * (1 - t) * t * P1 +
-                             3 * (1 - t) * t * t * P2 +
-                             t * t * t * P3;
+        glm::vec3 position = {
+            (1 - t) * (1 - t) * (1 - t) * P0.x + 3 * (1 - t) * (1 - t) * t * P1.x + 3 * (1 - t) * t * t * P2.x + t * t * t * P3.x,
+            (1 - t) * (1 - t) * (1 - t) * P0.y + 3 * (1 - t) * (1 - t) * t * P1.y + 3 * (1 - t) * t * t * P2.y + t * t * t * P3.y,
+            0.0f
+        };
                              
         m_vertices[i * 2] = position.x;
         m_vertices[i * 2 + 1] = position.y;
 
     }
-
 
     glGenVertexArrays(1, &m_VAO);
     glGenBuffers(1, &m_VBO);
