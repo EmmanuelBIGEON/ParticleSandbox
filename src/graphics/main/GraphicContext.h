@@ -4,6 +4,7 @@
 
 #include <glm/ext.hpp>
 
+
 class GraphicObject;
 class Shader;
 class Font;
@@ -19,7 +20,7 @@ enum AvailableShader
 };
 
 //! \class GraphicContext
-class GraphicContext
+class GraphicContext 
 {
     public: 
         GraphicContext();
@@ -56,6 +57,8 @@ class GraphicContext
 
         // For TextRendering
         Shader* GetShader(AvailableShader shader);
+
+        const std::vector<GraphicObject*> GetObjects() const { return m_Objects; }
 
     protected:
         bool okRendering;

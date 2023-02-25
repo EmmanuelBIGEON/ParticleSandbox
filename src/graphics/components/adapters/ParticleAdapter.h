@@ -24,6 +24,9 @@ class ParticleAdapter : public GraphicObject
         virtual void Update() override;
         virtual void Draw() override;
 
+        // Highligth the particle.
+        void SetHighlight(bool highlight){ m_Highlight = highlight;}
+
         //! \brief Initialize the VAO and VBO for the particle.
         //! The purpose is to reduce as much as possible the computation needed to draw the particle.
         static void LoadParticleVAO();
@@ -34,7 +37,10 @@ class ParticleAdapter : public GraphicObject
         static float* vertices;
         static int nbVertices;
 
+        static glm::vec3 highlightColor;
+
         glm::vec3 m_Color;
+        bool m_Highlight;
 
         Shader* m_Shader;
         Particle* m_Particle;

@@ -6,10 +6,14 @@
 
 class GraphicContext;
 
+class ParticleDetector;
+
 enum EventHandlerType
 {
     EVENT_HANDLER_TEST,
     EVENT_HANDLER_TEST2,
+    EVENT_HANDLER_PARTICLE_CREATOR,
+    EVENT_HANDLER_PARTICLE_HIGHLIGHTER
 };
 
 //! \class EventHandler
@@ -53,6 +57,38 @@ class EventHandler_Test2 : public EventHandler
         GraphicContext* m_Context;
 
 };
+
+//! \class EventHandler_ParticleCreator
+//! \brief Create a particle on click
+class EventHandler_ParticleCreator : public EventHandler
+{
+    public:
+        EventHandler_ParticleCreator(GraphicContext* context) : m_Context(context) {}
+        virtual ~EventHandler_ParticleCreator() {}
+
+        virtual void HandleEvent(const Event& event);
+
+    private: 
+        GraphicContext* m_Context;
+
+};
+
+//! \class EventHandler_ParticleHighlighter
+//! \brief Highlight a particle on hovering
+class EventHandler_ParticleHighlighter : public EventHandler
+{
+    public:
+        EventHandler_ParticleHighlighter(GraphicContext* context);
+        virtual ~EventHandler_ParticleHighlighter() {}
+
+        virtual void HandleEvent(const Event& event);
+
+    private: 
+        GraphicContext* m_Context;
+        ParticleDetector* m_ParticleDetector;
+
+};
+
 
 
 // (Be careful, for optimization purpose, it won't be tested if it's value is null)

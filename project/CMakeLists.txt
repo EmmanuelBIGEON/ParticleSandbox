@@ -18,6 +18,7 @@ set(SOURCES
     ../src/common/Window.cpp
     ../src/common/EventHandler.cpp
     ../src/common/Scene.cpp
+    ../src/common/Object.cpp
 
     ../src/core/Particle.cpp
 
@@ -25,6 +26,8 @@ set(SOURCES
     ../src/graphics/main/GraphicObject.cpp
     ../src/graphics/main/Shader.cpp
     ../src/graphics/main/Font.cpp
+
+    ../src/graphics/util/ParticleDetector.cpp
 
     ../src/graphics/components/adapters/TriangleAdapter.cpp
     ../src/graphics/components/adapters/AdvancedRectangle.cpp

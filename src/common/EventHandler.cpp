@@ -5,6 +5,8 @@
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
 #include "../graphics/components/adapters/WigglingCircle.h"
+#include "../graphics/components/adapters/ParticleAdapter.h"
+#include "../graphics/util/ParticleDetector.h"
 
 #include <glm/glm.hpp>
 
@@ -95,6 +97,102 @@ void EventHandler_Test2::HandleEvent(const Event& event)
 
                 // Set the color of the circle.
                 circle->SetColor(glm::vec3(r,g,b));
+            }
+        }
+    }
+}
+
+//! \brief Create a particle on click
+void EventHandler_ParticleCreator::HandleEvent(const Event& event)
+{
+    if(event.GetEventType() == EventType::EVENT_MOUSE)
+    {
+        MouseEvent* mouseEvent = (MouseEvent*)&event;
+        if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
+        {
+            MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
+            if(mousePressedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
+            {
+                float xCenter = (float)mouseEvent->posX;
+                float yCenter = (float)mouseEvent->posY; 
+                // Convert to OpenGL coordinates.
+                xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+                yCenter = -yCenter;
+                xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+                yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+
+                // Creat the particle.
+                Particle* particle = new Particle(glm::vec2(xCenter,yCenter));
+                ParticleAdapter* particleAdapter = new ParticleAdapter(m_Context,particle);
+                
+            }
+        }
+    }
+}
+
+EventHandler_ParticleHighlighter::EventHandler_ParticleHighlighter(GraphicContext* context) : m_Context(context)
+{
+    m_ParticleDetector = new ParticleDetector(context, glm::vec2(0.0f,0.0f), 100.0f);
+
+    // Connect signals of particleDetector to highlight the ParticleAdapters in red.
+    m_ParticleDetector->OnNewParticles.Connect([this](std::vector<ParticleAdapter*> particles)
+    {
+        for(auto particle : particles)
+        {
+            particle->SetHighlight(true);
+        }
+    });
+
+    m_ParticleDetector->OnErasedParticles.Connect([this](std::vector<ParticleAdapter*> particles)
+    {
+        std::cout << "Particles erased" << std::endl;
+        for(auto particle : particles)
+        {
+            particle->SetHighlight(false);
+        }
+    });
+
+}
+
+void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
+{
+    if(event.GetEventType() == EventType::EVENT_MOUSE)
+    {
+        MouseEvent* mouseEvent = (MouseEvent*)&event;
+        if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_MOVED)
+        {
+            MouseMovedEvent* mousePressedEvent = (MouseMovedEvent*)&event;
+            float xCenter = (float)mouseEvent->posX;
+            float yCenter = (float)mouseEvent->posY; 
+            xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
+            yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+            yCenter = -yCenter;
+            xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+            yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+
+            // Detect if the mouse is over a particle.
+            m_ParticleDetector->SetCenter(glm::vec2(xCenter,yCenter));
+            m_ParticleDetector->Update();
+                
+        }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
+        {
+            MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
+            if(mousePressedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
+            {
+                float xCenter = (float)mouseEvent->posX;
+                float yCenter = (float)mouseEvent->posY; 
+                // Convert to OpenGL coordinates.
+                xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+                yCenter = -yCenter;
+                xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+                yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+
+                // Creat the particle.
+                Particle* particle = new Particle(glm::vec2(xCenter,yCenter));
+                ParticleAdapter* particleAdapter = new ParticleAdapter(m_Context,particle);
+                
             }
         }
     }

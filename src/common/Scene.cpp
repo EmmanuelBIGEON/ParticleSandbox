@@ -64,6 +64,8 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
+    // scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_HIGHLIGHTER);
 
     // We create a particle.
     Particle* particle = new Particle();
@@ -79,6 +81,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 
 void Scene::ConnectHandler(EventHandlerType handlerType)
 {
+    // It is stupid.. TODO remove.
     if(global_EventHandler != nullptr)
     {
         EventHandler* tmp = global_EventHandler;
@@ -91,6 +94,18 @@ void Scene::ConnectHandler(EventHandlerType handlerType)
         case EVENT_HANDLER_TEST2:
         {
             EventHandler_Test2* handler = new EventHandler_Test2(m_GraphicContext);
+            global_EventHandler = handler;
+            break;
+        }
+        case EVENT_HANDLER_PARTICLE_CREATOR:
+        {
+            EventHandler_ParticleCreator* handler = new EventHandler_ParticleCreator(m_GraphicContext);
+            global_EventHandler = handler;
+            break;
+        }
+        case EVENT_HANDLER_PARTICLE_HIGHLIGHTER:
+        {
+            EventHandler_ParticleHighlighter* handler = new EventHandler_ParticleHighlighter(m_GraphicContext);
             global_EventHandler = handler;
             break;
         }

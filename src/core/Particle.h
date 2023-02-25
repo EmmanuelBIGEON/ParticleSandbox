@@ -11,8 +11,9 @@ class Particle : public Object
 {
     public:
         Particle();
-        Particle(const glm::vec2& position, const glm::vec2& velocity, const glm::vec2& force, float mass, float radius);
-        Particle(const glm::vec2& position, float radius);
+        // Particle(const glm::vec2& position, const glm::vec2& velocity, const glm::vec2& force, float mass, float radius);
+        // Particle(const glm::vec2& position, float radius); 
+        Particle(const glm::vec2& position);
 
         virtual ~Particle();
 

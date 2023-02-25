@@ -19,7 +19,7 @@ int viewportWidth = 1200, viewportHeight = 900;
 
 Window::Window()
 {
-    // Setup the event handler 
+    // Setup the event handler (even if it is replaced, because it is assumed that it always exists)
     global_EventHandler = new EventHandler_Test();
 }
 

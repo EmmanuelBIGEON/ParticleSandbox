@@ -8,9 +8,12 @@ unsigned int ParticleAdapter::VBO = 0;
 float* ParticleAdapter::vertices = nullptr;
 int ParticleAdapter::nbVertices = 0;
 
+glm::vec3 ParticleAdapter::highlightColor = glm::vec3(0.9, 0.01, 0.01);
+
 ParticleAdapter::ParticleAdapter(GraphicContext* context, Particle* particle) 
-    : GraphicObject(context, AvailableShader::SHADER_PARTICLE), m_Particle(particle), m_Color(0.05, 0.9, 0.91)
+    : GraphicObject(context, AvailableShader::SHADER_PARTICLE), m_Particle(particle), m_Color(0.05, 0.9, 0.91), m_Highlight(false)
 {
+    m_ObjectType = OBJECTGR_PARTICLE;
     m_Shader = context->GetShader(AvailableShader::SHADER_PARTICLE);
 }
 
@@ -29,7 +32,14 @@ void ParticleAdapter::Draw()
     // std::cout << "Drawing particle" << std::endl;
     glm::vec2 position = m_Particle->GetPosition();
     m_Shader->SetVec2("shiftPos", position);
-    m_Shader->SetVec3("particleColor", m_Color);
+    if(m_Highlight)
+    {
+        m_Shader->SetVec3("particleColor", highlightColor);
+    }
+    else
+    {
+        m_Shader->SetVec3("particleColor", m_Color);
+    }
 
     // std::cout << "Drawing particle position: " << position.x << ", " << position.y << std::endl;
     glBindVertexArray(VAO);
