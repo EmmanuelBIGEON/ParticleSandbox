@@ -20,7 +20,7 @@ BezierCurve::BezierCurve(GraphicContext* context, const Line& line) : GraphicObj
 
 BezierCurve::~BezierCurve()
 {
-    // delete[] m_vertices;
+    delete[] m_vertices;
 }
 
 void BezierCurve::SetColor(const glm::vec3& color)
