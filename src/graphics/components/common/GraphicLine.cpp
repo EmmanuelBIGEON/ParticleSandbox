@@ -42,12 +42,6 @@ void GraphicLine::Update()
 
 void GraphicLine::Draw()
 {
-    m_Shader->Use();
-    // std::cout << "Drawing line" << std::endl;
-
-    // glUniform3f(glGetUniformLocation(m_Shader->shaderID, "lineColor"), m_Color.x, m_Color.y, m_Color.z);
-    glm::mat2 rotationMatrixInversed = glm::mat2(1.0f);
-    m_Shader->SetMat2("rotationMatrixInversed", rotationMatrixInversed);
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_LINES, 0, 2);
     glBindVertexArray(0);
