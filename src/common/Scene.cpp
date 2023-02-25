@@ -60,19 +60,6 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
-    // ---------- OBJECTS ----------
-    TriangleAdapter* adapter = new TriangleAdapter(graphicContext, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    RectangleAdapter* adapter2 = new RectangleAdapter(graphicContext, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
-    // GraphicText* text = new GraphicText(graphicContext, "Hello World", font_main, 400.0f, 300.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-    // CircleAdapter* circle = new CircleAdapter(graphicContext, Circle(Point(400.0f, 300.0f), 200.0f));
-    // circle->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
-    // AdvancedRectangle* rect = new AdvancedRectangle(graphicContext, Rectangle(Point(200.0f, 200.0f), Point(1400.0f, 1000.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
-    // CircleAdapter* circle2 = new CircleAdapter(graphicContext, Circle(Point(800.0f, 500.0f), 400.0f));
-    // CircleAdapter* circle3 = new CircleAdapter(graphicContext, Circle(Point(500.0f, 400.0f), 80.0f));
-    // circle3->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
-
-
-    // GraphicImage* image = new GraphicImage(graphicContext, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 400.0f, 400.0f);
     return nullptr;
 }
 
