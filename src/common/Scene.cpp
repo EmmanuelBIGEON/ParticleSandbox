@@ -49,8 +49,8 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
     bezier->SetControlPoint2(glm::vec2(800.0f, 100.0f));
     bezier->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
     std::cout << "Bezier:" << std::endl;
-    // GraphicLine* line1 = new GraphicLine(graphicContext, line);
-    // line1->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
+    GraphicLine* line1 = new GraphicLine(graphicContext, line);
+    line1->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
     // draw line bezier
     return scene;
 }

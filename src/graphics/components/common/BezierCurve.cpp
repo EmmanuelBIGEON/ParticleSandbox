@@ -106,6 +106,18 @@ void BezierCurve::Update()
     for (int i = 0; i < NUM_POINTS; i++) {
         float t = (float)i / (float)(NUM_POINTS-1);
         m_vertices[i * 2] = (1 - t) * (1 - t) * (1 - t) * P0.x + 3 * (1 - t) * (1 - t) * t * P1.x + 3 * (1 - t) * t * t * P2.x + t * t * t * P3.x;
+        m_vertices[i * 2 + 1] = (1 - t) * (1 - t) * (1 - t) * P0.y + 3 * (1 - t) * (1 - t) * t * P1.y + 3 * (1 - t) * t * t * P2.y + t * t * t * P3.y;
+
+        glm::vec3 point(m_vertices[i * 2], m_vertices[i * 2 + 1], 0.0f);
+        point = point * m_rotationMatrixInversed;
+        m_vertices[i * 2] = point.x;
+        m_vertices[i * 2 + 1] = point.y;
+    }
+
+    // print first points..
+    std::cout << "first points: " << std::endl;
+    for (int i = 0; i < 10; i++) {
+        std::cout << m_vertices[i * 2] << ", " << m_vertices[i * 2 + 1] << std::endl;
     }
 
     glGenVertexArrays(1, &m_VAO);
@@ -127,7 +139,6 @@ void BezierCurve::Draw()
 {
     m_Shader->SetVec3("lineColor", m_Color);
     m_rotationMatrixInversed = glm::mat2(1.0f);
-    m_Shader->SetMat3("rotationMatrixInversed", m_rotationMatrixInversed);
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_LINE_STRIP, 0, 100);
     glBindVertexArray(0);

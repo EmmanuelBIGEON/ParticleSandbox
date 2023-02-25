@@ -17,18 +17,11 @@ GraphicLine::~GraphicLine()
 
 void GraphicLine::Update()
 {
-
-    m_IsUpdated = true;
-}
-
-void GraphicLine::Draw()
-{
-    m_Shader->Use();
-    // std::cout << "Drawing line" << std::endl;
     m_vertices[0] = m_Line.start.x;
     m_vertices[1] = m_Line.start.y;
     m_vertices[2] = m_Line.end.x;
     m_vertices[3] = m_Line.end.y;
+
 
     std::cout << "Drawing a line from " << m_Line.start.x << ", " << m_Line.start.y << " to " << m_Line.end.x << ", " << m_Line.end.y << std::endl;
 
@@ -44,6 +37,13 @@ void GraphicLine::Draw()
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    m_IsUpdated = true;
+}
+
+void GraphicLine::Draw()
+{
+    m_Shader->Use();
+    // std::cout << "Drawing line" << std::endl;
 
     // glUniform3f(glGetUniformLocation(m_Shader->shaderID, "lineColor"), m_Color.x, m_Color.y, m_Color.z);
     glm::mat2 rotationMatrixInversed = glm::mat2(1.0f);
