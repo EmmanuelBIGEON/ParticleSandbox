@@ -19,6 +19,8 @@ set(SOURCES
     ../src/common/EventHandler.cpp
     ../src/common/Scene.cpp
 
+    ../src/core/Particle.cpp
+
     ../src/graphics/main/GraphicContext.cpp
     ../src/graphics/main/GraphicObject.cpp
     ../src/graphics/main/Shader.cpp
