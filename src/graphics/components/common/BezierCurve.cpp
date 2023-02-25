@@ -12,6 +12,10 @@
 BezierCurve::BezierCurve(GraphicContext* context, const Line& line) : GraphicObject(context, SHADER_LINE), m_Line(line), m_Color(1.0f, 0.0f, 0.0f), m_VAO(0), m_VBO(0), m_vertices(nullptr)
 {
     m_Shader = context->GetShader(SHADER_LINE);
+
+    // safety.
+    m_ControlPoint1 = line.start;
+    m_ControlPoint2 = line.end;
 }
 
 BezierCurve::~BezierCurve()
