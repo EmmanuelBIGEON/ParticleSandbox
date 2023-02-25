@@ -3,6 +3,9 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
+
+#include "../components/adapters/ParticleAdapter.h"
 
 #include <iostream>
 
@@ -11,11 +14,18 @@
 #include "Shader.h"
 #include "Font.h"
 
-GraphicContext::GraphicContext() : okRendering(false), m_Objects(), needUpdate(true)
+GraphicContext::GraphicContext() 
+    : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
+    shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), shader_particle(nullptr)
 {
     glm::mat4 model = glm::mat4(1.0f);
     // translate for the center of the screen (because OpenGL is in [-1, 1])
     model = glm::translate(model, glm::vec3(-1.0f, -1.0f, 0.0f));
+
+    // echo the model
+    // std::cout << "Model matrix: " << std::endl;
+    // std::cout << glm::to_string(model) << std::endl;
+
     model = glm::scale(model, glm::vec3(1.0f/800.0f, 1.0f/600.0f, 1.0f));
     glm::mat4 projection = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
@@ -43,6 +53,8 @@ void GraphicContext::Init()
     shader_lighting = new Shader("shaders/lighting.vs", "shaders/lighting.fs");
     // SHADER_LINE
     shader_line = new Shader("shaders/line.vs", "shaders/line.fs");
+    // SHADER_PARTICLE
+    shader_particle = new Shader("shaders/particle.vs", "shaders/particle.fs");
     // -----------------------------
 
     // ---------- Fonts ----------
@@ -139,6 +151,15 @@ void GraphicContext::Render()
 
                 break;
             }
+            case SHADER_PARTICLE:
+            {
+                shader_particle->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+
         }
         object->Draw();
     }
@@ -199,6 +220,13 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_line->SetMat4("model", m_ModelMatrix);
 
+    // shader_particle
+    shader_particle->Use();
+    // Update the model matrix
+    shader_particle->SetMat4("model", m_ModelMatrix);
+    
+    ParticleAdapter::LoadParticleVAO();
+
     needUpdate = false;
 }
 
@@ -217,6 +245,8 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
             return shader_lighting;
         case SHADER_LINE:
             return shader_line;
+        case SHADER_PARTICLE:
+            return shader_particle;
     }
     return nullptr;
 }

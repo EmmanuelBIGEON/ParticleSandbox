@@ -1,7 +1,7 @@
 #include "GraphicObject.h"
 
 
-GraphicObject::GraphicObject(GraphicContext* context, AvailableShader shaderIndex) : m_Context(context), m_ShaderIndex(shaderIndex), m_IsUpdated(false)
+GraphicObject::GraphicObject(GraphicContext* context, AvailableShader shaderIndex) : Object(), m_Context(context), m_ShaderIndex(shaderIndex), m_IsUpdated(false)
 {
     context->Register(this);
 }

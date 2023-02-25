@@ -2,10 +2,12 @@
 
 #include "GraphicContext.h"
 
+#include "../../common/Object.h"
+
 //! \class GraphicObject
 //! \brief Base class for all graphic objects.
 //! Don't forget to unbind it from the context when you delete it.
-class GraphicObject
+class GraphicObject : public Object
 {
     public:
         GraphicObject(GraphicContext* context, AvailableShader shaderIndex);

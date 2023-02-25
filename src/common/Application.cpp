@@ -2,6 +2,7 @@
 #include "Window.h"
 
 #include "../graphics/main/GraphicContext.h"
+#include "../graphics/components/adapters/ParticleAdapter.h"
 #include "Scene.h"
 
 Application::Application() : m_Window(nullptr), m_GraphicContext(nullptr), m_currentScene(nullptr)
@@ -28,11 +29,15 @@ void Application::CreateWindow()
 
     window->OnWindowReady.Connect([this](void)
     {
+        // Initialize the graphic context.
         m_GraphicContext->Init();
 
+        // Initiliaze needed objects.
+        // ParticleAdapter::LoadParticleVAO();
+
         // Load the scene.
-        LoadScene_1();
-        // LoadScene_2();
+        // LoadScene_1();
+        LoadScene_2();
         
     });
 

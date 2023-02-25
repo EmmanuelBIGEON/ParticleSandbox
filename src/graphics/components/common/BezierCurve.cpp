@@ -86,7 +86,6 @@ void BezierCurve::Draw()
 {
     m_Shader->SetVec3("lineColor", m_Color);
     glBindVertexArray(m_VAO);
-    // glDrawArrays(GL_LINES, 0, 2);
     glDrawArrays(GL_LINE_STRIP, 0, 100);
     glBindVertexArray(0);
 }

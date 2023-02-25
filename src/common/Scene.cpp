@@ -6,6 +6,7 @@
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
 #include "../graphics/components/adapters/WigglingCircle.h"
+#include "../graphics/components/adapters/ParticleAdapter.h"
 #include "../graphics/components/common/GraphicText.h"
 #include "../graphics/components/common/GraphicImage.h"
 #include "../graphics/components/common/GraphicLine.h"
@@ -62,7 +63,17 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
-    return nullptr;
+    Scene* scene = new Scene(graphicContext);
+
+    // We create a particle.
+    Particle* particle = new Particle();
+    particle->SetPosition(glm::vec2(400.0f, 300.0f));
+
+    // We create a particle adapter.
+    ParticleAdapter* adapter = new ParticleAdapter(graphicContext, particle);
+    std::cout << "Particle:" << std::endl;
+
+    return scene;
 }
 
 
