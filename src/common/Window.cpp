@@ -62,14 +62,15 @@ void Window::Display(Application* app)
         return;
     }
 
+    // --------------------- OpenGL settings ---------------------
     // Enable alpha blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+
     // enable anti-aliasing (MSAA)
     glEnable(GL_MULTISAMPLE);  
-    // enable line
-    // glEnable(GL_LINE_SMOOTH);
-    // glLineWidth(5.0f);
+    
+    // -----------------------------------------------------------
 
     OnWindowReady.Emit();
     while (!glfwWindowShouldClose(window))
