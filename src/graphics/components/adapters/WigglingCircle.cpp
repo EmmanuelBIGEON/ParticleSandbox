@@ -7,6 +7,8 @@ WigglingCircle::WigglingCircle(GraphicContext* context, const Circle& circle)
 : GraphicObject(context, SHADER_BASIC), m_Circle(circle), m_vertices(nullptr), m_nbVertices(0), m_VAO(0), m_VBO(0), m_Color(glm::vec3(0.0f, 1.0f, 0.0f)), needRecompute(true), m_goingLeft(true), m_shift(0.0f)
 {
     m_Shader = context->GetShader(SHADER_BASIC);
+    m_maxDistance = 5.0f;
+    m_currentVelocity = 0.01f;
 }
 
 WigglingCircle::~WigglingCircle()
@@ -33,29 +35,30 @@ void WigglingCircle::Update()
     {
         // We move the center of the circle slowly from left to right
         // maximum distance is 5.0f
-
-        float maxDistance = 5.0f;
-        float currentVelocity = 0.1f;
         float x = 0.0f;
         // m_shift
 
         if(m_goingLeft)
         {
             // Calculate new x from shift
-            x = m_shift - currentVelocity;
-            if(x <= -maxDistance)
+            x = m_shift - m_currentVelocity;
+            m_currentVelocity += 0.01f;
+            if(x <= -m_maxDistance)
             {
                 m_goingLeft = false;
-                x = -maxDistance;
+                x = -m_maxDistance;
+                m_currentVelocity = 0.01f;
             }
         }else
         {
             // Calculate new x from shift
-            x = m_shift + currentVelocity;
-            if(x >= maxDistance)
+            x = m_shift + m_currentVelocity;
+            m_currentVelocity += 0.01f;
+            if(x >= m_maxDistance)
             {
                 m_goingLeft = true;
-                x = maxDistance;
+                x = m_maxDistance;
+                m_currentVelocity = 0.01f;
             }
         }
 
@@ -66,6 +69,8 @@ void WigglingCircle::Update()
         return;
     }else 
     {
+        m_maxDistance = m_Circle.GetRadius() * 0.5f;
+        m_currentVelocity = m_maxDistance * 0.01f;
         needRecompute = false;
     }
     

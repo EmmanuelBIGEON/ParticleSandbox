@@ -29,6 +29,8 @@ class WigglingCircle : public GraphicObject
         glm::mat4 m_shiftPos;
         bool m_goingLeft;
         float m_shift;
+        float m_maxDistance;
+        float m_currentVelocity;
 
         float* m_vertices;
         int m_nbVertices;

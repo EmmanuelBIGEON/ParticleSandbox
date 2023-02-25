@@ -5,6 +5,7 @@
 #include "../graphics/components/adapters/AdvancedRectangle.h"
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
+#include "../graphics/components/adapters/WigglingCircle.h"
 #include "../graphics/components/common/GraphicText.h"
 #include "../graphics/components/common/GraphicImage.h"
 #include "../graphics/components/common/GraphicLine.h"
@@ -51,6 +52,7 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
     // bezier->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
     // PanickedCircle* circle = new PanickedCircle(graphicContext, Circle(Point(400.0f, 300.0f), 200.0f));
+    WigglingCircle* circle = new WigglingCircle(graphicContext, Circle(Point(400.0f, 300.0f), 50.0f));
     std::cout << "Bezier:" << std::endl;
     // GraphicLine* line1 = new GraphicLine(graphicContext, line);
     // line1->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
