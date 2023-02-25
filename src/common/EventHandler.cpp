@@ -3,6 +3,7 @@
 #include "../graphics/main/GraphicContext.h"
 
 #include "../graphics/components/adapters/CircleAdapter.h"
+#include "../graphics/components/adapters/PanickedCircle.h"
 
 #include <glm/glm.hpp>
 
@@ -83,8 +84,8 @@ void EventHandler_Test2::HandleEvent(const Event& event)
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
 
                 // Create the circle.
-                CircleAdapter* circle = new CircleAdapter(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
-
+                // CircleAdapter* circle = new CircleAdapter(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
+                PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
                 // generate a random color
                 float r = (float)rand() / (float)RAND_MAX;
                 float g = (float)rand() / (float)RAND_MAX;

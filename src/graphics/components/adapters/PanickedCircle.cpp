@@ -25,6 +25,10 @@ void PanickedCircle::Update()
     {
         m_nbVertices = 0;
         delete[] m_vertices;
+
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+        
     }
 
     // security
