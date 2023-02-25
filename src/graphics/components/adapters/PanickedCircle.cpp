@@ -4,8 +4,9 @@
 #include <iostream>
 
 PanickedCircle::PanickedCircle(GraphicContext* context, const Circle& circle) 
-: GraphicObject(context, SHADER_BASIC), m_Circle(circle), m_vertices(nullptr), m_nbVertices(0), m_VAO(0), m_VBO(0), m_Color(glm::vec3(0.0f, 1.0f, 0.0f)), firstTimeCalled(true)
+: GraphicObject(context, SHADER_BASIC), m_Circle(circle), m_vertices(nullptr), m_nbVertices(0), m_VAO(0), m_VBO(0), m_Color(glm::vec3(0.0f, 1.0f, 0.0f)), needRecompute(true)
 {
+    m_Shader = context->GetShader(SHADER_BASIC);
 }
 
 PanickedCircle::~PanickedCircle()
@@ -21,16 +22,6 @@ PanickedCircle::~PanickedCircle()
 
 void PanickedCircle::Update()
 {
-    if(m_vertices != nullptr)
-    {
-        m_nbVertices = 0;
-        delete[] m_vertices;
-
-        glDeleteVertexArrays(1, &m_VAO);
-        glDeleteBuffers(1, &m_VBO);
-        
-    }
-
     // security
     if(m_Circle.GetRadius() <= 0.0f)
         return;
@@ -38,7 +29,7 @@ void PanickedCircle::Update()
     float center_x = m_Circle.GetCenter().x;
     float center_y = m_Circle.GetCenter().y;
 
-    if(!firstTimeCalled)
+    if(!needRecompute)
     {
         // We move the center of the circle
         // maximum distance is 5.0f
@@ -47,15 +38,23 @@ void PanickedCircle::Update()
         float velocity = 0.1f;
         float x = (rand() % (int)(distance * 2.0f)) - distance;
         float y = (rand() % (int)(distance * 2.0f)) - distance;
-        center_x += x * velocity;
-        center_y += y * velocity;
-
+        m_shiftPos = glm::translate(glm::mat4(1.0f), glm::vec3(x * velocity, y * velocity, 0.0f));
+        // IMPORTANT RETURN ! Notice !
+        return;
     }else 
     {
-        firstTimeCalled = false;
+        needRecompute = false;
     }
     
-    
+    if(m_vertices != nullptr)
+    {
+        m_nbVertices = 0;
+        delete[] m_vertices;
+
+        glDeleteVertexArrays(1, &m_VAO);
+        glDeleteBuffers(1, &m_VBO);
+
+    }
         
     // Calculate the number of vertices depending on the radius (for a better circle)
     // More vertices as the circle is bigger.
@@ -110,14 +109,17 @@ void PanickedCircle::Update()
     // need a benchmark if it matters with bigger context.
     glBindVertexArray(0);
 
-    // Perpetually update the circle to make it wiggle !
+    // Perpetually update the circle to make it wiggle in panick !
+    // It is covering in fear !
     // m_IsUpdated = true;
 }
 
 void PanickedCircle::Draw()
 {
-    // draw a filled circle
+    
+    m_Shader->SetMat4("shiftPos", m_shiftPos);
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_TRIANGLE_FAN, 0, m_nbVertices);
+    m_Shader->SetMat4("shiftPos", glm::mat4(1.0f));
     glBindVertexArray(0);
 }

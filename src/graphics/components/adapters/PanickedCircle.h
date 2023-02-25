@@ -2,6 +2,7 @@
 
 #include "../../main/GraphicContext.h"
 #include "../../main/GraphicObject.h"
+#include "../../main/Shader.h"
 
 #include "../../../geometry/Circle.h"
 
@@ -21,9 +22,11 @@ class PanickedCircle : public GraphicObject
         virtual void Draw() override;
 
     private:
-
+        Shader* m_Shader;
         Circle m_Circle;
         glm::vec3 m_Color;
+
+        glm::mat4 m_shiftPos;
 
         float* m_vertices;
         int m_nbVertices;
@@ -31,6 +34,6 @@ class PanickedCircle : public GraphicObject
         unsigned int m_VAO;
         unsigned int m_VBO;
         
-        bool firstTimeCalled;
+        bool needRecompute;
 
 };
