@@ -69,13 +69,28 @@ void Window::Display(Application* app)
 
     // enable anti-aliasing (MSAA)
     glEnable(GL_MULTISAMPLE);  
-    
+
     // -----------------------------------------------------------
 
     OnWindowReady.Emit();
+
+    double currentTime = glfwGetTime();
+    double lastTime = currentTime;
+    double deltaTime = 0.0f;
+    int maximumFPS = 1 / 60.0f;
     while (!glfwWindowShouldClose(window))
     {
-        app->Render();
+        // tick
+        double currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastTime;
+
+        // limit the framerate
+        if(deltaTime >= maximumFPS)
+        {
+            lastTime = currentFrame;
+            app->Render();
+        }
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
