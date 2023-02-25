@@ -224,8 +224,6 @@ void GraphicContext::Update()
     shader_particle->Use();
     // Update the model matrix
     shader_particle->SetMat4("model", m_ModelMatrix);
-    
-    ParticleAdapter::LoadParticleVAO();
 
     needUpdate = false;
 }

@@ -33,7 +33,7 @@ void Application::CreateWindow()
         m_GraphicContext->Init();
 
         // Initiliaze needed objects.
-        // ParticleAdapter::LoadParticleVAO();
+        ParticleAdapter::LoadParticleVAO();
 
         // Load the scene.
         // LoadScene_1();

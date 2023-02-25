@@ -15,7 +15,7 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 double lastMouseX = 0, lastMouseY = 0;
-int viewportWidth = 800, viewportHeight = 600;
+int viewportWidth = 1200, viewportHeight = 900;
 
 Window::Window()
 {
@@ -39,7 +39,7 @@ void Window::Display(Application* app)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "ParticleSandbox", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(viewportWidth, viewportHeight, "ParticleSandbox", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;

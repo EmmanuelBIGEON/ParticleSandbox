@@ -51,7 +51,7 @@ void ParticleAdapter::LoadParticleVAO()
 
     // Create the VAO and VBO for the particle.
     // Default size is 10.0f radius.
-    float radius = 200.0f;
+    float radius = 10.0f;
 
     // Calculate the number of vertices depending on the radius (for a better circle)
     // More vertices as the circle is bigger.
@@ -78,13 +78,6 @@ void ParticleAdapter::LoadParticleVAO()
         vertices[i*2 + 1] = y;
     }
 
-    std::cout << "nbVertices: " << nbVertices << std::endl;
-    // print first 10 vertices
-    for(int i = 0; i < 10; i++)
-    {
-        std::cout << "Vertex " << i << ": " << vertices[i*2 + 0] << ", " << vertices[i*2 + 1] << std::endl;
-    }
-
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
@@ -97,6 +90,4 @@ void ParticleAdapter::LoadParticleVAO()
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
-
-    std::cout << "Particle VAO loaded" << std::endl;
 }
