@@ -8,11 +8,11 @@
 
 #include <glm/glm.hpp>
 
-class PanickedCircle : public GraphicObject
+class WigglingCircle : public GraphicObject
 {
     public:
-        PanickedCircle(GraphicContext* context, const Circle& circle);
-        virtual ~PanickedCircle();
+        WigglingCircle(GraphicContext* context, const Circle& circle);
+        virtual ~WigglingCircle();
 
         const Circle& GetCircle() const { return m_Circle; }
         void SetCircle(const Circle& circle) { m_Circle = circle; m_IsUpdated=false; needRecompute=true;}
@@ -27,6 +27,8 @@ class PanickedCircle : public GraphicObject
         glm::vec3 m_Color;
 
         glm::mat4 m_shiftPos;
+        bool m_goingLeft;
+        float m_shift;
 
         float* m_vertices;
         int m_nbVertices;
