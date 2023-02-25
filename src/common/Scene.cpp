@@ -85,6 +85,29 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 }
 
 
+
+Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
+{
+    Scene* scene = new Scene(graphicContext);
+    // scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_HIGHLIGHTER);
+
+    // generate particles
+    ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
+    generator->Generate(5000);
+
+    // We create a particle.
+    Particle* particle = new Particle();
+    particle->SetPosition(glm::vec2(400.0f, 300.0f));
+
+    // We create a particle adapter.
+    ParticleAdapter* adapter = new ParticleAdapter(graphicContext, particle);
+    std::cout << "Particle:" << std::endl;
+
+    return scene;
+}
+
+
 void Scene::ConnectHandler(EventHandlerType handlerType)
 {
     // It is stupid.. TODO remove.

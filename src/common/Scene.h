@@ -30,6 +30,7 @@ class Scene
 
         static Scene* CreateScene_1(GraphicContext* graphicContext);
         static Scene* CreateScene_2(GraphicContext* graphicContext);
+        static Scene* CreateScene_3(GraphicContext* graphicContext);
 
     private:
 

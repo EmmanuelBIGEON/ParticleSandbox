@@ -24,6 +24,7 @@ class Application
 
         void LoadScene_1();
         void LoadScene_2();
+        void LoadScene_3();
 
 
     protected:
