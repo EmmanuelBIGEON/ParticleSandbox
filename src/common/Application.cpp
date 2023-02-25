@@ -5,6 +5,11 @@
 #include "../graphics/components/adapters/ParticleAdapter.h"
 #include "Scene.h"
 
+// lock
+#include <mutex>
+std::mutex m_mutex;
+
+
 Application::Application() : m_Window(nullptr), m_GraphicContext(nullptr), m_currentScene(nullptr)
 {
 }
@@ -36,7 +41,6 @@ void Application::CreateWindow()
         ParticleAdapter::LoadParticleVAO();
 
         // Load the scene.
-        // LoadScene_1();
         LoadScene_2();
         
     });
@@ -47,11 +51,15 @@ void Application::CreateWindow()
 
 void Application::Render()
 {
+    // lock
+    m_mutex.lock();
     // m_GraphicContext->Render();
     if(m_currentScene)
     {
         m_currentScene->Update();
     }
+    // unlock
+    m_mutex.unlock();
 }
 
 void Application::LoadScene_1()

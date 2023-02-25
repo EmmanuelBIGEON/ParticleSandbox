@@ -74,24 +74,12 @@ void Window::Display(Application* app)
 
     OnWindowReady.Emit();
 
-    double currentTime = glfwGetTime();
-    double lastTime = currentTime;
-    double deltaTime = 0.0f;
-    int maximumFPS = 1 / 60.0f;
+    // Apparently already capped at 60 fps
+    // https://stackoverflow.com/questions/50412575/is-there-a-way-to-remove-60-fps-cap-in-glfw
+    // For now 60 fps is okay.
     while (!glfwWindowShouldClose(window))
     {
-        // tick
-        double currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastTime;
-
-        // limit the framerate
-        if(deltaTime >= maximumFPS)
-        {
-            lastTime = currentFrame;
-            app->Render();
-        }
-
-
+        app->Render();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

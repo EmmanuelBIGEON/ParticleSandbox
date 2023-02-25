@@ -23,6 +23,25 @@ void ParticleDetector::Update()
         if (object->GetType() == OBJECTGR_PARTICLE)
         {
             ParticleAdapter* particle = static_cast<ParticleAdapter*>(object);
+            
+            // if(glm::distance(particle->GetParticle()->GetPosition(), m_Center) < m_Radius)
+            // {
+            //     // if not in list
+            //     if(std::find(m_Particles.begin(), m_Particles.end(), particle) == m_Particles.end())
+            //     {
+            //         m_Particles.push_back(particle);
+            //         newParticles.push_back(particle);
+            //     }
+            // }else
+            // {
+            //     // if in list
+            //     if(std::find(m_Particles.begin(), m_Particles.end(), particle) != m_Particles.end())
+            //     {
+            //         m_Particles.erase(std::remove(m_Particles.begin(), m_Particles.end(), particle), m_Particles.end());
+            //         erasedParticles.push_back(particle);
+            //     }
+            // }
+            
             if(std::find(m_Particles.begin(), m_Particles.end(), particle) == m_Particles.end())
             {
                 if (glm::distance(particle->GetParticle()->GetPosition(), m_Center) < m_Radius)

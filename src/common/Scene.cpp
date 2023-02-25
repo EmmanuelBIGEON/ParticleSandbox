@@ -12,6 +12,8 @@
 #include "../graphics/components/common/GraphicLine.h"
 #include "../graphics/components/common/BezierCurve.h"
 
+#include "../graphics/util/generators/ParticleGenerator.h"
+
 #include "EventHandler.h"
 
 #include <glad/glad.h>
@@ -66,6 +68,10 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
     Scene* scene = new Scene(graphicContext);
     // scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_HIGHLIGHTER);
+
+    // generate particles
+    ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
+    generator->Generate(5000);
 
     // We create a particle.
     Particle* particle = new Particle();
