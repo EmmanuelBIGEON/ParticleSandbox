@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "../../main/GraphicContext.h"
+
 unsigned int ParticleAdapter::VAO = 0;
 unsigned int ParticleAdapter::VBO = 0;
 
@@ -65,13 +67,13 @@ void ParticleAdapter::Update()
     // control the position
     if(position.x < 0.0f)
         position.x = 0.0f;
-    else if(position.x > 800.0f)
-        position.x = 800.0f;
+    else if(position.x > GraphicContext::worldWidth)
+        position.x = GraphicContext::worldWidth;
 
     if(position.y < 0.0f)
         position.y = 0.0f;
-    else if(position.y > 600.0f)
-        position.y = 600.0f;
+    else if(position.y > GraphicContext::worldHeight)
+        position.y = GraphicContext::worldHeight;
 
     m_Particle->SetPosition(position);
     
