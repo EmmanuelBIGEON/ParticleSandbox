@@ -24,10 +24,8 @@ void BasicUI::Init(GraphicContext* context)
     // Connect the watcher to the context
     m_particleAddedSlot = context->OnObjectRegistered.Connect([this](GraphicObject* object)
     {
-        std::cout << "Particlaaae added" << std::endl;
         if(object->GetObjectType() == ObjectType::OBJECTGR_PARTICLE)
         {
-            std::cout << "Particle added" << std::endl;
             m_particlesCount++;
         }
     });

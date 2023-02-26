@@ -18,16 +18,16 @@ class Particle : public Object
         virtual ~Particle();
 
         //! \brief Get the position of the particle.
-        glm::vec2& GetPosition() { return m_Position; }
-        void SetPosition(const glm::vec2& position) { m_Position = position; }
+        glm::lowp_vec2& GetPosition() { return m_Position; }
+        void SetPosition(const glm::lowp_vec2& position) { m_Position = position; }
 
         //! \brief Get the velocity of the particle.
-        glm::vec2& GetVelocity() { return m_Velocity; }
+        glm::lowp_vec2& GetVelocity() { return m_Velocity; }
         void SetVelocity(const glm::vec2& velocity) { m_Velocity = velocity; }
 
         //! \brief Get the current force of the particle.
-        const glm::vec2& GetForce() const { return m_Force; }
-        void SetForce(const glm::vec2& force) { m_Force = force; }
+        float GetForce() const { return m_Force; }
+        void SetForce(const float& force) { m_Force = force; }
 
         //! \brief Get the mass of the particle.
         float GetMass() const { return m_Mass; }
@@ -41,9 +41,9 @@ class Particle : public Object
         bool CheckCollision(const Particle& particle) const;
 
     private:
-        glm::vec2 m_Position; //! The position of the particle.
-        glm::vec2 m_Velocity; //! The velocity of the particle.
-        glm::vec2 m_Force; //! The current force of the particle.
+        glm::lowp_vec2 m_Position; //! The position of the particle.
+        glm::lowp_vec2 m_Velocity; //! The velocity of the particle.
+        float m_Force; //! The current force of the particle.
         float m_Mass; //! The mass of the particle.
         float m_Radius; //! The radius of the particle.
 };

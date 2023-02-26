@@ -82,21 +82,42 @@ void GraphicContext::Clear(bool DeleteObjects)
 
 void GraphicContext::Register(GraphicObject* object)
 {
-    std::cout << "Registering object" << std::endl;
-    m_Objects.push_back(object);
+    if(object->GetObjectType() == OBJECTGR_PARTICLE)
+    {
+        ParticleAdapter* adapter = static_cast<ParticleAdapter*>(object);
+        m_ParticleAdapters.push_back(adapter);
+    }else
+    {
+        m_Objects.push_back(object);
+    }
     OnObjectRegistered.Emit(object);
 }
 
 
 void GraphicContext::Remove(GraphicObject* object)
 {
-    for(auto it = m_Objects.begin(); it != m_Objects.end(); it++)
+    if(object->GetObjectType() == OBJECTGR_PARTICLE)
     {
-        if(*it == object)
+        for(auto it = m_ParticleAdapters.begin(); it != m_ParticleAdapters.end(); it++)
         {
-            m_Objects.erase(it);
-            OnObjectRemoved.Emit(object);
-            return;
+            if(*it == object)
+            {
+                m_ParticleAdapters.erase(it);
+                OnObjectRemoved.Emit(object);
+                return;
+            }
+        }
+    }
+    else
+    {
+        for(auto it = m_Objects.begin(); it != m_Objects.end(); it++)
+        {
+            if(*it == object)
+            {
+                m_Objects.erase(it);
+                OnObjectRemoved.Emit(object);
+                return;
+            }
         }
     }
 }
@@ -170,17 +191,28 @@ void GraphicContext::Render()
 
                 break;
             }
-            case SHADER_PARTICLE:
-            {
-                shader_particle->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
+            // case SHADER_PARTICLE:
+            // {
+            //     shader_particle->Use();
+            //     if(!object->IsUpdated()) // if the object is not updated, update it
+            //         object->Update();   
 
-                break;
-            }
+            //     break;
+            // }
 
         }
         object->Draw();
+    }
+
+    // render particels
+    shader_particle->Use();
+    shader_particle->SetVec3("particleColor", ParticleAdapter::highlightColor);
+    glBindVertexArray(ParticleAdapter::VAO);
+
+    for(auto adapter : m_ParticleAdapters)
+    {
+        adapter->Update();   
+        adapter->Draw();
     }
 }
 

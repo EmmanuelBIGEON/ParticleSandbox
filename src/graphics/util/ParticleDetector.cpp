@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-ParticleDetector::ParticleDetector(GraphicContext* context, const glm::vec2& center, float radius)
+ParticleDetector::ParticleDetector(GraphicContext* context, const glm::lowp_vec2& center, float radius)
     : m_Context(context), m_Center(center), m_Radius(radius)
 {
 }
@@ -44,7 +44,7 @@ void ParticleDetector::Update()
             
             if(std::find(m_Particles.begin(), m_Particles.end(), particle) == m_Particles.end())
             {
-                if (glm::distance(particle->GetParticle()->GetPosition(), m_Center) < m_Radius)
+                if (glm::length(particle->GetParticle()->GetPosition() - m_Center) < m_Radius)
                 {
                     m_Particles.push_back(particle); 
                     newParticles.push_back(particle);
@@ -53,7 +53,7 @@ void ParticleDetector::Update()
             {
                 
                 // Particle is in the list
-                if(glm::distance(particle->GetParticle()->GetPosition(), m_Center) >= m_Radius)
+                if(glm::length(particle->GetParticle()->GetPosition() - m_Center) >= m_Radius)
                 {
                     m_Particles.erase(std::remove(m_Particles.begin(), m_Particles.end(), particle), m_Particles.end());
                     erasedParticles.push_back(particle);

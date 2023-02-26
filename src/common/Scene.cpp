@@ -20,6 +20,9 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+// use lowp vector2
+typedef glm::tvec2<GLbyte, glm::lowp> lowp_vec2;
+
 Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(graphicContext), m_BasicUI(nullptr)
 {
     if (withUI)
@@ -98,6 +101,9 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+
+    ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
+    generator->Generate(1000);
 
     // We create a particle.
     Particle* particle = new Particle();

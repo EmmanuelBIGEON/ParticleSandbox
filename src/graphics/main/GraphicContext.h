@@ -7,6 +7,8 @@
 
 #include "../../common/Signal.h"
 
+class ParticleAdapter;
+
 class GraphicObject;
 class Shader;
 class Font;
@@ -64,6 +66,7 @@ class GraphicContext
         Shader* GetShader(AvailableShader shader);
 
         const std::vector<GraphicObject*> GetObjects() const { return m_Objects; }
+        const std::vector<ParticleAdapter*> GetParticleAdapters() const { return m_ParticleAdapters; }
 
         Font* font_main;
 
@@ -80,6 +83,9 @@ class GraphicContext
         //! \brief List of all the objects to be rendered.
         //! This structure might be changed later.
         std::vector<GraphicObject*> m_Objects;
+
+        // render separately the particles for efficiency
+        std::vector<ParticleAdapter*> m_ParticleAdapters;
 
         Shader* shader_basic;
         Shader* shader_text;
