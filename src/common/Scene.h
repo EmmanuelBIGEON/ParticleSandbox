@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../graphics/main/GraphicContext.h"
+#include "../graphics/util/BasicUI.h"
 
 #include "EventHandler.h"
 
@@ -13,7 +14,7 @@ class Scene;
 class Scene
 {
     public:
-        Scene(GraphicContext* graphicContext);
+        Scene(GraphicContext* graphicContext, bool withUI = true);
         virtual ~Scene();
 
         //! \brief Initialize the scene.
@@ -36,4 +37,7 @@ class Scene
 
         // Do not destroy. It's owned by the application.
         GraphicContext* m_GraphicContext;
+
+        // BasicUI : Allow to display the FPS and the number of particles.
+        BasicUI* m_BasicUI;
 };

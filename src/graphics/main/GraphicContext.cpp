@@ -14,6 +14,9 @@
 #include "Shader.h"
 #include "Font.h"
 
+float GraphicContext::worldWidth = 1600.0f;
+float GraphicContext::worldHeight = 1200.0f;
+
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
     shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), shader_particle(nullptr)
@@ -26,7 +29,7 @@ GraphicContext::GraphicContext()
     // std::cout << "Model matrix: " << std::endl;
     // std::cout << glm::to_string(model) << std::endl;
 
-    model = glm::scale(model, glm::vec3(1.0f/800.0f, 1.0f/600.0f, 1.0f));
+    model = glm::scale(model, glm::vec3(1.0f/(worldWidth/2.0f), 1.0f/(worldHeight/2.0f), 1.0f));
     glm::mat4 projection = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, 0.0f)); 
@@ -79,21 +82,37 @@ void GraphicContext::Clear(bool DeleteObjects)
 
 void GraphicContext::Register(GraphicObject* object)
 {
+    std::cout << "Registering object" << std::endl;
     m_Objects.push_back(object);
+    OnObjectRegistered.Emit(object);
+}
+
+
+void GraphicContext::Remove(GraphicObject* object)
+{
+    for(auto it = m_Objects.begin(); it != m_Objects.end(); it++)
+    {
+        if(*it == object)
+        {
+            m_Objects.erase(it);
+            OnObjectRemoved.Emit(object);
+            return;
+        }
+    }
 }
 
 
 float GraphicContext::Convert_glX_to_WorldX(float x) const
 {
     // [-1, 1] -> [0,1600]
-    return (x + 1.0f) * 800.0f;
+    return (x + 1.0f) * (worldWidth/2.0f);
 
 }
 
 float GraphicContext::Convert_glY_to_WorldY(float y) const
 {
     // [-1, 1] -> [0,1200]
-    return (y + 1.0f) * 600.0f;
+    return (y + 1.0f) * (worldHeight/2.0f);
 }
 
 void GraphicContext::Render()

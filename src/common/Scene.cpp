@@ -20,8 +20,13 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-Scene::Scene(GraphicContext* graphicContext) : m_GraphicContext(graphicContext)
+Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(graphicContext), m_BasicUI(nullptr)
 {
+    if (withUI)
+    {
+        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 50.0f, GraphicContext::worldWidth, 50.0f);
+        m_BasicUI->Init(graphicContext);
+    }
 }
 
 Scene::~Scene()
@@ -38,6 +43,9 @@ void Scene::Init()
 
 void Scene::Update()
 {
+    if(m_BasicUI)
+        m_BasicUI->Update();
+        
     m_GraphicContext->Render();
 }
 
@@ -89,8 +97,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
-    // scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
-    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_HIGHLIGHTER);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
 
     // We create a particle.
     Particle* particle = new Particle();

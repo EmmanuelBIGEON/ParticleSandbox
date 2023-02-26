@@ -15,7 +15,8 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 double lastMouseX = 0, lastMouseY = 0;
-int viewportWidth = 1200, viewportHeight = 900;
+int Window::viewportWidth = 1200, Window::viewportHeight = 900;
+int Window::fps = 0;
 
 Window::Window()
 {
@@ -77,8 +78,22 @@ void Window::Display(Application* app)
     // Apparently already capped at 60 fps
     // https://stackoverflow.com/questions/50412575/is-there-a-way-to-remove-60-fps-cap-in-glfw
     // For now 60 fps is okay.
+
+    // lets count fps
+    double lastTime = glfwGetTime();
+    int nbFrames = 0;
     while (!glfwWindowShouldClose(window))
     {
+
+        double currentTime = glfwGetTime();
+        nbFrames++;
+        if (currentTime - lastTime >= 1.0) 
+        {
+            lastTime += 1.0;
+            fps = nbFrames;
+            nbFrames = 0;
+        }
+
         app->Render();
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -90,8 +105,8 @@ void Window::Display(Application* app)
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    viewportWidth = width;
-    viewportHeight = height;
+    Window::viewportWidth = width;
+    Window::viewportHeight = height;
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

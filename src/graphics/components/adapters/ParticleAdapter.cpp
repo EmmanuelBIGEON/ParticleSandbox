@@ -12,9 +12,8 @@ int ParticleAdapter::nbVertices = 0;
 glm::vec3 ParticleAdapter::highlightColor = glm::vec3(0.9, 0.01, 0.01);
 
 ParticleAdapter::ParticleAdapter(GraphicContext* context, Particle* particle) 
-    : GraphicObject(context, AvailableShader::SHADER_PARTICLE), m_Particle(particle), m_Color(0.05, 0.9, 0.91), m_Highlight(false)
+    : GraphicObject(context, AvailableShader::SHADER_PARTICLE, OBJECTGR_PARTICLE), m_Particle(particle), m_Color(0.05, 0.9, 0.91), m_Highlight(false)
 {
-    m_ObjectType = OBJECTGR_PARTICLE;
     m_Shader = context->GetShader(AvailableShader::SHADER_PARTICLE);
 }
 
@@ -54,8 +53,8 @@ void ParticleAdapter::Update()
 
         // distance
         // std::cout << "Distance: " << distance << std::endl;
-        std::cout << "Direction: " << direction.x << ", " << direction.y << std::endl;
-        std::cout << "Resulting direction: " << resulting_movement.x << ", " << resulting_movement.y << std::endl;
+        // std::cout << "Direction: " << direction.x << ", " << direction.y << std::endl;
+        // std::cout << "Resulting direction: " << resulting_movement.x << ", " << resulting_movement.y << std::endl;
 
     }
 

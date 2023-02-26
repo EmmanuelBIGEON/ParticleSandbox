@@ -7,9 +7,6 @@
 
 class Application;
 
-extern int viewportWidth;
-extern int viewportHeight;
-
 class Window
 {
     public:
@@ -20,6 +17,9 @@ class Window
         //! Render the graphics context.
         void Display(Application* app);
 
-        
         Signal<> OnWindowReady;
+
+        static int viewportWidth;
+        static int viewportHeight;
+        static int fps;
 };

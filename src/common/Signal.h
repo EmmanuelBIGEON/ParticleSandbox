@@ -40,7 +40,7 @@ class Signal
 
         //! \brief Connects a slot to the signal
         //! Use in constructor of slot
-        void Connect(std::function<void(Args...)> function);
+        Slot<Args...>* Connect(std::function<void(Args...)> function);
 
         //! \brief Disconnects a slot from the signal
         //! Use in destructor of slot
@@ -97,10 +97,11 @@ void Signal<Args...>::Emit(Args... args)
 }
 
 template <typename... Args>
-void Signal<Args...>::Connect(std::function<void(Args...)> function)
+Slot<Args...>* Signal<Args...>::Connect(std::function<void(Args...)> function)
 {
     Slot<Args...>* slot = new Slot<Args...>(this, function);
     m_Slots.push_back(slot);
+    return slot;
 }
 
 template <typename... Args>

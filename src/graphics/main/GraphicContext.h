@@ -5,6 +5,8 @@
 #include <glm/ext.hpp>
 
 
+#include "../../common/Signal.h"
+
 class GraphicObject;
 class Shader;
 class Font;
@@ -51,7 +53,10 @@ class GraphicContext
         virtual void Render();
 
         //! \brief Register a graphic object to the context for it to be rendered.
-        virtual void Register(GraphicObject* object);
+        void Register(GraphicObject* object);
+
+        //! \brief Remove a graphic object from the context.
+        void Remove(GraphicObject* object);
         
         virtual void Update(); // placeholder function for now, might be used later
 
@@ -59,6 +64,14 @@ class GraphicContext
         Shader* GetShader(AvailableShader shader);
 
         const std::vector<GraphicObject*> GetObjects() const { return m_Objects; }
+
+        Font* font_main;
+
+        static float worldWidth;
+        static float worldHeight;
+
+        Signal<GraphicObject*> OnObjectRegistered;
+        Signal<GraphicObject*> OnObjectRemoved;
 
     protected:
         bool okRendering;
@@ -75,7 +88,6 @@ class GraphicContext
         Shader* shader_line;
         Shader* shader_particle; // Principal shader for the simulation
 
-        Font* font_main;
 
         //! \brief Projection matrix.
         //! Convert coordinates from world space to screen space.

@@ -75,8 +75,8 @@ void EventHandler_Test2::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
 
                 std::cout << "Create a circle (GL value) at " << xCenter << " " << yCenter << std::endl;
@@ -116,8 +116,8 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
@@ -165,8 +165,8 @@ void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
             MouseMovedEvent* mousePressedEvent = (MouseMovedEvent*)&event;
             float xCenter = (float)mouseEvent->posX;
             float yCenter = (float)mouseEvent->posY; 
-            xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
-            yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+            xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
+            yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
             yCenter = -yCenter;
             xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
             yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
@@ -183,8 +183,8 @@ void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);

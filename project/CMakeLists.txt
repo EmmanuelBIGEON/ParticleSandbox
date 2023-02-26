@@ -28,6 +28,7 @@ set(SOURCES
     ../src/graphics/main/Font.cpp
 
     ../src/graphics/util/ParticleDetector.cpp
+    ../src/graphics/util/BasicUI.cpp
     ../src/graphics/util/generators/ParticleGenerator.cpp
 
     ../src/graphics/components/adapters/TriangleAdapter.cpp
