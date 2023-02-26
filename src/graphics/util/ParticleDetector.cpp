@@ -20,7 +20,7 @@ void ParticleDetector::Update()
 
     for (auto& object : m_Context->GetObjects())
     {
-        if (object->GetType() == OBJECTGR_PARTICLE)
+        if (object->GetObjectType() == OBJECTGR_PARTICLE)
         {
             ParticleAdapter* particle = static_cast<ParticleAdapter*>(object);
             

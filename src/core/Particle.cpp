@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-Particle::Particle(): Object(), m_Position(0.0f), m_Velocity(0.0f), m_Force(0.0f), m_Mass(0.0f), m_Radius(0.0f)
+Particle::Particle(): Object(), m_Position(0.0f), m_Velocity(0.0f), m_Force(1.0f), m_Mass(0.0f), m_Radius(0.0f)
 {
 }
 
@@ -17,7 +17,7 @@ Particle::Particle(): Object(), m_Position(0.0f), m_Velocity(0.0f), m_Force(0.0f
 // }
 
 Particle::Particle(const glm::vec2& position)
-    : Object(), m_Position(position)
+    : Object(), m_Position(position), m_Velocity(0.0f), m_Force(1.0f), m_Mass(0.0f), m_Radius(0.0f)
 {
 }
 

@@ -92,17 +92,16 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
     // scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_HIGHLIGHTER);
 
-    // generate particles
-    ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    generator->Generate(5000);
-
     // We create a particle.
     Particle* particle = new Particle();
     particle->SetPosition(glm::vec2(400.0f, 300.0f));
-
-    // We create a particle adapter.
     ParticleAdapter* adapter = new ParticleAdapter(graphicContext, particle);
-    std::cout << "Particle:" << std::endl;
+
+    // We create a particle.
+    Particle* particle2 = new Particle();
+    particle2->SetPosition(glm::vec2(500.0f, 300.0f));
+    ParticleAdapter* adapter2 = new ParticleAdapter(graphicContext, particle2);
+
 
     return scene;
 }

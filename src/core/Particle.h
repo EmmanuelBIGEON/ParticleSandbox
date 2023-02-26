@@ -18,11 +18,11 @@ class Particle : public Object
         virtual ~Particle();
 
         //! \brief Get the position of the particle.
-        const glm::vec2& GetPosition() const { return m_Position; }
+        glm::vec2& GetPosition() { return m_Position; }
         void SetPosition(const glm::vec2& position) { m_Position = position; }
 
         //! \brief Get the velocity of the particle.
-        const glm::vec2& GetVelocity() const { return m_Velocity; }
+        glm::vec2& GetVelocity() { return m_Velocity; }
         void SetVelocity(const glm::vec2& velocity) { m_Velocity = velocity; }
 
         //! \brief Get the current force of the particle.

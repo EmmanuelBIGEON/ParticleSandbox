@@ -44,7 +44,7 @@ class Object
         static Object* GetObject(const UUIDv4::UUID& id) { return m_Objects[id]; }
 
         //! \brief Get the type of the object.
-        ObjectType GetType() const { return m_ObjectType; }
+        ObjectType GetObjectType() const { return m_ObjectType; }
 
 
     protected:
