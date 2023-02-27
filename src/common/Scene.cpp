@@ -82,7 +82,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 
     // generate particles
     ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    generator->Generate(5000);
+    generator->Generate(100);
 
     // We create a particle.
     Particle* particle = new Particle();

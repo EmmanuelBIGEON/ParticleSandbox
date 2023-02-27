@@ -32,18 +32,28 @@ void ParticleAdapter::Update()
     {
         if(particle == this)
             continue;
+
+        // distance
+        float distance = glm::distance(m_Position, particle->m_Position);
+        
+        if(distance < 5.0f)
+            continue;
+
+        // direction 
+        glm::lowp_vec2 direction = glm::normalize(m_Position - particle->m_Position);
         
         ParticleAdapter* particleAdapter = static_cast<ParticleAdapter*>(particle);
-        mvt_x += (particleAdapter->m_Position.x - m_Position.x);
-        mvt_y += (particleAdapter->m_Position.y - m_Position.y);
+        mvt_x += direction.x * 0.1f;
+        mvt_y += direction.y * 0.1f;
     }
 
-    m_Position += glm::normalize(glm::lowp_vec2(mvt_x, mvt_y));
+    m_Position += glm::normalize(glm::lowp_vec2(mvt_x, mvt_y)) * 4.0f;
     // m_Particle->SetPosition(position);
 }
 
 void ParticleAdapter::Draw()
 {
+    m_Shader->SetVec3("particleColor", m_Highlight ? highlightColor : m_Color);
     m_Shader->SetVec2("shiftPos", m_Position);
     glDrawArrays(GL_TRIANGLE_FAN, 0, nbVertices);
 

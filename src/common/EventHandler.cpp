@@ -140,6 +140,7 @@ EventHandler_ParticleHighlighter::EventHandler_ParticleHighlighter(GraphicContex
     {
         for(auto particle : particles)
         {
+        std::cout << "New particles" << std::endl;
             particle->SetHighlight(true);
         }
     });
