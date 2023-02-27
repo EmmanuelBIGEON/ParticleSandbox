@@ -4,7 +4,8 @@ enum EventType
 {
     EVENT_NONE,
     EVENT_MOUSE,
-    EVENT_KEY
+    EVENT_KEY,
+    EVENT_WHEEL
 };
 
 enum EventMouseType
@@ -55,6 +56,19 @@ class MouseEvent : public Event
     
     protected:
         EventMouseType m_MouseType;
+
+};
+
+class WheelEvent : public Event
+{
+    public:
+        WheelEvent(double offsetX, double offsetY) : m_OffsetX(offsetX), m_OffsetY(offsetY) { m_EventType = EVENT_WHEEL; }
+        virtual ~WheelEvent() {}
+
+        virtual EventType GetEventType() const { return EVENT_WHEEL; }
+
+        double m_OffsetX;
+        double m_OffsetY;
 
 };
 

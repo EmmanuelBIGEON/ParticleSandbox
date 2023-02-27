@@ -62,6 +62,11 @@ class GraphicContext
         
         virtual void Update(); // placeholder function for now, might be used later
 
+        //! Zoom in the view.
+        void ZoomIn(float factor);
+        //! Zoom out the view.
+        void ZoomOut(float factor);
+
         // For TextRendering
         Shader* GetShader(AvailableShader shader);
 
@@ -80,6 +85,7 @@ class GraphicContext
         bool okRendering;
         bool needUpdate;
 
+        float zoomFactor;
         //! \brief List of all the objects to be rendered.
         //! This structure might be changed later.
         std::vector<GraphicObject*> m_Objects;

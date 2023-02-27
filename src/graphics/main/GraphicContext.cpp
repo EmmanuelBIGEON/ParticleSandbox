@@ -13,24 +13,26 @@
 
 #include "Shader.h"
 #include "Font.h"
+#include "../../common/Window.h"
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
-    shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), shader_particle(nullptr)
+    shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), shader_particle(nullptr), zoomFactor(1.0f)
 {
     glm::mat4 model = glm::mat4(1.0f);
     // translate for the center of the screen (because OpenGL is in [-1, 1])
     model = glm::translate(model, glm::vec3(-1.0f, -1.0f, 0.0f));
 
-    // echo the model
-    // std::cout << "Model matrix: " << std::endl;
-    // std::cout << glm::to_string(model) << std::endl;
-
     model = glm::scale(model, glm::vec3(1.0f/(worldWidth/2.0f), 1.0f/(worldHeight/2.0f), 1.0f));
+    // glm::mat4 projection = glm::ortho(0.0f, worldWidth, 0.0f, worldHeight, -1.0f, 1.0f); // TODO big fail..
     glm::mat4 projection = glm::mat4(1.0f);
+    // apply a scaling factor to the projection matrix to zoom in or out
+    float zoomFactor = 0.5f; // example value, adjust as needed
+    projection = glm::scale(projection, glm::vec3(zoomFactor, zoomFactor, 1.0f));
+
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, 0.0f)); 
 
@@ -229,8 +231,6 @@ void GraphicContext::Update()
 
     // Shader_text
     shader_text->Use();
-    // Update the projection matrix
-    shader_text->SetMat4("projection", m_ProjectionMatrix);
     // Update the view matrix
     shader_text->SetMat4("view", m_ViewMatrix);
     // Update the model matrix
@@ -273,6 +273,8 @@ void GraphicContext::Update()
 
     // shader_particle
     shader_particle->Use();
+    // Update the projection matrix
+    shader_particle->SetMat4("projection", m_ProjectionMatrix);
     // Update the model matrix
     shader_particle->SetMat4("model", m_ModelMatrix);
 
@@ -299,3 +301,27 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
     }
     return nullptr;
 }
+
+void GraphicContext::ZoomIn(float factor)
+{
+    return // TODO
+    // limit zoomFactor to 10.0f
+    if(zoomFactor > 10.0f)
+        return;
+    
+    zoomFactor += factor;
+    // std::cout << "ZoomFactor: " << zoomFactor << std::endl;
+    needUpdate = true;
+}
+
+void GraphicContext::ZoomOut(float factor)
+{
+    // limit zoomFactor to 0.1f
+    if(zoomFactor < 0.1f)
+        return;
+    
+    zoomFactor -= factor;
+    
+    needUpdate = true;
+}
+

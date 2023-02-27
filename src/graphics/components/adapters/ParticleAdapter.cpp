@@ -46,7 +46,7 @@ void ParticleAdapter::Update()
             mvt_x = resulting_movement.x;
             mvt_y = resulting_movement.y;
             continue;
-        }else if(distance < 100.0f)
+        }else if(distance < 170.0f)
         {
             continue;
         }else if(distance < 250.0f)
@@ -89,8 +89,8 @@ void ParticleAdapter::Update()
     }
     
     // apply coef
-    mvt_x *= 4.0f;
-    mvt_y *= 4.0f;
+    mvt_x *= 6.0f;
+    mvt_y *= 6.0f;
     m_Position += glm::lowp_vec2(mvt_x, mvt_y);
     // m_Particle->SetPosition(position);
 }

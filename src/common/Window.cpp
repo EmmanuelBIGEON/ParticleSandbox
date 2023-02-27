@@ -13,6 +13,7 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 double lastMouseX = 0, lastMouseY = 0;
 int Window::viewportWidth = 1200, Window::viewportHeight = 900;
@@ -55,6 +56,7 @@ void Window::Display(Application* app)
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -170,4 +172,11 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
             global_EventHandler->HandleEvent(event);
         }
     }
+
+}
+
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    WheelEvent event(xoffset, yoffset);
+    global_EventHandler->HandleEvent(event);
 }
