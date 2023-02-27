@@ -34,4 +34,7 @@
 build/**
 bin/**
 
+other/space_coordinates/build/**
+other/space_coordinates/bin/**
+
 .vscode/**

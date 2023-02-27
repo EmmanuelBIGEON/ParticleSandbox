@@ -304,7 +304,7 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
 
 void GraphicContext::ZoomIn(float factor)
 {
-    return // TODO
+    return; // TODO
     // limit zoomFactor to 10.0f
     if(zoomFactor > 10.0f)
         return;
@@ -316,6 +316,7 @@ void GraphicContext::ZoomIn(float factor)
 
 void GraphicContext::ZoomOut(float factor)
 {
+    return; // TODO
     // limit zoomFactor to 0.1f
     if(zoomFactor < 0.1f)
         return;
