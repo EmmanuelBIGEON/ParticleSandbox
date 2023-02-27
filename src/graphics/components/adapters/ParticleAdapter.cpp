@@ -27,6 +27,8 @@ ParticleAdapter::~ParticleAdapter()
 
 void ParticleAdapter::Update()
 {
+
+    glm::lowp_vec2 resulting_movement = glm::lowp_vec2(0.0f, 0.0f);
     // For all particles in context
     for(const auto& particle : m_Context->GetParticleAdapters())
     {
@@ -36,18 +38,60 @@ void ParticleAdapter::Update()
         // distance
         float distance = glm::distance(m_Position, particle->m_Position);
         
-        if(distance < 5.0f)
+        if(distance > 0.0f && distance < 8.0f)
+        {
+            // repulsion
+            glm::lowp_vec2 direction = glm::normalize(m_Position - particle->m_Position);
+            resulting_movement += direction / distance;
+            mvt_x = resulting_movement.x;
+            mvt_y = resulting_movement.y;
             continue;
-
-        // direction 
-        glm::lowp_vec2 direction = glm::normalize(m_Position - particle->m_Position);
+        }else if(distance < 100.0f)
+        {
+            continue;
+        }else if(distance < 250.0f)
+        {
+            // attraction
+            glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
+            resulting_movement += direction / (distance);
+            mvt_x = resulting_movement.x; 
+            mvt_y = resulting_movement.y;
+            continue;
+        }else if(distance < 350.0f)
+        {
+            // attraction
+            glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
+            resulting_movement += direction / (distance) / 2.0f;
+            mvt_x = resulting_movement.x; 
+            mvt_y = resulting_movement.y;
+            continue;
+        }
+        else
+        {
+            // attraction
+            glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
+            resulting_movement += direction / (distance) / 3.0f;
+            mvt_x = resulting_movement.x; 
+            mvt_y = resulting_movement.y;
+            continue;
+        }
+        // // direction 
+        // glm::lowp_vec2 direction = glm::normalize(particle->m_Position -m_Position);
         
-        ParticleAdapter* particleAdapter = static_cast<ParticleAdapter*>(particle);
-        mvt_x += direction.x * 0.1f;
-        mvt_y += direction.y * 0.1f;
+        // ParticleAdapter* particleAdapter = static_cast<ParticleAdapter*>(particle);
+        // // mvt_x += direction.x * 0.1f;
+        // // mvt_y += direction.y * 0.1f;
+        // // Using the force and a distance factor
+        
+        // resulting_movement += particleAdapter->GetParticle()->GetForce() * direction / distance;
+        // mvt_x = resulting_movement.x;
+        // mvt_y = resulting_movement.y;
     }
-
-    m_Position += glm::normalize(glm::lowp_vec2(mvt_x, mvt_y)) * 4.0f;
+    
+    // apply coef
+    mvt_x *= 4.0f;
+    mvt_y *= 4.0f;
+    m_Position += glm::lowp_vec2(mvt_x, mvt_y);
     // m_Particle->SetPosition(position);
 }
 

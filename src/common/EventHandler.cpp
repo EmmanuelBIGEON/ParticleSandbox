@@ -88,8 +88,8 @@ void EventHandler_Test2::HandleEvent(const Event& event)
 
                 // Create the circle.
                 // CircleAdapter* circle = new CircleAdapter(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
-                PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
-                // WigglingCircle* circle = new WigglingCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
+                // PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
+                WigglingCircle* circle = new WigglingCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
                 // generate a random color
                 float r = (float)rand() / (float)RAND_MAX;
                 float g = (float)rand() / (float)RAND_MAX;
