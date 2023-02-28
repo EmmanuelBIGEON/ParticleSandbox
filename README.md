@@ -2,6 +2,8 @@
 **A particle simulator and sandbox in C++**
 (under construction)
 
+![Preview ParticleSandbox](preview.png)
+
 ### Dependencies
 I provide the dependencies for Visual Studio 17 2022 (x64 and Debug) but otherwise, you have to provide them and edit the environment file (project/env.bat)
 
