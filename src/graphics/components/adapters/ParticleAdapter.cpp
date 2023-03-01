@@ -39,7 +39,7 @@ void ParticleAdapter::Update()
         float distance = glm::distance(m_Position, particle->m_Position);
         
         
-        if(distance > 0.0f && distance < 8.0f)
+        if(distance > 0.0f && distance < 5.0f)
         {
             // repulsion
             glm::lowp_vec2 direction = glm::normalize(m_Position - particle->m_Position);
@@ -47,16 +47,17 @@ void ParticleAdapter::Update()
             mvt_x = resulting_movement.x;
             mvt_y = resulting_movement.y;
             continue;
-        }else if(distance < 20.0f)
+        }else if(distance < 100.0f)
         {
+            continue;
             // do nothing.
-        }else if(distance < 50.0f)
+        }else if(distance < 250.0f)
         {
             // Simplified attraction to keep the particles together
             glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
-            resulting_movement += 5.0f * direction / (distance);
-            mvt_x = resulting_movement.x;
-            mvt_y = resulting_movement.y;
+            resulting_movement += direction / (distance);
+            mvt_x += resulting_movement.x;
+            mvt_y += resulting_movement.y;
         }else
         {
 
@@ -70,7 +71,7 @@ void ParticleAdapter::Update()
         }
     }
     
-    // apply coef
+    // apply coef to accelerate the simulation
     mvt_x *= 6.0f;
     mvt_y *= 6.0f;
     m_Position += glm::lowp_vec2(mvt_x, mvt_y);
