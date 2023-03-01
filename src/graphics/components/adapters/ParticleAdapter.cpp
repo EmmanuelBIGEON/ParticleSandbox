@@ -41,7 +41,6 @@ void ParticleAdapter::Update()
 {
     mvt_x = 0.0f;
     mvt_y = 0.0f;
-    int count = 1;
     glm::lowp_vec2 resulting_movement = glm::lowp_vec2(0.0f, 0.0f);
     // For all particles in context
     for(const auto& otherParticle : m_Context->GetParticleAdapters())
@@ -70,12 +69,12 @@ void ParticleAdapter::Update()
         vect = otherPosition - Position;
 
         float distance = glm::length(vect);
-        glm::lowp_vec2 direction = glm::normalize(vect);
 
         bool sametype = m_Particle->GetParticleClass() == otherParticle->m_Particle->GetParticleClass();
 
         if(sametype)
         {
+            glm::lowp_vec2 direction = glm::normalize(vect);
             if(distance > 0.0f && distance < 5.0f)
             {
                 // repulsion
@@ -102,12 +101,13 @@ void ParticleAdapter::Update()
                 // formula = F = G * ((m1 * m2) / r^2)
                 // Let's assume G = 1
                 // glm::lowp_vec2 direction = glm::normalize(otherParticle->Position - Position);
-                float force = 40* (m_Particle->GetMass() * otherParticle->m_Particle->GetMass()) / (distance * distance);
+                float force = 30 * (m_Particle->GetMass() * otherParticle->m_Particle->GetMass()) / (distance * distance);
                 mvt_x += direction.x * force;
                 mvt_y += direction.y * force;
             }
         }else 
         {
+            glm::lowp_vec2 direction = glm::normalize(-vect);
             if(distance > 0.0f && distance < 5.0f)
             {
                 // repulsion
@@ -126,19 +126,22 @@ void ParticleAdapter::Update()
                 continue;
             }else
             {
+                resulting_movement += 2.2f * direction / distance;
+                // if(m_Particle->GetParticleClass() == PARTICLE_CLASS_A)
+                //     resulting_movement = 1.5f * resulting_movement;
                 // Higher repulsion to keep the particles apart
                 // glm::lowp_vec2 direction = glm::normalize(Position - otherParticle->Position);
-                resulting_movement += 2.2f * direction / distance;
                 mvt_x = resulting_movement.x;
                 mvt_y = resulting_movement.y;
+                continue;
             }
         }
 
     }
 
     // apply coef to accelerate the simulation
-    mvt_x *= 6.0f;
-    mvt_y *= 6.0f;
+    mvt_x *= 8.0f;
+    mvt_y *= 8.0f;
     Position += glm::lowp_vec2(mvt_x, mvt_y);
 
     // if(Position.x < 0.0f)
