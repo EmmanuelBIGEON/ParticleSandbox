@@ -18,7 +18,19 @@ ParticleAdapter::ParticleAdapter(GraphicContext* context, Particle* particle)
     m_Particle(particle), m_Color(0.05, 0.9, 0.91), m_Highlight(false), mvt_x(0.0f), mvt_y(0.0f)
 {
     m_Shader = context->GetShader(AvailableShader::SHADER_PARTICLE);
-    m_Position  = particle->GetPosition();
+    Position  = particle->GetPosition();
+
+    switch(m_Particle->GetParticleClass())
+    {
+        case ParticleClass::PARTICLE_CLASS_A:
+            m_Color = glm::vec3(0.05, 0.9, 0.91);
+            break;
+        case ParticleClass::PARTICLE_CLASS_B:
+            m_Color = glm::vec3(0.91, 0.91, 0.05);
+    }
+
+    // generate random color
+    // m_Color = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
 }
 
 ParticleAdapter::~ParticleAdapter()
@@ -29,59 +41,135 @@ void ParticleAdapter::Update()
 {
     mvt_x = 0.0f;
     mvt_y = 0.0f;
+    int count = 1;
     glm::lowp_vec2 resulting_movement = glm::lowp_vec2(0.0f, 0.0f);
     // For all particles in context
-    for(const auto& particle : m_Context->GetParticleAdapters())
+    for(const auto& otherParticle : m_Context->GetParticleAdapters())
     {
-        if(particle == this)
+        if(otherParticle == this)
             continue;
 
-        float distance = glm::distance(m_Position, particle->m_Position);
-        
-        
-        if(distance > 0.0f && distance < 5.0f)
-        {
-            // repulsion
-            glm::lowp_vec2 direction = glm::normalize(m_Position - particle->m_Position);
-            resulting_movement += 0.2f * direction / distance;
-            mvt_x = resulting_movement.x;
-            mvt_y = resulting_movement.y;
-            continue;
-        }else if(distance < 100.0f)
-        {
-            continue;
-            // do nothing.
-        }else if(distance < 250.0f)
-        {
-            // Simplified attraction to keep the particles together
-            glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
-            resulting_movement += direction / (distance);
-            mvt_x += resulting_movement.x;
-            mvt_y += resulting_movement.y;
-        }else
-        {
+        glm::lowp_vec2 otherPosition = otherParticle->Position;
+        glm::lowp_vec2 vect = otherPosition - Position;
+        // float distance = glm::distance(Position, otherPosition);
+        // get closest distance considering that the world is repeating itself
+        // Note : WorldWidth = 1600, WorldHeight = 1200
+        // if distance > 800, then we need to calculate the position using the opposite side of the world
+        // otherwise we have to test if it is > 600
+        // float distance = glm::distance(Position, otherPosition);
+        if(vect.x > 800.0f)
+            otherPosition.x -= 1600.0f;
+        else if(vect.x < -800.0f)
+            otherPosition.x += 1600.0f;
 
-            // Use the law of gravitation to compute the force
-            // formula = F = G * ((m1 * m2) / r^2)
-            // Let's assume G = 1
-            glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
-            float force = 40* (m_Particle->GetMass() * particle->m_Particle->GetMass()) / (distance * distance);
-            mvt_x += direction.x * force;
-            mvt_y += direction.y * force;
+        if(vect.y > 600.0f)
+            otherPosition.y -= 1200.0f;
+        else if(vect.y < -600.0f)
+            otherPosition.y += 1200.0f;
+
+        vect = otherPosition - Position;
+
+        float distance = glm::length(vect);
+        glm::lowp_vec2 direction = glm::normalize(vect);
+
+        bool sametype = m_Particle->GetParticleClass() == otherParticle->m_Particle->GetParticleClass();
+
+        if(sametype)
+        {
+            if(distance > 0.0f && distance < 5.0f)
+            {
+                // repulsion
+                // glm::lowp_vec2 direction = glm::normalize(Position - otherParticle->Position);
+                resulting_movement += 0.2f * direction / distance;
+                mvt_x += resulting_movement.x;
+                mvt_y += resulting_movement.y;
+                continue;
+            }else if(distance < 100.0f)
+            {
+                continue;
+                // do nothing.
+            }else if(distance < 250.0f)
+            {
+                // Simplified attraction to keep the particles together
+                // glm::lowp_vec2 direction = glm::normalize(otherParticle->Position - Position);
+                resulting_movement += direction / (distance);
+                mvt_x += resulting_movement.x;
+                mvt_y += resulting_movement.y;
+            }else
+            {
+
+                // Use the law of gravitation to compute the force
+                // formula = F = G * ((m1 * m2) / r^2)
+                // Let's assume G = 1
+                // glm::lowp_vec2 direction = glm::normalize(otherParticle->Position - Position);
+                float force = 40* (m_Particle->GetMass() * otherParticle->m_Particle->GetMass()) / (distance * distance);
+                mvt_x += direction.x * force;
+                mvt_y += direction.y * force;
+            }
+        }else 
+        {
+            if(distance > 0.0f && distance < 5.0f)
+            {
+                // repulsion
+                // glm::lowp_vec2 direction = glm::normalize(Position - otherParticle->Position);
+                resulting_movement += 4.5f * direction / distance;
+                mvt_x = resulting_movement.x;
+                mvt_y = resulting_movement.y;
+                continue;
+            }else if(distance < 250.0f)
+            {
+                // Higher repulsion to keep the particles apart
+                // glm::lowp_vec2 direction = glm::normalize(Position - otherParticle->Position);
+                resulting_movement += 4.0f * direction / distance;
+                mvt_x = resulting_movement.x;
+                mvt_y = resulting_movement.y;
+                continue;
+            }else
+            {
+                // Higher repulsion to keep the particles apart
+                // glm::lowp_vec2 direction = glm::normalize(Position - otherParticle->Position);
+                resulting_movement += 2.2f * direction / distance;
+                mvt_x = resulting_movement.x;
+                mvt_y = resulting_movement.y;
+            }
         }
+
     }
-    
+
     // apply coef to accelerate the simulation
     mvt_x *= 6.0f;
     mvt_y *= 6.0f;
-    m_Position += glm::lowp_vec2(mvt_x, mvt_y);
+    Position += glm::lowp_vec2(mvt_x, mvt_y);
+
+    // if(Position.x < 0.0f)
+    //     Position.x = 0.0f;
+    // if(Position.x > 1600.0f)
+    //     Position.x = 1600.0f;
+    // if(Position.y < 0.0f)
+    //     Position.y = 0.0f;
+    // if(Position.y > 1200.0f)
+    //     Position.y = 1200.0f;
+
+    // calculate the new position of the particle if it goes beyond world bounds
+    if(Position.x < 0.0f)
+        Position.x = Position.x + 1600.0f;
+    else if(Position.x > 1600.0f)
+        Position.x = Position.x - 1600.0f;
+    if(Position.y < 0.0f)
+        Position.y = Position.y + 1200.0f;
+    else if(Position.y > 1200.0f)
+        Position.y = Position.y - 1200.0f;
+    
+
+
+        
     // m_Particle->SetPosition(position);
 }
 
 void ParticleAdapter::Draw()
 {
     m_Shader->SetVec3("particleColor", m_Highlight ? highlightColor : m_Color);
-    m_Shader->SetVec2("shiftPos", m_Position);
+    m_Shader->SetVec2("shiftPos", Position);
     glDrawArrays(GL_TRIANGLE_FAN, 0, nbVertices);
 
 }

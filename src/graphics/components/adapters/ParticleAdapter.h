@@ -30,7 +30,11 @@ class ParticleAdapter : public GraphicObject
         //! The purpose is to reduce as much as possible the computation needed to draw the particle.
         static void LoadParticleVAO();
 
-        glm::lowp_vec2 m_Position;
+        // Quick access to the position of the particle.
+        // Doesn't update the particle position because there's no use for now. 
+        glm::lowp_vec2 Position;
+        ParticleClass ParticleClass;
+
         static glm::vec3 highlightColor;
         static unsigned int VAO;
     private:

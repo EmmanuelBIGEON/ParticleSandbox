@@ -11,7 +11,7 @@ class ParticleGenerator
         ParticleGenerator(GraphicContext* context, const glm::vec2& bottomLeft, const glm::vec2& topRight);
         virtual ~ParticleGenerator();
 
-        void Generate(int nbParticles);
+        void Generate(int nbParticles, ParticleClass particleClass = ParticleClass::PARTICLE_CLASS_A);
     
     private:
         GraphicContext* m_Context;
