@@ -27,7 +27,8 @@ ParticleAdapter::~ParticleAdapter()
 
 void ParticleAdapter::Update()
 {
-
+    mvt_x = 0.0f;
+    mvt_y = 0.0f;
     glm::lowp_vec2 resulting_movement = glm::lowp_vec2(0.0f, 0.0f);
     // For all particles in context
     for(const auto& particle : m_Context->GetParticleAdapters())
@@ -35,57 +36,38 @@ void ParticleAdapter::Update()
         if(particle == this)
             continue;
 
-        // distance
         float distance = glm::distance(m_Position, particle->m_Position);
+        
         
         if(distance > 0.0f && distance < 8.0f)
         {
             // repulsion
             glm::lowp_vec2 direction = glm::normalize(m_Position - particle->m_Position);
-            resulting_movement += direction / distance;
+            resulting_movement += 0.2f * direction / distance;
             mvt_x = resulting_movement.x;
             mvt_y = resulting_movement.y;
             continue;
-        }else if(distance < 170.0f)
+        }else if(distance < 20.0f)
         {
-            continue;
-        }else if(distance < 250.0f)
+            // do nothing.
+        }else if(distance < 50.0f)
         {
-            // attraction
+            // Simplified attraction to keep the particles together
             glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
-            resulting_movement += direction / (distance);
-            mvt_x = resulting_movement.x; 
+            resulting_movement += 5.0f * direction / (distance);
+            mvt_x = resulting_movement.x;
             mvt_y = resulting_movement.y;
-            continue;
-        }else if(distance < 350.0f)
+        }else
         {
-            // attraction
+
+            // Use the law of gravitation to compute the force
+            // formula = F = G * ((m1 * m2) / r^2)
+            // Let's assume G = 1
             glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
-            resulting_movement += direction / (distance) / 2.0f;
-            mvt_x = resulting_movement.x; 
-            mvt_y = resulting_movement.y;
-            continue;
+            float force = 40* (m_Particle->GetMass() * particle->m_Particle->GetMass()) / (distance * distance);
+            mvt_x += direction.x * force;
+            mvt_y += direction.y * force;
         }
-        else
-        {
-            // attraction
-            glm::lowp_vec2 direction = glm::normalize(particle->m_Position - m_Position);
-            resulting_movement += direction / (distance) / 3.0f;
-            mvt_x = resulting_movement.x; 
-            mvt_y = resulting_movement.y;
-            continue;
-        }
-        // // direction 
-        // glm::lowp_vec2 direction = glm::normalize(particle->m_Position -m_Position);
-        
-        // ParticleAdapter* particleAdapter = static_cast<ParticleAdapter*>(particle);
-        // // mvt_x += direction.x * 0.1f;
-        // // mvt_y += direction.y * 0.1f;
-        // // Using the force and a distance factor
-        
-        // resulting_movement += particleAdapter->GetParticle()->GetForce() * direction / distance;
-        // mvt_x = resulting_movement.x;
-        // mvt_y = resulting_movement.y;
     }
     
     // apply coef
@@ -117,7 +99,7 @@ void ParticleAdapter::LoadParticleVAO()
 
     // Create the VAO and VBO for the particle.
     // Default size is 10.0f radius.
-    float radius = 10.0f;
+    float radius = Particle::Radius;
 
     // Calculate the number of vertices depending on the radius (for a better circle)
     // More vertices as the circle is bigger.
