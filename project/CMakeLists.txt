@@ -19,6 +19,7 @@ set(SOURCES
     ../src/common/EventHandler.cpp
     ../src/common/Scene.cpp
     ../src/common/Object.cpp
+    ../src/common/Chrono.cpp
 
     ../src/core/Particle.cpp
 
