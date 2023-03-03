@@ -14,6 +14,12 @@
 #include "Shader.h"
 #include "Font.h"
 #include "../../common/Window.h"
+#include "../../common/Chrono.h"
+
+#include <thread>
+
+
+
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
@@ -193,15 +199,6 @@ void GraphicContext::Render()
 
                 break;
             }
-            // case SHADER_PARTICLE:
-            // {
-            //     shader_particle->Use();
-            //     if(!object->IsUpdated()) // if the object is not updated, update it
-            //         object->Update();   
-
-            //     break;
-            // }
-
         }
         object->Draw();
     }
@@ -211,11 +208,37 @@ void GraphicContext::Render()
     shader_particle->SetVec3("particleColor", ParticleAdapter::highlightColor);
     glBindVertexArray(ParticleAdapter::VAO);
 
+    // Chrono chrono;
+    // chrono.Start();
+
+    // create threads
+    std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
+    std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
+    // std::thread t3(&GraphicContext::RenderThread, this, 3, 2);
+    // std::thread t4(&GraphicContext::RenderThread, this, 4, 3);
+    // std::thread t5(&GraphicContext::RenderThread, this, 6, 4);
+    // std::thread t6(&GraphicContext::RenderThread, this, 6, 5);
+
+
+    // wait for threads to finish
+    t1.join();
+    t2.join();
+    // t3.join();
+    // t4.join();
+    // t5.join();
+    // t6.join();
+
+    // chrono.Stop();
+    // std::cout << "Render time: " << chrono.GetElapsedTime() << " ms" << std::endl;
+    // chrono.Start();
+
+
     for(auto adapter : m_ParticleAdapters)
     {
-        adapter->Update();   
         adapter->Draw();
     }
+    // chrono.Stop();
+    // std::cout << "Draw time: " << chrono.GetElapsedTime() << " ms" << std::endl;
 }
 
 void GraphicContext::Update()
@@ -281,6 +304,32 @@ void GraphicContext::Update()
     needUpdate = false;
 }
 
+void GraphicContext::RenderThread(int nbOfThreads, int threadId)
+{
+    // std::cout << "Thread " << threadId << " started" << std::endl;
+    // Get position of the first object to render
+    // Example for a list of 19 objects
+    // nbOfThreads = 2
+
+
+    int size = m_ParticleAdapters.size();
+    int firstObject = (size / nbOfThreads) * threadId;
+    int maxRenderObject = (size / nbOfThreads) * (threadId + 1);
+
+    ParticleAdapter* adapter;
+    for(int i = firstObject; i < maxRenderObject; i++)
+    {
+        adapter = m_ParticleAdapters[i];
+        if(!adapter)
+        {
+            // we get out of the loop because it might be the end.
+            // Bad way of doing it.. todo. For the moment, research is more important
+            break;
+        }
+        adapter->Update();   
+    }
+    // std::cout << "Thread " << threadId << " finished" << std::endl;
+}
 
 Shader* GraphicContext::GetShader(AvailableShader shader)
 {

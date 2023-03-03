@@ -82,6 +82,10 @@ class GraphicContext
         Signal<GraphicObject*> OnObjectRemoved;
 
     protected:
+
+        //! Render particles in multiple threads
+        virtual void RenderThread(int nbOfThreads, int threadId);
+        
         bool okRendering;
         bool needUpdate;
 
