@@ -48,4 +48,6 @@ class Button : public GraphicObject
         glm::vec3 m_HoveringColor;
         std::string m_Text;
 
-}
+        bool m_isHovered = false;
+
+};
