@@ -50,12 +50,7 @@ void ParticleAdapter::Update()
 
         glm::lowp_vec2 otherPosition = otherParticle->Position;
         glm::lowp_vec2 vect = otherPosition - Position;
-        // float distance = glm::distance(Position, otherPosition);
-        // get closest distance considering that the world is repeating itself
-        // Note : WorldWidth = 1600, WorldHeight = 1200
-        // if distance > 800, then we need to calculate the position using the opposite side of the world
-        // otherwise we have to test if it is > 600
-        // float distance = glm::distance(Position, otherPosition);
+        
         if(vect.x > 800.0f)
             otherPosition.x -= 1600.0f;
         else if(vect.x < -800.0f)

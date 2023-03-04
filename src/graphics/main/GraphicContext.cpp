@@ -133,14 +133,12 @@ void GraphicContext::Remove(GraphicObject* object)
 
 float GraphicContext::Convert_glX_to_WorldX(float x) const
 {
-    // [-1, 1] -> [0,1600]
     return (x + 1.0f) * (worldWidth/2.0f);
 
 }
 
 float GraphicContext::Convert_glY_to_WorldY(float y) const
 {
-    // [-1, 1] -> [0,1200]
     return (y + 1.0f) * (worldHeight/2.0f);
 }
 
@@ -210,35 +208,23 @@ void GraphicContext::Render()
 
     // Chrono chrono;
     // chrono.Start();
-
-    // create threads
-    std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
-    std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
-    // std::thread t3(&GraphicContext::RenderThread, this, 3, 2);
-    // std::thread t4(&GraphicContext::RenderThread, this, 4, 3);
-    // std::thread t5(&GraphicContext::RenderThread, this, 6, 4);
-    // std::thread t6(&GraphicContext::RenderThread, this, 6, 5);
-
-
-    // wait for threads to finish
-    t1.join();
-    t2.join();
-    // t3.join();
-    // t4.join();
-    // t5.join();
-    // t6.join();
-
-    // chrono.Stop();
-    // std::cout << "Render time: " << chrono.GetElapsedTime() << " ms" << std::endl;
-    // chrono.Start();
-
-
-    for(auto adapter : m_ParticleAdapters)
+    if(m_ParticleAdapters.size() > 300)
     {
-        adapter->Draw();
+        std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
+        std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
+
+        t1.join();
+        t2.join();
+        for(auto adapter : m_ParticleAdapters) adapter->Draw();
+    }else
+    {
+        for(auto adapter : m_ParticleAdapters)
+        {
+            adapter->Update();
+            adapter->Draw();
+        }
     }
-    // chrono.Stop();
-    // std::cout << "Draw time: " << chrono.GetElapsedTime() << " ms" << std::endl;
+
 }
 
 void GraphicContext::Update()
@@ -306,29 +292,22 @@ void GraphicContext::Update()
 
 void GraphicContext::RenderThread(int nbOfThreads, int threadId)
 {
-    // std::cout << "Thread " << threadId << " started" << std::endl;
-    // Get position of the first object to render
-    // Example for a list of 19 objects
-    // nbOfThreads = 2
-
-
     int size = m_ParticleAdapters.size();
     int firstObject = (size / nbOfThreads) * threadId;
     int maxRenderObject = (size / nbOfThreads) * (threadId + 1);
+
+    if(threadId == nbOfThreads - 1)
+    {
+        size = size % nbOfThreads;
+        maxRenderObject += size;
+    }
 
     ParticleAdapter* adapter;
     for(int i = firstObject; i < maxRenderObject; i++)
     {
         adapter = m_ParticleAdapters[i];
-        if(!adapter)
-        {
-            // we get out of the loop because it might be the end.
-            // Bad way of doing it.. todo. For the moment, research is more important
-            break;
-        }
         adapter->Update();   
     }
-    // std::cout << "Thread " << threadId << " finished" << std::endl;
 }
 
 Shader* GraphicContext::GetShader(AvailableShader shader)

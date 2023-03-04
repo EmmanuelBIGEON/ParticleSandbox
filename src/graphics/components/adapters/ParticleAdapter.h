@@ -19,7 +19,6 @@ class ParticleAdapter : public GraphicObject
         Particle* GetParticle() { return m_Particle; }
 
         void SetColor(const glm::vec3& color) { m_Color = color; }
-
         virtual void Update() override;
         virtual void Draw() override;
 

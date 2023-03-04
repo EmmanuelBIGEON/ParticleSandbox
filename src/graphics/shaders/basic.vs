@@ -12,6 +12,6 @@ out vec4 vertexColor; // specify a color output to the fragment shader
 
 void main()
 {
-    gl_Position = projection * view * model * shiftPos * vec4(aPos, 1.0); // set the output position to the transformed vertex position
+    gl_Position = model * shiftPos * vec4(aPos, 1.0); // set the output position to the transformed vertex position
     vertexColor = aColor; // set the output variable to the input color we got from the vertex data
 }

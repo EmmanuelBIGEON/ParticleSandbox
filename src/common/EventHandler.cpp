@@ -78,18 +78,13 @@ void EventHandler_Test2::HandleEvent(const Event& event)
                 xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
                 yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
-
-                std::cout << "Create a circle (GL value) at " << xCenter << " " << yCenter << std::endl;
-                // reverse
-
                 // Convert to world coordinates.
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
 
-                // Create the circle.
                 // CircleAdapter* circle = new CircleAdapter(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
-                // PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
-                WigglingCircle* circle = new WigglingCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
+                PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 40.0f));
+                // WigglingCircle* circle = new WigglingCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
                 // generate a random color
                 float r = (float)rand() / (float)RAND_MAX;
                 float g = (float)rand() / (float)RAND_MAX;
@@ -121,6 +116,7 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+                std::cout << "Create a Particle  at " << xCenter << " " << yCenter << std::endl;
 
                 // Creat the particle.
                 Particle* particle = new Particle(glm::vec2(xCenter,yCenter));

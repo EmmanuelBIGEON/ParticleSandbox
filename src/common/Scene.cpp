@@ -56,21 +56,11 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_TEST2);
-    TriangleAdapter* adapter = new TriangleAdapter(graphicContext, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
-    RectangleAdapter* adapter2 = new RectangleAdapter(graphicContext, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
-    Line line(Point(600.0f, 600.0f), Point(1000.0f, 1000.0f));
-    // Line line(Point(0.0f, 0.0f), Point(40.5f,0.5f));
-    BezierCurve* bezier = new BezierCurve(graphicContext, line);
-    bezier->SetControlPoint1(glm::vec2(400.0f, 1200.0f));
-    bezier->SetControlPoint2(glm::vec2(800.0f, 100.0f));
-    bezier->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 
-    // PanickedCircle* circle = new PanickedCircle(graphicContext, Circle(Point(400.0f, 300.0f), 200.0f));
-    WigglingCircle* circle = new WigglingCircle(graphicContext, Circle(Point(400.0f, 300.0f), 50.0f));
-    std::cout << "Bezier:" << std::endl;
-    // GraphicLine* line1 = new GraphicLine(graphicContext, line);
-    // line1->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
-    // draw line bezier
+    // WigglingCircle* circle = new WigglingCircle(graphicContext, Circle(Point(800.0f, 600.0f), 200.0f));
+
+    GraphicText* text = new GraphicText(graphicContext, "Click anywhere on the screen !", 
+    graphicContext->font_main, 500.0f, 500.0f, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
     return scene;
 }
 
@@ -78,21 +68,11 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
-    // scene->ConnectHandler(EVENT_HANDLER_PARTICLE_HIGHLIGHTER);
 
     // generate particles
     ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    generator->Generate(1000, ParticleClass::PARTICLE_CLASS_A);
+    generator->Generate(0000, ParticleClass::PARTICLE_CLASS_A);
     generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
- 
-    // We create a particle.
-    Particle* particle = new Particle();
-    particle->SetPosition(glm::vec2(400.0f, 300.0f));
-
-    // We create a particle adapter.
-    ParticleAdapter* adapter = new ParticleAdapter(graphicContext, particle);
-    std::cout << "Particle:" << std::endl;
-
     return scene;
 }
 
