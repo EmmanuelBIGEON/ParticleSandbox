@@ -3,6 +3,8 @@
 #include "../../main/GraphicContext.h"
 #include "../../main/GraphicObject.h"
 
+#include "../common/GraphicText.h"
+
 #include "../../../common/Signal.h"
 
 #include <glm/glm.hpp>
@@ -34,20 +36,31 @@ class Button : public GraphicObject
         //! \brief Set the hovering color of the button.
         void SetHoveringColor(const glm::vec3& color);
 
-        glm::vec2 GetPosition() const { return m_Position; }
+        glm::vec2 GetPosition() const { return m_Pos; }
         glm::vec2 GetSize() const { return m_Size; }
         glm::vec3 GetColor() const { return m_Color; }
         glm::vec3 GetHoveringColor() const { return m_HoveringColor; }
         std::string GetText() const { return m_Text; }
 
+        bool m_isHovered;
+
         Signal<> OnClick;
     protected: 
-        glm::vec2 m_Position;
+
+        Shader* m_Shader;   
+        glm::vec2 m_Pos;
         glm::vec2 m_Size;
         glm::vec3 m_Color;
         glm::vec3 m_HoveringColor;
         std::string m_Text;
 
-        bool m_isHovered;
 
+        unsigned int m_VAO;
+        unsigned int m_VBO;
+        unsigned int m_EBO;
+
+        float m_vertices[8];
+        int m_indices[6];
+
+        GraphicText* m_TextObject;
 };

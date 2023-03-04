@@ -20,7 +20,8 @@ enum AvailableShader
     SHADER_TEXTURE,
     SHADER_LIGHTING,
     SHADER_LINE,
-    SHADER_PARTICLE
+    SHADER_PARTICLE,
+    SHADER_BUTTON
 };
 
 //! \class GraphicContext
@@ -103,6 +104,7 @@ class GraphicContext
         Shader* shader_lighting; // [won't be reshapped, kept for testing purposes]
         Shader* shader_line;
         Shader* shader_particle; // Principal shader for the simulation
+        Shader* shader_button;
 
 
         //! \brief Projection matrix.

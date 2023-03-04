@@ -43,6 +43,7 @@ set(SOURCES
     ../src/graphics/components/common/GraphicImage.cpp
     ../src/graphics/components/common/GraphicLine.cpp
     ../src/graphics/components/common/BezierCurve.cpp
+    ../src/graphics/components/ui/Button.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES} favicon.rc)
