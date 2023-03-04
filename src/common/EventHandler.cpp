@@ -191,7 +191,7 @@ void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
 
-                // Creat the particle.
+                // Create the particle.
                 Particle* particle = new Particle(glm::vec2(xCenter,yCenter));
                 ParticleAdapter* particleAdapter = new ParticleAdapter(m_Context,particle);
                 
