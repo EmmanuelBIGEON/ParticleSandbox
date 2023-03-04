@@ -70,7 +70,6 @@ void EventHandler_Test2::HandleEvent(const Event& event)
             MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
             if(mousePressedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
             {
-                std::cout << "Create a circle at " << mouseEvent->posX << " " << mouseEvent->posY << std::endl;
 
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
@@ -82,9 +81,8 @@ void EventHandler_Test2::HandleEvent(const Event& event)
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
 
-                // CircleAdapter* circle = new CircleAdapter(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
                 PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 40.0f));
-                // WigglingCircle* circle = new WigglingCircle(m_Context,Circle(Point(xCenter,yCenter), 100.0f));
+
                 // generate a random color
                 float r = (float)rand() / (float)RAND_MAX;
                 float g = (float)rand() / (float)RAND_MAX;
@@ -116,8 +114,6 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
-                std::cout << "Create a Particle  at " << xCenter << " " << yCenter << std::endl;
-
                 // Creat the particle.
                 Particle* particle = new Particle(glm::vec2(xCenter,yCenter));
                 ParticleAdapter* particleAdapter = new ParticleAdapter(m_Context,particle);
@@ -147,14 +143,12 @@ EventHandler_ParticleHighlighter::EventHandler_ParticleHighlighter(GraphicContex
     {
         for(auto particle : particles)
         {
-        std::cout << "New particles" << std::endl;
             particle->SetHighlight(true);
         }
     });
 
     m_ParticleDetector->OnErasedParticles.Connect([this](std::vector<ParticleAdapter*> particles)
     {
-        std::cout << "Particles erased" << std::endl;
         for(auto particle : particles)
         {
             particle->SetHighlight(false);
