@@ -45,6 +45,11 @@ GraphicContext::GraphicContext()
     m_ModelMatrix = model;
     m_ProjectionMatrix = projection;
     m_ViewMatrix = view;
+
+    OnMouseMoved.Connect([this](float x, float y)
+    {
+        std::cout << "Mouse moved: " << x << ", " << y << std::endl;
+    });
 }
 
 GraphicContext::~GraphicContext()
@@ -335,6 +340,8 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
             return shader_line;
         case SHADER_PARTICLE:
             return shader_particle;
+        case SHADER_BUTTON:
+            return shader_button;
     }
     return nullptr;
 }

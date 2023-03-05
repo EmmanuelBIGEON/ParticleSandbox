@@ -199,3 +199,26 @@ void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
         }
     }
 }
+
+void EventHandler_UI::HandleEvent(const Event& event)
+{
+    if(event.GetEventType() == EventType::EVENT_MOUSE)
+    {
+        MouseEvent* mouseEvent = (MouseEvent*)&event;
+        if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_MOVED)
+        {
+            MouseMovedEvent* mousePressedEvent = (MouseMovedEvent*)&event;
+            float xCenter = (float)mouseEvent->posX;
+            float yCenter = (float)mouseEvent->posY; 
+            xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
+            yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+            yCenter = -yCenter;
+            xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+            yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+
+            // Detect if the mouse is over an UI object.
+            // m_Context->SetMousePosition(glm::vec2(xCenter,yCenter));
+            m_Context->OnMouseMoved.Emit(xCenter,yCenter);
+        }
+    }
+}

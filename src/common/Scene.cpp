@@ -12,6 +12,8 @@
 #include "../graphics/components/common/GraphicLine.h"
 #include "../graphics/components/common/BezierCurve.h"
 
+#include "../graphics/components/ui/Button.h"
+
 #include "../graphics/util/generators/ParticleGenerator.h"
 
 #include "EventHandler.h"
@@ -61,6 +63,8 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 
     GraphicText* text = new GraphicText(graphicContext, "Click anywhere on the screen !", 
     graphicContext->font_main, 500.0f, 500.0f, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
+
+
     return scene;
 }
 
@@ -81,20 +85,9 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
-    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->ConnectHandler(EVENT_HANDLER_UI);
 
-    ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    generator->Generate(1000);
-
-    // We create a particle.
-    Particle* particle = new Particle();
-    particle->SetPosition(glm::vec2(400.0f, 300.0f));
-    ParticleAdapter* adapter = new ParticleAdapter(graphicContext, particle);
-
-    // We create a particle.
-    Particle* particle2 = new Particle();
-    particle2->SetPosition(glm::vec2(500.0f, 300.0f));
-    ParticleAdapter* adapter2 = new ParticleAdapter(graphicContext, particle2);
+    Button* button = new Button(graphicContext, glm::vec2(100.0f, 100.0f), glm::vec2(200.0f, 200.0f), glm::vec3(1.0f, 0.0f, 0.0f), "Click me !");
 
 
     return scene;
@@ -128,6 +121,12 @@ void Scene::ConnectHandler(EventHandlerType handlerType)
         case EVENT_HANDLER_PARTICLE_HIGHLIGHTER:
         {
             EventHandler_ParticleHighlighter* handler = new EventHandler_ParticleHighlighter(m_GraphicContext);
+            global_EventHandler = handler;
+            break;
+        }
+        case EVENT_HANDLER_UI:
+        {
+            EventHandler_UI* handler = new EventHandler_UI(m_GraphicContext);
             global_EventHandler = handler;
             break;
         }

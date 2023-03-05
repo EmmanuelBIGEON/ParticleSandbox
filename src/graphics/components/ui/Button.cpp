@@ -3,12 +3,12 @@
 #include <glad/glad.h>
 
 Button::Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text)
-    : GraphicObject(context, SHADER_BASIC), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),
+    : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),
     m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr)
 {
     // SHADER_BASIC is not the shader for it. It's just a default value.
     // TODO shader, thinking..
-    m_Shader = m_Context->GetShader(SHADER_BASIC);
+    m_Shader = m_Context->GetShader(SHADER_BUTTON);
 }
 
 Button::~Button()

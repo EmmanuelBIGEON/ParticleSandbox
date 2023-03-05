@@ -13,7 +13,8 @@ enum EventHandlerType
     EVENT_HANDLER_TEST,
     EVENT_HANDLER_TEST2,
     EVENT_HANDLER_PARTICLE_CREATOR,
-    EVENT_HANDLER_PARTICLE_HIGHLIGHTER
+    EVENT_HANDLER_PARTICLE_HIGHLIGHTER,
+    EVENT_HANDLER_UI
 };
 
 //! \class EventHandler
@@ -87,6 +88,19 @@ class EventHandler_ParticleHighlighter : public EventHandler
         GraphicContext* m_Context;
         ParticleDetector* m_ParticleDetector;
 
+};
+
+//! \class EventHandler_ParticleHighlighter
+//! \brief Implement needed interaction with the UI
+class EventHandler_UI : public EventHandler
+{
+    public:
+        EventHandler_UI(GraphicContext* context) : m_Context(context) {}
+        virtual ~EventHandler_UI() {}
+
+        virtual void HandleEvent(const Event& event);
+    private: 
+        GraphicContext* m_Context;
 };
 
 

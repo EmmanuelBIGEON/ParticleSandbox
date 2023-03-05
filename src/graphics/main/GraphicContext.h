@@ -79,10 +79,17 @@ class GraphicContext
         static float worldWidth;
         static float worldHeight;
 
+        //! \brief Signal emitted when the mouse is moved.
+        //! Allowing UI elements to connect to it.
+        Signal<float, float> OnMouseMoved;
+
+        //! \brief Signal when a graphic object join or leave the context.
         Signal<GraphicObject*> OnObjectRegistered;
         Signal<GraphicObject*> OnObjectRemoved;
 
     protected:
+
+        
 
         //! Render particles in multiple threads
         virtual void RenderThread(int nbOfThreads, int threadId);
@@ -94,6 +101,8 @@ class GraphicContext
         //! \brief List of all the objects to be rendered.
         //! This structure might be changed later.
         std::vector<GraphicObject*> m_Objects;
+
+        //! subvector containing only hovered objects
 
         // render separately the particles for efficiency
         std::vector<ParticleAdapter*> m_ParticleAdapters;
@@ -121,5 +130,8 @@ class GraphicContext
 
         float m_ScreenWidth;
         float m_ScreenHeight;
+
+        float m_MouseX;
+        float m_MouseY;
         
 };
