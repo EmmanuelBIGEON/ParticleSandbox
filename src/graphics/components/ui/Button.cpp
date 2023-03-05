@@ -9,6 +9,30 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
     // SHADER_BASIC is not the shader for it. It's just a default value.
     // TODO shader, thinking..
     m_Shader = m_Context->GetShader(SHADER_BUTTON);
+
+    // default calculation of m_HoveringColor
+    // if the color is too dark, the hovering color will be lighter
+    // if the color is too light, the hovering color will be darker
+    float sum = m_Color.r + m_Color.g + m_Color.b;
+    if(sum < 1.5f) 
+        m_HoveringColor = m_Color + glm::vec3(0.3f, 0.3f, 0.3f);
+    else
+        m_HoveringColor = m_Color - glm::vec3(0.3f, 0.3f, 0.3f);
+
+    // Connect to mouve move of the context
+
+    m_Context->OnMouseMoved.Connect([this](float x, float y)
+    {
+        if(x > m_Pos.x && x < m_Pos.x + m_Size.x && 
+           y > m_Pos.y && y < m_Pos.y + m_Size.y)
+        {
+            m_isHovered = true;
+        }
+        else
+        {
+            m_isHovered = false;
+        }
+    });
 }
 
 Button::~Button()
