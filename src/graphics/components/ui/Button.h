@@ -45,7 +45,7 @@ class Button : public GraphicObject
         bool m_isHovered;
 
         Signal<> OnClick;
-        
+
     protected: 
 
         Shader* m_Shader;   

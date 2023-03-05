@@ -88,7 +88,10 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
     Button* button = new Button(graphicContext, glm::vec2(100.0f, 100.0f), glm::vec2(200.0f, 200.0f), glm::vec3(1.0f, 0.0f, 0.0f), "Click me !");
-
+    button->OnClick.Connect([button]()
+    {
+        std::cout << "Button clicked !" << std::endl;
+    });
 
     return scene;
 }

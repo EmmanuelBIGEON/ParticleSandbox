@@ -45,11 +45,6 @@ GraphicContext::GraphicContext()
     m_ModelMatrix = model;
     m_ProjectionMatrix = projection;
     m_ViewMatrix = view;
-
-    OnMouseMoved.Connect([this](float x, float y)
-    {
-        std::cout << "Mouse moved: " << x << ", " << y << std::endl;
-    });
 }
 
 GraphicContext::~GraphicContext()

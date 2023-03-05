@@ -83,6 +83,11 @@ class GraphicContext
         //! Allowing UI elements to connect to it.
         Signal<float, float> OnMouseMoved;
 
+        //! \brief Signal emitted when the mouse is clicked.
+        //! Allowing UI elements to connect to it.
+        // Give the position (in world coordinates) of the mouse when it was clicked.
+        Signal<float, float> OnMouseClicked;
+
         //! \brief Signal when a graphic object join or leave the context.
         Signal<GraphicObject*> OnObjectRegistered;
         Signal<GraphicObject*> OnObjectRemoved;
