@@ -1,6 +1,11 @@
 #include "ParticleAdapter.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include <glm/glm.hpp>
 
 #include "../../main/GraphicContext.h"
@@ -78,11 +83,11 @@ void ParticleAdapter::Update()
                 mvt_x += resulting_movement.x;
                 mvt_y += resulting_movement.y;
                 continue;
-            }else if(distance < 100.0f)
+            }else if(distance < 70.0f)
             {
                 continue;
                 // do nothing.
-            }else if(distance < 250.0f)
+            }else if(distance < 200.0f)
             {
                 // Simplified attraction to keep the particles together
                 // glm::lowp_vec2 direction = glm::normalize(otherParticle->Position - Position);
@@ -96,7 +101,7 @@ void ParticleAdapter::Update()
                 // formula = F = G * ((m1 * m2) / r^2)
                 // Let's assume G = 1
                 // glm::lowp_vec2 direction = glm::normalize(otherParticle->Position - Position);
-                float force = 30 * (m_Particle->GetMass() * otherParticle->m_Particle->GetMass()) / (distance * distance);
+                float force = 50 * (m_Particle->GetMass() * otherParticle->m_Particle->GetMass()) / (distance * distance);
                 mvt_x += direction.x * force;
                 mvt_y += direction.y * force;
             }

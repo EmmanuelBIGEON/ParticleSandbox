@@ -10,7 +10,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Window.h"
+#include "Application.h"
 
 EventHandler* global_EventHandler = nullptr;
 
@@ -74,13 +74,14 @@ void EventHandler_Test2::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
                 // Convert to world coordinates.
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
 
+                std::cout << "xCenter: " << xCenter << " yCenter: " << yCenter << std::endl;
                 PanickedCircle* circle = new PanickedCircle(m_Context,Circle(Point(xCenter,yCenter), 40.0f));
 
                 // generate a random color
@@ -109,8 +110,8 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
@@ -167,8 +168,8 @@ void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
             MouseMovedEvent* mousePressedEvent = (MouseMovedEvent*)&event;
             float xCenter = (float)mouseEvent->posX;
             float yCenter = (float)mouseEvent->posY; 
-            xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
-            yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+            xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+            yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
             yCenter = -yCenter;
             xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
             yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
@@ -185,8 +186,8 @@ void EventHandler_ParticleHighlighter::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
@@ -210,8 +211,8 @@ void EventHandler_UI::HandleEvent(const Event& event)
             MouseMovedEvent* mousePressedEvent = (MouseMovedEvent*)&event;
             float xCenter = (float)mouseEvent->posX;
             float yCenter = (float)mouseEvent->posY; 
-            xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
-            yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+            xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+            yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
             yCenter = -yCenter;
             xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
             yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
@@ -227,8 +228,8 @@ void EventHandler_UI::HandleEvent(const Event& event)
                 float xCenter = (float)mouseEvent->posX;
                 float yCenter = (float)mouseEvent->posY; 
                 // Convert to OpenGL coordinates.
-                xCenter = (xCenter / (float)Window::viewportWidth) * 2.0f - 1.0f;
-                yCenter = (yCenter / (float)Window::viewportHeight) * 2.0f - 1.0f;
+                xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);

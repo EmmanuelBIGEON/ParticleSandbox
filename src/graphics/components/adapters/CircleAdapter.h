@@ -2,6 +2,7 @@
 
 #include "../../main/GraphicContext.h"
 #include "../../main/GraphicObject.h"
+#include "../../main/Shader.h"
 
 #include "../../../geometry/Circle.h"
 
@@ -21,6 +22,7 @@ class CircleAdapter : public GraphicObject
         virtual void Draw() override;
 
     private:
+        Shader* m_Shader;
 
         Circle m_Circle;
         glm::vec3 m_Color;

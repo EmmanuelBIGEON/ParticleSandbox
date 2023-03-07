@@ -1,6 +1,10 @@
 #include "AdvancedRectangle.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 AdvancedRectangle::AdvancedRectangle(GraphicContext* context, const Rectangle& rectangle, const glm::vec3& color)
     : GraphicObject(context, SHADER_LIGHTING), m_Rectangle(rectangle), m_Color(color), m_VAO(0), m_VBO(0)

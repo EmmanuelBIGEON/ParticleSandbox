@@ -41,7 +41,7 @@ void BasicUI::Init(GraphicContext* context)
 
 void BasicUI::Update()
 {
-    m_fps = Window::fps;
+    m_fps = Application::fps;
 
     std::string text = "Particles: ";
     text += std::to_string(m_particlesCount);

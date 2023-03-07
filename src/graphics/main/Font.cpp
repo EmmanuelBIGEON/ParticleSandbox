@@ -5,7 +5,12 @@
 #include FT_FREETYPE_H  
 
 #include <freetype/freetype.h>
+
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 #include <iostream>
 
@@ -54,17 +59,23 @@ void Font::Load(const char* path, int size)
         unsigned int texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
+
+#ifdef __EMSCRIPTEN__
+
         glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RED,
-            m_Face->glyph->bitmap.width,
-            m_Face->glyph->bitmap.rows,
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
+            GL_TEXTURE_2D, 0, GL_R8,
+            m_Face->glyph->bitmap.width, m_Face->glyph->bitmap.rows,
+            0, GL_RED, GL_UNSIGNED_BYTE,
             m_Face->glyph->bitmap.buffer
         );
+#else 
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RED,
+            m_Face->glyph->bitmap.width, m_Face->glyph->bitmap.rows,
+            0, GL_RED, GL_UNSIGNED_BYTE,
+            m_Face->glyph->bitmap.buffer
+        );
+#endif
         // set texture options
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -75,7 +86,7 @@ void Font::Load(const char* path, int size)
             texture, 
             glm::ivec2(m_Face->glyph->bitmap.width, m_Face->glyph->bitmap.rows),
             glm::ivec2(m_Face->glyph->bitmap_left, m_Face->glyph->bitmap_top),
-            m_Face->glyph->advance.x
+             static_cast<unsigned int>(m_Face->glyph->advance.x)
         };
         characters.insert(std::pair<char, Character>(c, character));
     }

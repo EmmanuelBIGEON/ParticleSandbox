@@ -2,6 +2,7 @@
 
 #include "../../main/GraphicContext.h"
 #include "../../main/GraphicObject.h"
+#include "../../main/Shader.h"
 
 #include "../../../geometry/Rectangle.h"
 
@@ -23,6 +24,7 @@ class RectangleAdapter : public GraphicObject
         virtual void Draw() override;
 
     private:
+        Shader* m_Shader;
         Rectangle m_Rectangle;
 
         unsigned int m_VAO; // Might be possible to optimize 

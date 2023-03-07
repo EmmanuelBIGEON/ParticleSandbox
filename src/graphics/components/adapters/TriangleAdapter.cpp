@@ -1,6 +1,11 @@
 #include "TriangleAdapter.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include <iostream>
 
 #include <glm/ext.hpp>
@@ -8,6 +13,7 @@
 TriangleAdapter::TriangleAdapter(GraphicContext* context, const Triangle& triangle) : GraphicObject(context,SHADER_BASIC), 
     m_Triangle(triangle), m_VAO(0), m_VBO(0), m_Color(1.0f, 0.0f, 1.0f), m_Alpha(1.0f)
 {
+    m_Shader = context->GetShader(SHADER_BASIC);
 }
 
 TriangleAdapter::~TriangleAdapter()
@@ -78,6 +84,7 @@ void TriangleAdapter::Update()
 
 void TriangleAdapter::Draw()
 {
+    m_Shader->SetMat4("shiftPos", glm::mat4(1.0f));
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
