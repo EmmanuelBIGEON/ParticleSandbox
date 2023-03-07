@@ -2,6 +2,7 @@
 
 class GraphicContext;
 class Window;
+class Wasm_View;
 class Scene;
 
 //! \class Application
@@ -10,8 +11,6 @@ class Scene;
 class Application
 {
     public:
-        Application();
-        virtual ~Application();
 
         void Run();
 
@@ -26,13 +25,39 @@ class Application
         void LoadScene_2();
         void LoadScene_3();
 
+        static int viewportWidth;
+        static int viewportHeight;
+        static int fps;
+
+        // singleton
+        static Application* GetInstance()
+        {
+            if(instance == nullptr)
+                instance = new Application();
+            return instance;
+        }
 
     protected:
-        
-        virtual void CreateWindow();
+
+        Application();
+        virtual ~Application();
+
+        static Application* instance;
+
+#ifdef __EMSCRIPTEN__
+        void CreateWasmView();
+#else 
+        void CreateWindow();
+#endif 
 
     private: 
+
+#ifdef __EMSCRIPTEN__
+        Wasm_View* m_WasmView;
+#else
         Window* m_Window;
+#endif
+
         GraphicContext* m_GraphicContext;
         Scene* m_currentScene;
 

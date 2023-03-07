@@ -34,6 +34,14 @@
 build/**
 bin/**
 
+
+
+project/wasm/build/**
+project/wasm/web/**
+project/wasm/inc/freetype/**
+project/wasm/inc/glm/**
+project/wasm/inc/ft2build.h
+
 other/space_coordinates/build/**
 other/space_coordinates/bin/**
 

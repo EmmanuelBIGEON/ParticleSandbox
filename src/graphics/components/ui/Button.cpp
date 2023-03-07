@@ -1,6 +1,10 @@
 #include "Button.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 Button::Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text)
     : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),

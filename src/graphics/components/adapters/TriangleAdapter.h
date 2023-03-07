@@ -3,6 +3,7 @@
 #include "../../../geometry/Triangle.h"
 #include "../../main/GraphicObject.h"
 #include "../../main/GraphicContext.h"
+#include "../../main/Shader.h"
 
 #include <glm/vec3.hpp>
 
@@ -24,6 +25,7 @@ class TriangleAdapter : public GraphicObject
         virtual void Draw() override;
 
     private:
+        Shader* m_Shader;
         Triangle m_Triangle;
 
         // opengl

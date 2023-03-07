@@ -18,7 +18,13 @@
 
 #include "EventHandler.h"
 
+
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
@@ -58,11 +64,12 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_TEST2);
-
+    TriangleAdapter* adapter = new TriangleAdapter(graphicContext, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
+    RectangleAdapter* adapter2 = new RectangleAdapter(graphicContext, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
     // WigglingCircle* circle = new WigglingCircle(graphicContext, Circle(Point(800.0f, 600.0f), 200.0f));
 
-    GraphicText* text = new GraphicText(graphicContext, "Click anywhere on the screen !", 
-    graphicContext->font_main, 500.0f, 500.0f, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
+    // GraphicText* text = new GraphicText(graphicContext, "Click anywhere on the screen !", 
+    // graphicContext->font_main, 500.0f, 500.0f, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 
     return scene;
@@ -75,7 +82,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 
     // generate particles
     ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    generator->Generate(1000, ParticleClass::PARTICLE_CLASS_A);
+    generator->Generate(320, ParticleClass::PARTICLE_CLASS_A);
     generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
     return scene;
 }

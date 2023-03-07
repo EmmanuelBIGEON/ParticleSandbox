@@ -9,7 +9,6 @@ include_directories(
 # replace \ by / in ${MAIN_DIR} to avoid cmake error
 string(REPLACE "\\" "/" MAIN_DIR ${MAIN_DIR})
 
-
 set(SOURCES
     ../src/glad/glad.c
     ../src/main.cpp

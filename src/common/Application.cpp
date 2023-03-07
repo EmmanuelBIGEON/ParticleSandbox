@@ -5,13 +5,33 @@
 #include "../graphics/components/adapters/ParticleAdapter.h"
 #include "Scene.h"
 
+
+#ifdef __EMSCRIPTEN__
+#include "../wasm/Wasm_View.h"
+#endif
+
 // lock
 #include <mutex>
+
+#include <iostream>
+
+// singleton 
+Application* Application::instance = nullptr;
+
 std::mutex m_mutex;
 
+int Application::viewportWidth = 1200, Application::viewportHeight = 900;
+int Application::fps = 0;
 
-Application::Application() : m_Window(nullptr), m_GraphicContext(nullptr), m_currentScene(nullptr)
+
+Application::Application() : m_GraphicContext(nullptr), m_currentScene(nullptr)
 {
+#ifdef __EMSCRIPTEN__
+    m_WasmView = nullptr;
+#else
+    m_Window = nullptr;
+#endif
+
 }
 
 Application::~Application()
@@ -21,18 +41,38 @@ Application::~Application()
 void Application::Run()
 {
     m_GraphicContext = new GraphicContext();
+
+#ifdef __EMSCRIPTEN__
+    CreateWasmView();
+#else
     CreateWindow(); 
-    
     // Unreachable code.
     // The application loop is in the window.
     // If needed, multithread is an option.
+#endif
+}
+    
+
+#ifdef __EMSCRIPTEN__
+
+
+void Application::CreateWasmView()
+{
+    m_WasmView = new Wasm_View();
+    m_GraphicContext->Init();
+    ParticleAdapter::LoadParticleVAO();
+
+    // Load the scene.
+    LoadScene_2();
 }
 
+
+#else
 void Application::CreateWindow()
 {
-    Window* window = new Window();
+    m_Window = new Window();
 
-    window->OnWindowReady.Connect([this](void)
+    m_Window->OnWindowReady.Connect([this](void)
     {
         // Initialize the graphic context.
         m_GraphicContext->Init();
@@ -41,13 +81,13 @@ void Application::CreateWindow()
         ParticleAdapter::LoadParticleVAO();
 
         // Load the scene.
-        LoadScene_3();
+        LoadScene_1();
         
     });
 
-    window->Display(this);
+    m_Window->Display(this);
 }
-
+#endif
 
 void Application::Render()
 {

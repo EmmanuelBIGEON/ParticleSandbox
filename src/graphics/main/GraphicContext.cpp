@@ -1,6 +1,11 @@
 #include "GraphicContext.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -16,7 +21,9 @@
 #include "../../common/Window.h"
 #include "../../common/Chrono.h"
 
+#ifndef __EMSCRIPTEN__
 #include <thread>
+#endif
 
 
 
@@ -163,7 +170,10 @@ void GraphicContext::Render()
             {
                 shader_basic->Use();
                 if(!object->IsUpdated()) // if the object is not updated, update it
+                {
                     object->Update();   
+
+                }
 
                 break;
             }
@@ -218,21 +228,27 @@ void GraphicContext::Render()
 
     // Chrono chrono;
     // chrono.Start();
-    if(m_ParticleAdapters.size() > 300)
-    {
-        std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
-        std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
+    // if(m_ParticleAdapters.size() > 300)
+    // {
+    //     std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
+    //     std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
 
-        t1.join();
-        t2.join();
-        for(auto adapter : m_ParticleAdapters) adapter->Draw();
-    }else
+    //     t1.join();
+    //     t2.join();
+    //     for(auto adapter : m_ParticleAdapters) adapter->Draw();
+    // }else
+    // {
+    //     for(auto adapter : m_ParticleAdapters)
+    //     {
+    //         adapter->Update();
+    //         adapter->Draw();
+    //     }
+    // }
+
+    for(auto adapter : m_ParticleAdapters)
     {
-        for(auto adapter : m_ParticleAdapters)
-        {
-            adapter->Update();
-            adapter->Draw();
-        }
+        adapter->Update();
+        adapter->Draw();
     }
 
 }

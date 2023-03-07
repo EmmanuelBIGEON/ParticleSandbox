@@ -19,7 +19,4 @@ class Window
 
         Signal<> OnWindowReady;
 
-        static int viewportWidth;
-        static int viewportHeight;
-        static int fps;
 };

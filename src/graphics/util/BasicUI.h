@@ -4,7 +4,7 @@
 #include "../main/GraphicContext.h"
 #include "../main/GraphicObject.h"
 
-#include "../../common/Window.h"
+#include "../../common/Application.h"
 
 //! \class BasicUI
 //! \brief Display the FPS and the number of particules in the context.

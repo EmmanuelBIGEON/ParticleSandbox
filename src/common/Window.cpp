@@ -16,9 +16,6 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 double lastMouseX = 0, lastMouseY = 0;
-int Window::viewportWidth = 1200, Window::viewportHeight = 900;
-int Window::fps = 0;
-
 Window::Window()
 {
     // Setup the event handler (even if it is replaced, because it is assumed that it always exists)
@@ -41,7 +38,7 @@ void Window::Display(Application* app)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    GLFWwindow* window = glfwCreateWindow(viewportWidth, viewportHeight, "ParticleSandbox", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(Application::viewportWidth, Application::viewportHeight, "ParticleSandbox", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -92,7 +89,7 @@ void Window::Display(Application* app)
         if (currentTime - lastTime >= 1.0) 
         {
             lastTime += 1.0;
-            fps = nbFrames;
+            Application::fps = nbFrames;
             nbFrames = 0;
         }
 
@@ -107,8 +104,8 @@ void Window::Display(Application* app)
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    Window::viewportWidth = width;
-    Window::viewportHeight = height;
+    Application::viewportWidth = width;
+    Application::viewportHeight = height;
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

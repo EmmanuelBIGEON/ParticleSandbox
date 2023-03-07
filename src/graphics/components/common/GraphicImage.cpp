@@ -1,6 +1,10 @@
 #include "GraphicImage.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -115,11 +119,20 @@ void GraphicImage::Update()
         std::string extension = m_Path.substr(m_Path.find_last_of(".") + 1);
         if(extension == "jpg")
         {
+#ifdef __EMSCRIPTEN__
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB8, GL_UNSIGNED_BYTE, data); // GL_RGB
+#else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); // GL_RGB
+#endif
             glGenerateMipmap(GL_TEXTURE_2D);
         }else if(extension == "png")
         {
+
+#ifdef __EMSCRIPTEN__
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA8, GL_UNSIGNED_BYTE, data); // GL_RGBA
+#else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); // GL_RGBA
+#endif
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 

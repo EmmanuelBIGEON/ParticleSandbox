@@ -1,11 +1,17 @@
 #include "CircleAdapter.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include <iostream>
 
 CircleAdapter::CircleAdapter(GraphicContext* context, const Circle& circle) 
 : GraphicObject(context, SHADER_BASIC), m_Circle(circle), m_vertices(nullptr), m_nbVertices(0), m_VAO(0), m_VBO(0), m_Color(glm::vec3(0.0f, 1.0f, 0.0f))
 {
+    m_Shader = context->GetShader(SHADER_BASIC);
 }
 
 CircleAdapter::~CircleAdapter()
@@ -91,6 +97,7 @@ void CircleAdapter::Update()
 void CircleAdapter::Draw()
 {
     // draw a filled circle
+    m_Shader->SetMat4("shiftPos", glm::mat4(1.0f));
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_TRIANGLE_FAN, 0, m_nbVertices);
     glBindVertexArray(0);

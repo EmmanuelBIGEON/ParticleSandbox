@@ -1,11 +1,16 @@
 #include "RectangleAdapter.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 
 RectangleAdapter::RectangleAdapter(GraphicContext* context, const Rectangle& rectangle) : GraphicObject(context, SHADER_BASIC),
  m_Rectangle(rectangle), m_Color(glm::vec3(0.0f, 1.0f, 1.0f)), m_Alpha(1.0f), m_VAO(0), m_VBO(0), m_EBO(0)
 {
+    m_Shader = context->GetShader(SHADER_BASIC);
 }
 
  RectangleAdapter::~RectangleAdapter()
@@ -93,7 +98,9 @@ void RectangleAdapter::Update()
 
 void RectangleAdapter::Draw()
 {
+    m_Shader->SetMat4("shiftPos", glm::mat4(1.0f));
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    std::cout << "Drawing rectangle" << std::endl;
 }
 
