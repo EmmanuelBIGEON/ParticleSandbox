@@ -24,6 +24,8 @@ class GraphicText : public GraphicObject
         const std::string& GetText() const { return m_Text; }
         const Font* GetFont() const { return m_Font; }
 
+        void SetColor(glm::vec3 color) { m_Color = color;}
+
         virtual void Update() override;
         virtual void Draw() override;
 

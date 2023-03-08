@@ -6,6 +6,9 @@
 #include <glad/glad.h>
 #endif
 
+#include "../../main/GraphicContext.h"
+#include "../../main/Font.h"
+
 Button::Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text)
     : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),
     m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr)
@@ -30,11 +33,19 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
         if(x > m_Pos.x && x < m_Pos.x + m_Size.x && 
            y > m_Pos.y && y < m_Pos.y + m_Size.y)
         {
-            m_isHovered = true;
+            if(!m_isHovered)
+            {
+                m_isHovered = true;
+                m_TextObject->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
+            }
         }
         else
         {
-            m_isHovered = false;
+            if(m_isHovered)
+            {
+                m_isHovered = false;
+                m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
+            }
         }
     });
 
@@ -85,8 +96,17 @@ void Button::Update()
     glBindVertexArray(0);
 
     // m_TextObject later..
+    if(m_TextObject)
+    {
+        delete m_TextObject;
+    }
+    int textX = m_Pos.x + m_Size.x / 2 - m_Text.length() * 10;
+    int textY = m_Pos.y + m_Size.y / 2 - m_Context->font_main->GetSize() / 2;
+    // Need a better way to calculate the text position
+    // New constructor for GraphicText TODO
+    m_TextObject = new GraphicText(m_Context, m_Text, m_Context->font_main, textX, textY, 0.9f, glm::vec3(1.0f, 1.0f, 1.0f));
 
-
+    m_IsUpdated = true;
 }
 
 void Button::Draw()

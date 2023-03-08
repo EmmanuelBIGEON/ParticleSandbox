@@ -17,6 +17,7 @@ GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, 
 GraphicText::GraphicText(GraphicContext* context, const std::string& text, Font* font, float x, float y, float scale, glm::vec3 color) 
     : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), m_VBO(0)
 {
+    m_Shader = context->GetShader(SHADER_TEXT);
 }
 
 GraphicText::~GraphicText()
@@ -56,6 +57,7 @@ void GraphicText::Draw()
     // Code example found in learnopengl.com
 
     // activate corresponding render state	
+    // std::cout << "Drawing with color " << m_Color.x << " " << m_Color.y << " " << m_Color.z << std::endl;
     glUniform3f(glGetUniformLocation(m_Shader->shaderID, "textColor"), m_Color.x, m_Color.y, m_Color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_VAO);
