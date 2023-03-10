@@ -1,4 +1,4 @@
-# ParticleSandbox
+# ParticleSandbox (under construction)
 **A particle simulator and sandbox in C++**
 (under construction)
 
