@@ -8,6 +8,10 @@
 
 #include <iostream>
 
+
+// Defining the minimal padding of the box containing the text.
+#define FIXED_PADDING 5
+
 GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, float x, float y, float scale, glm::vec3 color) 
     : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), m_VBO(0)
 {
@@ -19,6 +23,14 @@ GraphicText::GraphicText(GraphicContext* context, const std::string& text, Font*
 {
     m_Shader = context->GetShader(SHADER_TEXT);
 }
+
+GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, float xstart, float ystart, float xend, float yend, glm::vec3 color)
+    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_xstart(xstart), m_ystart(ystart), m_xend(xend), m_yend(yend), m_scale(1.0f), m_Color(color), m_VAO(0), m_VBO(0)
+{
+    m_Shader = context->GetShader(SHADER_TEXT);
+}
+
+
 
 GraphicText::~GraphicText()
 {
@@ -36,7 +48,70 @@ void GraphicText::SetFont(Font* font)
 
 void GraphicText::Update()
 {
-    // std::cout << "GraphicText::Update()" << std::endl;
+
+    // Calculate size with xstart, ystart, xend, yend
+    // It needs to stay in the box. Scale if needed.
+    // For starter, TextAlign is always center
+    int text_align = TextAlign::ALIGN_CENTER;
+
+    // Calculate size of all characters
+    // to determine if text is too large and to align it accordingly
+    float textWidth = 0.0f;
+    std::string::const_iterator c;
+    for (c = m_Text.begin(); c != m_Text.end(); c++) 
+    {
+        Character ch = m_Font->characters[*c];
+        textWidth += (ch.Advance >> 6); // bitshift by 6 to get value in pixels (2^6 = 64)
+    }
+
+
+    // check if text too large
+    // If text overflows box, if height is large enough, create the text on multiple lines
+    if (textWidth > (m_xend - m_xstart))
+    {
+
+        // Get the font size (in pixels)
+        int fontSize = m_Font->GetSize();
+
+        // Calculate the number of lines needed
+        int nbLines = ceil(textWidth / (m_xend - m_xstart));
+
+        // Calculate lines available in box height  
+        int availableLines = (m_yend - m_ystart - FIXED_PADDING * 2) / fontSize;
+        if(availableLines <= 0)
+        {
+            std::cout << "Box of text too small unable to display anything (text value: " << m_Text << ")" << std::endl;
+            m_IsUpdated = true;
+            return;
+        }
+        
+        // The maximum difference between available lines and needed lines is 3
+        // Exceeded this limit, the text won't be displayed because it will be too small.
+        // Otherwise, the text will be scaled down to fit the box if it is between 1 and 3 lines exceeding the limit.
+        if (nbLines - availableLines > 3) // Too much lines, text won't be displayed
+        {
+            std::cout << "Text too large, not displayed (text value: " << m_Text << ")" << std::endl;
+            m_IsUpdated = true;
+            return;
+        }
+        else if (nbLines - availableLines > 0) // Text will be scaled down to fit the available space
+        {
+            // Calculate the new scale using the available space in all lines
+            int maxAvailableSpace = nbLines * (m_xend - m_xstart - FIXED_PADDING * 2);
+            m_scale = (float)maxAvailableSpace / textWidth;
+        }else
+        {
+            m_scale = 1.0f;
+        }
+
+        // Create the vertices for each line
+        // Considering text-align and the scale previously calculated
+        // TODO...
+
+    }
+
+    
+
     glGenVertexArrays(1, &m_VAO);
     glGenBuffers(1, &m_VBO);
     glBindVertexArray(m_VAO);
@@ -46,6 +121,7 @@ void GraphicText::Update()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
 
     m_IsUpdated = true;
 }

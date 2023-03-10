@@ -42,6 +42,7 @@ void Font::Load(const char* path, int size)
         return;
     }
 
+    // size is in pixels (both width and height are the same value)
     FT_Set_Pixel_Sizes(m_Face, 0, size);
 
 
