@@ -22,3 +22,8 @@ void ParticleGenerator::Generate(int nbParticles, ParticleClass particleClass)
         ParticleAdapter* particleAdapter = new ParticleAdapter(m_Context, particle);
     }
 }
+
+void Generate_Type2(int nbParticles, ParticleClass particleClass = ParticleClass::PARTICLE_CLASS_A)
+{
+    
+}

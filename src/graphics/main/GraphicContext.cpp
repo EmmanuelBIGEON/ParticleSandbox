@@ -52,6 +52,13 @@ GraphicContext::GraphicContext()
     m_ModelMatrix = model;
     m_ProjectionMatrix = projection;
     m_ViewMatrix = view;
+
+    // setup particleadapter2 handling
+    m_ParticleAdapters2 = nullptr;
+    sizestruct_ParticleAdapters2 = sizeof(ParticleAdapter2);
+    len_ParticleAdapters2 = 0;
+    m_ParticleAdapters2_begin = nullptr;
+    m_ParticleAdapters2_end = nullptr;
 }
 
 GraphicContext::~GraphicContext()
@@ -222,34 +229,129 @@ void GraphicContext::Render()
     }
 
     // render particels
+    // shader_particle->Use();
+    // shader_particle->SetVec3("particleColor", ParticleAdapter::highlightColor);
+    // glBindVertexArray(ParticleAdapter::VAO);
+
+    // // Chrono chrono;
+    // // chrono.Start();
+    // // if(m_ParticleAdapters.size() > 300)
+    // // {
+    // //     std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
+    // //     std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
+
+    // //     t1.join();
+    // //     t2.join();
+    // //     for(auto adapter : m_ParticleAdapters) adapter->Draw();
+    // // }else
+    // // {
+    // //     for(auto adapter : m_ParticleAdapters)
+    // //     {
+    // //         adapter->Update();
+    // //         adapter->Draw();
+    // //     }
+    // // }
+
+    // for(auto adapter : m_ParticleAdapters)
+    // {
+    //     adapter->Update();
+    //     adapter->Draw();
+    // }
+
+    // render particles v2
     shader_particle->Use();
-    shader_particle->SetVec3("particleColor", ParticleAdapter::highlightColor);
+    shader_particle->SetVec3("particleColor", glm::vec3(0.9, 0.01, 0.01));
     glBindVertexArray(ParticleAdapter::VAO);
 
     // Chrono chrono;
-    // chrono.Start();
-    // if(m_ParticleAdapters.size() > 300)
-    // {
-    //     std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
-    //     std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
+    // double timerender_distancecalculation = 0.0;
+    // double timerender_mvtcalculation = 0.0;
+    // double timerender_preprocess = 0.0;
+    // double timerender_afterprocess = 0.0;
+    
 
-    //     t1.join();
-    //     t2.join();
-    //     for(auto adapter : m_ParticleAdapters) adapter->Draw();
-    // }else
-    // {
-    //     for(auto adapter : m_ParticleAdapters)
-    //     {
-    //         adapter->Update();
-    //         adapter->Draw();
-    //     }
-    // }
-
-    for(auto adapter : m_ParticleAdapters)
+    for(ParticleAdapter2* adapter = m_ParticleAdapters2_begin; adapter != m_ParticleAdapters2_end; adapter++)
     {
-        adapter->Update();
-        adapter->Draw();
+        // SUPER EFFICIENT COMPUTE
+        ParticleAdapter2* cursor = m_ParticleAdapters2_begin;
+        float mvt_x = 0.0f;
+        float mvt_y = 0.0f;
+        while(cursor != m_ParticleAdapters2_end)
+        {
+            if(cursor == adapter)
+            {
+                cursor++;
+                continue;
+            }
+            // chrono.Start();
+            // Computation of particles
+            const float& vect_x = cursor->pos_x - adapter->pos_x;
+            const float& vect_y = cursor->pos_y - adapter->pos_y;
+            // chrono.Stop();
+            // timerender_preprocess += chrono.GetElapsedTime();
+
+            // if(vect_x > 800.0f)
+            //     other_x -= 1600.0f;
+            // else if(vect_x < -800.0f)
+            //     other_x += 1600.0f;
+
+            // if(vect_y > 600.0f)
+            //     other_y -= 1200.0f;
+            // else if(vect_y < -600.0f)
+            //     other_y += 1200.0f;
+
+            // chrono.Start();
+            float distance = sqrt(vect_x*vect_x + vect_y*vect_y);
+            // chrono.Stop();
+            // timerender_distancecalculation += chrono.GetElapsedTime();
+
+            // chrono.Start();
+            const float& direction_x = vect_x / distance;
+            const float& direction_y = vect_y / distance;
+
+            if(distance < 100.0f)
+            {
+                mvt_x += direction_x * (100.0f - distance) / 100.0f;
+                mvt_y += direction_y * (100.0f - distance) / 100.0f;
+            }else 
+            {
+                mvt_x += direction_x * 0.1f;
+                mvt_y += direction_y * 0.1f;
+            }
+            // chrono.Stop();
+            // timerender_mvtcalculation += chrono.GetElapsedTime();
+
+            cursor++;
+        }
+
+        // chrono.Start();
+        adapter->pos_x += mvt_x;
+        adapter->pos_y += mvt_y;
+        
+        if(adapter->pos_x < 0.0f)
+            adapter->pos_x = adapter->pos_x + 1600.0f;
+        else if(adapter->pos_x > 1600.0f)
+            adapter->pos_x = adapter->pos_x - 1600.0f;
+        if(adapter->pos_y < 0.0f)
+            adapter->pos_y = adapter->pos_y + 1200.0f;
+        else if(adapter->pos_y > 1200.0f)
+            adapter->pos_y = adapter->pos_y - 1200.0f;
+        
+        // chrono.Stop();
+        // timerender_afterprocess += chrono.GetElapsedTime();
+
+        shader_particle->SetVec2("shiftPos", glm::vec2(adapter->pos_x, adapter->pos_y));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
+
     }
+
+    // display times
+    // std::cout << "timerender_distancecalculation: " << timerender_distancecalculation << std::endl;
+    // std::cout << "timerender_mvtcalculation: " << timerender_mvtcalculation << std::endl;
+    // std::cout << "timerender_preprocess: " << timerender_preprocess << std::endl;
+    // std::cout << "timerender_afterprocess: " << timerender_afterprocess << std::endl;
+    // std::cout << "timerender_total: " << timerender_distancecalculation + timerender_mvtcalculation + timerender_preprocess + timerender_afterprocess << std::endl;
+    // std::cout << std::endl;
 
 }
 
@@ -313,6 +415,54 @@ void GraphicContext::Update()
     shader_button->SetMat4("model", m_ModelMatrix);
 
     needUpdate = false;
+}
+
+
+void GraphicContext::AddParticles(int nbParticles)
+{
+    // m_ParticleAdapters2
+    // Allocate the memory for the particles
+    if(m_ParticleAdapters2 == nullptr)
+    {
+        m_ParticleAdapters2 = new ParticleAdapter2[nbParticles];
+        len_ParticleAdapters2 = nbParticles;
+        m_ParticleAdapters2_begin = m_ParticleAdapters2;
+        m_ParticleAdapters2_end = m_ParticleAdapters2 + len_ParticleAdapters2;
+
+        // fill with random values between world bounds
+        for(ParticleAdapter2* adapter = m_ParticleAdapters2_begin; adapter < m_ParticleAdapters2_end; adapter++)
+        {
+            adapter->pos_x = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1500.0f - 50.0f)));
+            adapter->pos_y = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1100.0f - 50.0f)));
+            adapter->mass = 1.0f;
+        }
+    }else 
+    {
+        // Recreate the array with the new size
+        ParticleAdapter2* oldArray = m_ParticleAdapters2;
+        m_ParticleAdapters2 = new ParticleAdapter2[nbParticles + len_ParticleAdapters2];
+        memcpy(m_ParticleAdapters2, oldArray, len_ParticleAdapters2 * sizeof(ParticleAdapter2));
+        len_ParticleAdapters2 += nbParticles;
+        delete[] oldArray;
+        m_ParticleAdapters2_begin = m_ParticleAdapters2;
+        m_ParticleAdapters2_end = m_ParticleAdapters2 + len_ParticleAdapters2;
+
+        // fill with random values between world bounds
+        ParticleAdapter2* start = m_ParticleAdapters2 + len_ParticleAdapters2 - nbParticles;
+        for(ParticleAdapter2* adapter = start; adapter < m_ParticleAdapters2_end; adapter++)
+        {
+            adapter->pos_x = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1500.0f - 50.0f)));
+            adapter->pos_y = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1100.0f - 50.0f)));
+            adapter->mass = 0;
+        }
+    }
+
+    // print first teen values of the array
+    for(int i = 0; i < 10; i++)
+    {
+        std::cout << "pos_x: " << m_ParticleAdapters2[i].pos_x << " pos_y: " << m_ParticleAdapters2[i].pos_y << std::endl;
+    }
+    
 }
 
 void GraphicContext::RenderThread(int nbOfThreads, int threadId)

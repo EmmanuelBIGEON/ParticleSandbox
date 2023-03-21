@@ -8,6 +8,7 @@
 #include "../../common/Signal.h"
 
 class ParticleAdapter;
+class ParticleAdapter2;
 
 class GraphicObject;
 class Shader;
@@ -63,6 +64,9 @@ class GraphicContext
         
         virtual void Update(); // placeholder function for now, might be used later
 
+        //! \brief Add a vector of particles2 and updates the useful data.
+        void AddParticles(int nbParticles);
+
         //! Zoom in the view.
         void ZoomIn(float factor);
         //! Zoom out the view.
@@ -94,8 +98,6 @@ class GraphicContext
 
     protected:
 
-        
-
         //! Render particles in multiple threads
         virtual void RenderThread(int nbOfThreads, int threadId);
         
@@ -111,6 +113,19 @@ class GraphicContext
 
         // render separately the particles for efficiency
         std::vector<ParticleAdapter*> m_ParticleAdapters;
+        
+        // ---- EXPERIMENTAL ----
+        //! List of particles to be rendered.
+        // Using efficient data structure to relieve the CPU
+        ParticleAdapter2* m_ParticleAdapters2;
+        int sizestruct_ParticleAdapters2; // Size of the struct ParticleAdapter2
+        int len_ParticleAdapters2;
+
+        ParticleAdapter2* m_ParticleAdapters2_begin; // Pointer to the beginning of the array
+        ParticleAdapter2* m_ParticleAdapters2_end; // Pointer to the end of the array
+        //! Update particle positions
+        void UpdateParticles();
+        // ------------------------
 
         Shader* shader_basic;
         Shader* shader_text;

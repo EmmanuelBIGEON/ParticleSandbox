@@ -12,6 +12,9 @@ class ParticleGenerator
         virtual ~ParticleGenerator();
 
         void Generate(int nbParticles, ParticleClass particleClass = ParticleClass::PARTICLE_CLASS_A);
+
+        // Probably will replace the first generate, testing a new way of displaying particles for efficiency
+        void Generate_Type2(int nbParticles, ParticleClass particleClass = ParticleClass::PARTICLE_CLASS_A);
     
     private:
         GraphicContext* m_Context;

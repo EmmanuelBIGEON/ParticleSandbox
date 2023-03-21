@@ -36,10 +36,10 @@ class ParticleAdapter : public GraphicObject
 
         static glm::vec3 highlightColor;
         static unsigned int VAO;
+        static int nbVertices;
     private:
         static unsigned int VBO;
         static float* vertices;
-        static int nbVertices;
 
         float mvt_x;
         float mvt_y;
@@ -51,3 +51,12 @@ class ParticleAdapter : public GraphicObject
         Particle* m_Particle;
 
 };
+
+// alternative particle adapter for optimization
+struct ParticleAdapter2
+{
+    float pos_x;
+    float pos_y;
+    float mass;
+};
+

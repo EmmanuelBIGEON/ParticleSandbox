@@ -4,10 +4,15 @@
 #include "common/Object.h"
 
 
+#include  "graphics/components/adapters/ParticleAdapter.h"
+
+
 int main()
 {
     // initialize rand
     srand(time(NULL));
+
+    // std::cout << "size of particleAdapter2 : " << sizeof(ParticleAdapter2) << std::endl;
     
     // Application* app = new Application();
     Application* app = Application::GetInstance();
