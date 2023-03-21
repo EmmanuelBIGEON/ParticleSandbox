@@ -373,7 +373,7 @@ void GraphicContext::Render()
     shader_particle->SetVec3("particleColor", glm::vec3(0.1, 0.91, 0.01));
     glBindVertexArray(ParticleAdapter::VAO);
 
-    float repulsion_factor = 0.007f; // You can adjust this value
+    float repulsion_factor = 0.0075f; // You can adjust this value
     float attraction_factor = 0.1f; // You can adjust this value
     for(int i = 0; i < nb_ParticleAdapters3; i++)
     {
