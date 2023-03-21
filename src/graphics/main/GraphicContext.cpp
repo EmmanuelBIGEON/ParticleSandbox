@@ -373,6 +373,8 @@ void GraphicContext::Render()
     shader_particle->SetVec3("particleColor", glm::vec3(0.1, 0.91, 0.01));
     glBindVertexArray(ParticleAdapter::VAO);
 
+    float repulsion_factor = 0.007f; // You can adjust this value
+    float attraction_factor = 0.1f; // You can adjust this value
     for(int i = 0; i < nb_ParticleAdapters3; i++)
     {
         float mvt_x = 0.0f;
@@ -389,56 +391,25 @@ void GraphicContext::Render()
             // load vector (other x and y)
             __m256 vecX = _mm256_load_ps(&m_ParticleAdapters3_posX[j]);
             __m256 vecY = _mm256_load_ps(&m_ParticleAdapters3_posY[j]);
-
-            // if(i==17)
-            // {
-            //     // sleep for 1 second
-            //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            // }
-
-            // Calculate the distance between the current particle and all the others
-            // debugging distance (step by step)
-            // sub value 
+            // Calculate the distance between the current particle and all the other
             __m256 sub_x = _mm256_sub_ps(vecX, scalar_x);
             __m256 sub_y = _mm256_sub_ps(vecY, scalar_y);
-            // print first value of VecX and scalar_x
-            float* vecX_ptr = (float*)&vecX;
-            float* vecY_ptr = (float*)&vecY;
-            float* sub_x_ptr = (float*)&sub_x;
-            float* scalar_x_ptr = (float*)&scalar_x;
-            float* scalar_y_ptr = (float*)&scalar_y;
-            // std::cout << "vecX: " << vecX_ptr[0] << " scalar_x: " << scalar_x_ptr[0] << " sub_x: " << sub_x_ptr[0] << std::endl;
-            // std::cout << "vecX: " << vecX_ptr[1] << " scalar_x: " << scalar_x_ptr[1] << " sub_x: " << sub_x_ptr[1] << std::endl;
 
             __m256 distance = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(sub_x, sub_x), _mm256_mul_ps(sub_y, sub_y)));
-            
-            float* distance_ptr = (float*)&distance;
-
-            // if(i == 0)
-            // {
-            //     // distance for between points (1) and j[0]
-            //     std::cout << "distance 0: " << distance_ptr[0] << " with (x,y): (" << vecX_ptr[0] << "," << vecY_ptr[0] << ") and (" << scalar_x_ptr[0] << "," << scalar_y_ptr[0] << ") (i,j) = (" << i << "," << j << ")" << std::endl;
-            // }
-            // std::cout << "distance 0: " << distance_ptr[0] << std::endl;
-            // std::cout << "distance 1: " << distance_ptr[1] << std::endl;
             // // Calculate the direction between the current particle and all the others
-            __m256 mask = _mm256_cmp_ps(distance, _mm256_setzero_ps(), _CMP_EQ_OQ);
-            __m256 direction_x = _mm256_blendv_ps(_mm256_div_ps(_mm256_sub_ps(vecX, scalar_x), distance), _mm256_set1_ps(0.0f), mask);
-            __m256 direction_y = _mm256_blendv_ps(_mm256_div_ps(_mm256_sub_ps(vecY, scalar_y), distance), _mm256_set1_ps(0.0f), mask);
+            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(60.0f), _CMP_LT_OQ);
+    __m256 repulsion_x = _mm256_blendv_ps(_mm256_mul_ps(sub_x, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+    __m256 repulsion_y = _mm256_blendv_ps(_mm256_mul_ps(sub_y, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+    // Calculate the direction between the current particle and all the others
+    __m256 mask_direction = _mm256_cmp_ps(distance, _mm256_setzero_ps(), _CMP_EQ_OQ);
+    __m256 direction_x = _mm256_blendv_ps(_mm256_div_ps(sub_x, distance), _mm256_set1_ps(0.0f), mask_direction);
+    __m256 direction_y = _mm256_blendv_ps(_mm256_div_ps(sub_y, distance), _mm256_set1_ps(0.0f), mask_direction);
+    // Add repulsion to direction
+    direction_x = _mm256_add_ps(direction_x, repulsion_x);
+    direction_y = _mm256_add_ps(direction_y, repulsion_y);
 
-            float* direction_x_ptr = (float*)&direction_x;
-            float* direction_y_ptr = (float*)&direction_y;
-            // std::cout << "direction_x 0: " << direction_x_ptr[0] << std::endl;
-            // std::cout << "direction_x 1: " << direction_x_ptr[1] << std::endl;
-            // std::cout << "direction_y 0: " << direction_y_ptr[0] << std::endl;
-            // std::cout << "direction_y 1: " << direction_y_ptr[1] << std::endl;
-            // __m256 direction_x = _mm256_div_ps(_mm256_sub_ps(vecX, scalar_x), distance);
-            // __m256 direction_y = _mm256_div_ps(_mm256_sub_ps(vecY, scalar_y), distance);
-
-            // // Calculate the movement of the current particle
-            __m256 mvt_x_tmp = _mm256_mul_ps(direction_x, _mm256_set1_ps(1.0f));
-            __m256 mvt_y_tmp = _mm256_mul_ps(direction_y, _mm256_set1_ps(1.0f));
-
+    __m256 mvt_x_tmp = _mm256_mul_ps(direction_x, _mm256_set1_ps(1.0f));
+    __m256 mvt_y_tmp = _mm256_mul_ps(direction_y, _mm256_set1_ps(1.0f));
             float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
             float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
             for(int k = 0; k < 8; k++)
@@ -448,8 +419,8 @@ void GraphicContext::Render()
             }
         }
 
-        m_ParticleAdapters3_posX[i] += mvt_x;
-        m_ParticleAdapters3_posY[i] += mvt_y;
+        m_ParticleAdapters3_posX[i] += mvt_x*attraction_factor;
+        m_ParticleAdapters3_posY[i] += mvt_y*attraction_factor;
         
         // resulting movement 
         // std::cout << "Resulting movement: (" << mvt_x << "," << mvt_y << ")" << std::endl;
@@ -467,8 +438,8 @@ void GraphicContext::Render()
         else if(m_ParticleAdapters3_posY[i] > 1200.0f)
             m_ParticleAdapters3_posY[i] = m_ParticleAdapters3_posY[i] - 1200.0f;
 
-        if(i==1)
-            std::cout << "Drawing particle at " << m_ParticleAdapters3_posX[i] << " " << m_ParticleAdapters3_posY[i] << std::endl;
+        // if(i==1)
+        //     std::cout << "Drawing particle at " << m_ParticleAdapters3_posX[i] << " " << m_ParticleAdapters3_posY[i] << std::endl;
         shader_particle->SetVec2("shiftPos", glm::vec2(m_ParticleAdapters3_posX[i], m_ParticleAdapters3_posY[i]));
         glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
     }
