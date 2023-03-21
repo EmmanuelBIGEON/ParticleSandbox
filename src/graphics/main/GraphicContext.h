@@ -120,12 +120,20 @@ class GraphicContext
         ParticleAdapter2* m_ParticleAdapters2;
         int sizestruct_ParticleAdapters2; // Size of the struct ParticleAdapter2
         int len_ParticleAdapters2;
-
         ParticleAdapter2* m_ParticleAdapters2_begin; // Pointer to the beginning of the array
         ParticleAdapter2* m_ParticleAdapters2_end; // Pointer to the end of the array
         //! Update particle positions
         void UpdateParticles();
         // ------------------------
+
+        // ---- EXPERIMENTAL ----
+        // Using SIMD operations to render particles
+        // Need to split attributes in 3 arrays
+        float* m_ParticleAdapters3_posX;
+        float* m_ParticleAdapters3_posY;
+        float* m_ParticleAdapters3_mass;
+        int nb_ParticleAdapters3;
+        // Maybe i can save the distance between the particles for even more efficiency. TODO
 
         Shader* shader_basic;
         Shader* shader_text;
