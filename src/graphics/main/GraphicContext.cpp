@@ -370,10 +370,10 @@ void GraphicContext::Render()
     // return;
     
     shader_particle->Use();
-    shader_particle->SetVec3("particleColor", glm::vec3(0.1, 0.91, 0.01));
+    shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.11, 0.01));
     glBindVertexArray(ParticleAdapter::VAO);
 
-    float repulsion_factor = 0.0075f; // You can adjust this value
+    float repulsion_factor = 0.008f; // You can adjust this value
     float attraction_factor = 0.1f; // You can adjust this value
     for(int i = 0; i < nb_ParticleAdapters3; i++)
     {
@@ -398,18 +398,18 @@ void GraphicContext::Render()
             __m256 distance = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(sub_x, sub_x), _mm256_mul_ps(sub_y, sub_y)));
             // // Calculate the direction between the current particle and all the others
             __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(60.0f), _CMP_LT_OQ);
-    __m256 repulsion_x = _mm256_blendv_ps(_mm256_mul_ps(sub_x, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
-    __m256 repulsion_y = _mm256_blendv_ps(_mm256_mul_ps(sub_y, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
-    // Calculate the direction between the current particle and all the others
-    __m256 mask_direction = _mm256_cmp_ps(distance, _mm256_setzero_ps(), _CMP_EQ_OQ);
-    __m256 direction_x = _mm256_blendv_ps(_mm256_div_ps(sub_x, distance), _mm256_set1_ps(0.0f), mask_direction);
-    __m256 direction_y = _mm256_blendv_ps(_mm256_div_ps(sub_y, distance), _mm256_set1_ps(0.0f), mask_direction);
-    // Add repulsion to direction
-    direction_x = _mm256_add_ps(direction_x, repulsion_x);
-    direction_y = _mm256_add_ps(direction_y, repulsion_y);
+            __m256 repulsion_x = _mm256_blendv_ps(_mm256_mul_ps(sub_x, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+            __m256 repulsion_y = _mm256_blendv_ps(_mm256_mul_ps(sub_y, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+            // Calculate the direction between the current particle and all the others
+            __m256 mask_direction = _mm256_cmp_ps(distance, _mm256_setzero_ps(), _CMP_EQ_OQ);
+            __m256 direction_x = _mm256_blendv_ps(_mm256_div_ps(sub_x, distance), _mm256_set1_ps(0.0f), mask_direction);
+            __m256 direction_y = _mm256_blendv_ps(_mm256_div_ps(sub_y, distance), _mm256_set1_ps(0.0f), mask_direction);
+            // Add repulsion to direction
+            direction_x = _mm256_add_ps(direction_x, repulsion_x);
+            direction_y = _mm256_add_ps(direction_y, repulsion_y);
 
-    __m256 mvt_x_tmp = _mm256_mul_ps(direction_x, _mm256_set1_ps(1.0f));
-    __m256 mvt_y_tmp = _mm256_mul_ps(direction_y, _mm256_set1_ps(1.0f));
+            __m256 mvt_x_tmp = _mm256_mul_ps(direction_x, _mm256_set1_ps(1.0f));
+            __m256 mvt_y_tmp = _mm256_mul_ps(direction_y, _mm256_set1_ps(1.0f));
             float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
             float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
             for(int k = 0; k < 8; k++)
