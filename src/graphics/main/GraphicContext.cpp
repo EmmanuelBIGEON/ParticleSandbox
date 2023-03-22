@@ -234,140 +234,6 @@ void GraphicContext::Render()
         object->Draw();
     }
 
-    // render particels
-    // shader_particle->Use();
-    // shader_particle->SetVec3("particleColor", ParticleAdapter::highlightColor);
-    // glBindVertexArray(ParticleAdapter::VAO);
-
-    // // Chrono chrono;
-    // // chrono.Start();
-    // // if(m_ParticleAdapters.size() > 300)
-    // // {
-    // //     std::thread t1(&GraphicContext::RenderThread, this, 2, 0);
-    // //     std::thread t2(&GraphicContext::RenderThread, this, 2, 1);
-
-    // //     t1.join();
-    // //     t2.join();
-    // //     for(auto adapter : m_ParticleAdapters) adapter->Draw();
-    // // }else
-    // // {
-    // //     for(auto adapter : m_ParticleAdapters)
-    // //     {
-    // //         adapter->Update();
-    // //         adapter->Draw();
-    // //     }
-    // // }
-
-    // for(auto adapter : m_ParticleAdapters)
-    // {
-    //     adapter->Update();
-    //     adapter->Draw();
-    // }
-
-    // // render particles v2
-    // shader_particle->Use();
-    // shader_particle->SetVec3("particleColor", glm::vec3(0.9, 0.01, 0.01));
-    // glBindVertexArray(ParticleAdapter::VAO);
-
-    // // Chrono chrono;
-    // // double timerender_distancecalculation = 0.0;
-    // // double timerender_mvtcalculation = 0.0;
-    // // double timerender_preprocess = 0.0;
-    // // double timerender_afterprocess = 0.0;
-    
-
-    // for(ParticleAdapter2* adapter = m_ParticleAdapters2_begin; adapter != m_ParticleAdapters2_end; adapter++)
-    // {
-    //     // SUPER EFFICIENT COMPUTE
-    //     ParticleAdapter2* cursor = m_ParticleAdapters2_begin;
-    //     float mvt_x = 0.0f;
-    //     float mvt_y = 0.0f;
-    //     while(cursor != m_ParticleAdapters2_end)
-    //     {
-    //         if(cursor == adapter)
-    //         {
-    //             cursor++;
-    //             continue;
-    //         }
-    //         // chrono.Start();
-    //         // Computation of particles
-    //         const float& vect_x = cursor->pos_x - adapter->pos_x;
-    //         const float& vect_y = cursor->pos_y - adapter->pos_y;
-    //         // chrono.Stop();
-    //         // timerender_preprocess += chrono.GetElapsedTime();
-
-    //         // if(vect_x > 800.0f)
-    //         //     other_x -= 1600.0f;
-    //         // else if(vect_x < -800.0f)
-    //         //     other_x += 1600.0f;
-
-    //         // if(vect_y > 600.0f)
-    //         //     other_y -= 1200.0f;
-    //         // else if(vect_y < -600.0f)
-    //         //     other_y += 1200.0f;
-
-    //         // chrono.Start();
-    //         float distance = sqrt(vect_x*vect_x + vect_y*vect_y);
-    //         // chrono.Stop();
-    //         // timerender_distancecalculation += chrono.GetElapsedTime();
-
-    //         // chrono.Start();
-    //         const float& direction_x = vect_x / distance;
-    //         const float& direction_y = vect_y / distance;
-
-    //         if(distance < 100.0f)
-    //         {
-    //             mvt_x += direction_x * (100.0f - distance) / 100.0f;
-    //             mvt_y += direction_y * (100.0f - distance) / 100.0f;
-    //         }else 
-    //         {
-    //             mvt_x += direction_x * 0.1f;
-    //             mvt_y += direction_y * 0.1f;
-    //         }
-    //         // chrono.Stop();
-    //         // timerender_mvtcalculation += chrono.GetElapsedTime();
-
-    //         cursor++;
-    //     }
-
-    //     // chrono.Start();
-    //     adapter->pos_x += mvt_x;
-    //     adapter->pos_y += mvt_y;
-        
-    //     if(adapter->pos_x < 0.0f)
-    //         adapter->pos_x = adapter->pos_x + 1600.0f;
-    //     else if(adapter->pos_x > 1600.0f)
-    //         adapter->pos_x = adapter->pos_x - 1600.0f;
-    //     if(adapter->pos_y < 0.0f)
-    //         adapter->pos_y = adapter->pos_y + 1200.0f;
-    //     else if(adapter->pos_y > 1200.0f)
-    //         adapter->pos_y = adapter->pos_y - 1200.0f;
-        
-    //     // chrono.Stop();
-    //     // timerender_afterprocess += chrono.GetElapsedTime();
-
-    //     shader_particle->SetVec2("shiftPos", glm::vec2(adapter->pos_x, adapter->pos_y));
-    //     glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
-
-    // }
-
-    // display times
-    // std::cout << "timerender_distancecalculation: " << timerender_distancecalculation << std::endl;
-    // std::cout << "timerender_mvtcalculation: " << timerender_mvtcalculation << std::endl;
-    // std::cout << "timerender_preprocess: " << timerender_preprocess << std::endl;
-    // std::cout << "timerender_afterprocess: " << timerender_afterprocess << std::endl;
-    // std::cout << "timerender_total: " << timerender_distancecalculation + timerender_mvtcalculation + timerender_preprocess + timerender_afterprocess << std::endl;
-    // std::cout << std::endl;
-
-    // methid 3 (using SIMD)
-    if(!nb_ParticleAdapters3)
-        return;
-    // std::cout << "nb_ParticleAdapters3: " << nb_ParticleAdapters3 << std::endl;
-    // std::cout << "m_ParticleAdapters3_posX[0]: " << m_ParticleAdapters3_posX[0] << std::endl;
-    // __m256 vecX = _mm256_load_ps(&m_ParticleAdapters3_posX[0]);
-    // float* ptr = (float*)&vecX;
-    // std::cout << "first value : " << ptr[0] << std::endl;
-    // return;
     
     shader_particle->Use();
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
@@ -394,32 +260,16 @@ void GraphicContext::Render()
             // Calculate the distance between the current particle and all the other
             __m256 sub_x = _mm256_sub_ps(vecX, scalar_x);
             __m256 sub_y = _mm256_sub_ps(vecY, scalar_y);
-            
-            // if(vect_x > 800.0f)
-            //     other_x -= 1600.0f;
-            // else if(vect_x < -800.0f)
-            //     other_x += 1600.0f;
-
-            // if(vect_y > 600.0f)
-            //     other_y -= 1200.0f;
-            // else if(vect_y < -600.0f)
-            //     other_y += 1200.0f;
-            // Apply correction of the position if the particle 
-            // is too close to the border of the screen
             __m256 mask_x = _mm256_cmp_ps(sub_x, _mm256_set1_ps(800.0f), _CMP_GT_OQ);
             __m256 mask_y = _mm256_cmp_ps(sub_y, _mm256_set1_ps(600.0f), _CMP_GT_OQ);
             __m256 mask_x2 = _mm256_cmp_ps(sub_x, _mm256_set1_ps(-800.0f), _CMP_LT_OQ);
             __m256 mask_y2 = _mm256_cmp_ps(sub_y, _mm256_set1_ps(-600.0f), _CMP_LT_OQ);
-            
             __m256 other_x = _mm256_blendv_ps(vecX, _mm256_sub_ps(vecX, _mm256_set1_ps(1600.0f)), mask_x);
             __m256 other_y = _mm256_blendv_ps(vecY, _mm256_sub_ps(vecY, _mm256_set1_ps(1200.0f)), mask_y);
             other_x = _mm256_blendv_ps(other_x, _mm256_add_ps(other_x, _mm256_set1_ps(1600.0f)), mask_x2);
             other_y = _mm256_blendv_ps(other_y, _mm256_add_ps(other_y, _mm256_set1_ps(1200.0f)), mask_y2);
-            // recalculate sub_x and sub_y
-            // copie sub x into other x (without mask)
             sub_x = _mm256_sub_ps(other_x, scalar_x);
             sub_y = _mm256_sub_ps(other_y, scalar_y);
-
             __m256 distance = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(sub_x, sub_x), _mm256_mul_ps(sub_y, sub_y)));
             // // Calculate the direction between the current particle and all the others
             __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(1000.0f), _CMP_LT_OQ);
@@ -462,12 +312,6 @@ void GraphicContext::Render()
 
         m_ParticleAdapters3_posX[i] += mvt_x*10.0f;
         m_ParticleAdapters3_posY[i] += mvt_y*10.0f;
-        
-        // resulting movement 
-        // std::cout << "Resulting movement: (" << mvt_x << "," << mvt_y << ")" << std::endl;
-        // sleep
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
 
         // // Check if the particle is out of the screen
         if(m_ParticleAdapters3_posX[i] < 0.0f)
@@ -479,8 +323,6 @@ void GraphicContext::Render()
         else if(m_ParticleAdapters3_posY[i] > 1200.0f)
             m_ParticleAdapters3_posY[i] = m_ParticleAdapters3_posY[i] - 1200.0f;
 
-        // if(i==1)
-        //     std::cout << "Drawing particle at " << m_ParticleAdapters3_posX[i] << " " << m_ParticleAdapters3_posY[i] << std::endl;
         shader_particle->SetVec2("shiftPos", glm::vec2(m_ParticleAdapters3_posX[i], m_ParticleAdapters3_posY[i]));
         glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
     }
