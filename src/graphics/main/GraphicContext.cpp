@@ -631,8 +631,8 @@ void GraphicContext::AddParticles(int nbParticles)
         // fill with random values between world bounds
         for(int i = nb_ParticleAdapters3; i < nb_ParticleAdapters3 + nbParticles; i++)
         {
-            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1500.0f - 50.0f)));
-            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1100.0f - 50.0f)));
+            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
+            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
             m_ParticleAdapters3_mass[i] = 1.0f;
         }
     }else
@@ -645,8 +645,8 @@ void GraphicContext::AddParticles(int nbParticles)
         // fill with random values between world bounds
         for(int i = 0; i < nbParticles; i++)
         {
-            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1500.0f - 50.0f)));
-            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1100.0f - 50.0f)));
+            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
+            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
             m_ParticleAdapters3_mass[i] = 1.0f;
         }
 
