@@ -11,9 +11,10 @@ BasicUI::~BasicUI()
 
 void BasicUI::Init(GraphicContext* context)
 {
+    m_particlesCount = context->GetNbParticles();
     // Create the text
     std::string text = "Particles: ";
-    text += std::to_string(m_particlesCount);
+    text += std::to_string(m_particlesCount); 
 
     std::string text2 = "FPS: ";
     text2 += std::to_string(m_fps);
@@ -22,20 +23,9 @@ void BasicUI::Init(GraphicContext* context)
     m_fpsText = new GraphicText(context, text2.c_str(), context->font_main, m_startingX, m_startingY + 20, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
 
     // Connect the watcher to the context
-    m_particleAddedSlot = context->OnObjectRegistered.Connect([this](GraphicObject* object)
+    m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)
     {
-        if(object->GetObjectType() == ObjectType::OBJECTGR_PARTICLE)
-        {
-            m_particlesCount++;
-        }
-    });
-
-    m_particleRemovedSlot = context->OnObjectRemoved.Connect([this](GraphicObject* object)
-    {
-        if(object->GetObjectType() == ObjectType::OBJECTGR_PARTICLE)
-        {
-            m_particlesCount--;
-        }
+        m_particlesCount += nb;
     });
 }
 

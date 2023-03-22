@@ -30,6 +30,6 @@ class BasicUI
         GraphicText* m_fpsText;
 
         // Create the slot here so they are destroyed on the destruction of the UI
-        Slot<GraphicObject*>* m_particleAddedSlot;
-        Slot<GraphicObject*>* m_particleRemovedSlot;
+        Slot<int>* m_particleAddedSlot;
+        // Slot<GraphicObject*>* m_particleRemovedSlot;
 };

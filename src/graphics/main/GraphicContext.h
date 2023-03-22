@@ -78,6 +78,8 @@ class GraphicContext
         const std::vector<GraphicObject*> GetObjects() const { return m_Objects; }
         const std::vector<ParticleAdapter*> GetParticleAdapters() const { return m_ParticleAdapters; }
 
+        const int& GetNbParticles() const { return nb_ParticleAdapters3; }
+
         Font* font_main;
 
         static float worldWidth;
@@ -95,6 +97,10 @@ class GraphicContext
         //! \brief Signal when a graphic object join or leave the context.
         Signal<GraphicObject*> OnObjectRegistered;
         Signal<GraphicObject*> OnObjectRemoved;
+        
+        //! \brief Signal added particles to the context.
+        Signal<int> OnParticlesAdded;
+
 
     protected:
 
@@ -113,18 +119,6 @@ class GraphicContext
 
         // render separately the particles for efficiency
         std::vector<ParticleAdapter*> m_ParticleAdapters;
-        
-        // ---- EXPERIMENTAL ----
-        //! List of particles to be rendered.
-        // Using efficient data structure to relieve the CPU
-        ParticleAdapter2* m_ParticleAdapters2;
-        int sizestruct_ParticleAdapters2; // Size of the struct ParticleAdapter2
-        int len_ParticleAdapters2;
-        ParticleAdapter2* m_ParticleAdapters2_begin; // Pointer to the beginning of the array
-        ParticleAdapter2* m_ParticleAdapters2_end; // Pointer to the end of the array
-        //! Update particle positions
-        void UpdateParticles();
-        // ------------------------
 
         // ---- EXPERIMENTAL ----
         // Using SIMD operations to render particles

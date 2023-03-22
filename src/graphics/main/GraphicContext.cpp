@@ -53,13 +53,6 @@ GraphicContext::GraphicContext()
     m_ProjectionMatrix = projection;
     m_ViewMatrix = view;
 
-    // setup particleadapter2 handling
-    m_ParticleAdapters2 = nullptr;
-    sizestruct_ParticleAdapters2 = sizeof(ParticleAdapter2);
-    len_ParticleAdapters2 = 0;
-    m_ParticleAdapters2_begin = nullptr;
-    m_ParticleAdapters2_end = nullptr;
-
     // setup particleadapter3 handling
     m_ParticleAdapters3_posX = nullptr;
     m_ParticleAdapters3_posY = nullptr;
@@ -396,53 +389,6 @@ void GraphicContext::Update()
 
 void GraphicContext::AddParticles(int nbParticles)
 {
-    // m_ParticleAdapters2
-    // Allocate the memory for the particles
-    // if(m_ParticleAdapters2 == nullptr)
-    // {
-    //     m_ParticleAdapters2 = new ParticleAdapter2[nbParticles];
-    //     len_ParticleAdapters2 = nbParticles;
-    //     m_ParticleAdapters2_begin = m_ParticleAdapters2;
-    //     m_ParticleAdapters2_end = m_ParticleAdapters2 + len_ParticleAdapters2;
-
-    //     // fill with random values between world bounds
-    //     for(ParticleAdapter2* adapter = m_ParticleAdapters2_begin; adapter < m_ParticleAdapters2_end; adapter++)
-    //     {
-    //         adapter->pos_x = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1500.0f - 50.0f)));
-    //         adapter->pos_y = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1100.0f - 50.0f)));
-    //         adapter->mass = 1.0f;
-    //     }
-    // }else 
-    // {
-    //     // Recreate the array with the new size
-    //     ParticleAdapter2* oldArray = m_ParticleAdapters2;
-    //     m_ParticleAdapters2 = new ParticleAdapter2[nbParticles + len_ParticleAdapters2];
-    //     memcpy(m_ParticleAdapters2, oldArray, len_ParticleAdapters2 * sizeof(ParticleAdapter2));
-    //     len_ParticleAdapters2 += nbParticles;
-    //     delete[] oldArray;
-    //     m_ParticleAdapters2_begin = m_ParticleAdapters2;
-    //     m_ParticleAdapters2_end = m_ParticleAdapters2 + len_ParticleAdapters2;
-
-    //     // fill with random values between world bounds
-    //     ParticleAdapter2* start = m_ParticleAdapters2 + len_ParticleAdapters2 - nbParticles;
-    //     for(ParticleAdapter2* adapter = start; adapter < m_ParticleAdapters2_end; adapter++)
-    //     {
-    //         adapter->pos_x = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1500.0f - 50.0f)));
-    //         adapter->pos_y = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1100.0f - 50.0f)));
-    //         adapter->mass = 0;
-    //     }
-    // }
-
-    // // print first teen values of the array
-    // for(int i = 0; i < 10; i++)
-    // {
-    //     std::cout << "pos_x: " << m_ParticleAdapters2[i].pos_x << " pos_y: " << m_ParticleAdapters2[i].pos_y << std::endl;
-    // }
-
-    // third version..
-    // Using SIMD
-    // Need to fill arrays of posx posy and mass
-    // forcing a multiple of 8 for the number of particles
     if(nbParticles % 8 != 0)
     {
         std::cout << "Multiple of 8 required" << std::endl;
@@ -495,11 +441,7 @@ void GraphicContext::AddParticles(int nbParticles)
         nb_ParticleAdapters3 = nbParticles;
     }
 
-    // print the firest 10 points
-    for(int i = 0; i < 10; i++)
-    {
-        std::cout << "pos_x: " << m_ParticleAdapters3_posX[i] << " pos_y: " << m_ParticleAdapters3_posY[i] << std::endl;
-    }
+    OnParticlesAdded.Emit(nbParticles);
 }
 
 void GraphicContext::RenderThread(int nbOfThreads, int threadId)
