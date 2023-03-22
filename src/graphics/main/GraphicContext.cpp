@@ -257,6 +257,9 @@ void GraphicContext::Render()
             // Calculate the distance between the current particle and all the other
             __m256 sub_x = _mm256_sub_ps(vecX, scalar_x);
             __m256 sub_y = _mm256_sub_ps(vecY, scalar_y);
+
+
+            // ---- Needs to be reworked, it's not working properly (particles find a spot to rest and don't move anymore or at least, don't make something uniform)
             __m256 mask_x = _mm256_cmp_ps(sub_x, _mm256_set1_ps(800.0f), _CMP_GT_OQ);
             __m256 mask_y = _mm256_cmp_ps(sub_y, _mm256_set1_ps(600.0f), _CMP_GT_OQ);
             __m256 mask_x2 = _mm256_cmp_ps(sub_x, _mm256_set1_ps(-800.0f), _CMP_LT_OQ);
@@ -267,6 +270,7 @@ void GraphicContext::Render()
             other_y = _mm256_blendv_ps(other_y, _mm256_add_ps(other_y, _mm256_set1_ps(1200.0f)), mask_y2);
             sub_x = _mm256_sub_ps(other_x, scalar_x);
             sub_y = _mm256_sub_ps(other_y, scalar_y);
+            // -----------------
             __m256 distance = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(sub_x, sub_x), _mm256_mul_ps(sub_y, sub_y)));
             // // Calculate the direction between the current particle and all the others
             __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(50.0f), _CMP_LT_OQ);
