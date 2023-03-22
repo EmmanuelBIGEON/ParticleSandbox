@@ -53,7 +53,7 @@ class ParticleAdapter : public GraphicObject
 };
 
 // alternative particle adapter for optimization
-struct ParticleAdapter2
+struct ParticleStruct
 {
     float pos_x;
     float pos_y;

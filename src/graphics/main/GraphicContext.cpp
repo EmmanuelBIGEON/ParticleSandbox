@@ -13,6 +13,8 @@
 #include "../components/adapters/ParticleAdapter.h"
 
 #include <iostream>
+#include <mutex>
+
 
 #include "GraphicObject.h"
 
@@ -231,9 +233,11 @@ void GraphicContext::Render()
     shader_particle->Use();
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
     glBindVertexArray(ParticleAdapter::VAO);
-
+    
     float repulsion_factor = 0.0025f; // You can adjust this value
     float attraction_factor = 0.0001f; // You can adjust this value
+
+    m_ParticleAdaptersMutex.lock();
     for(int i = 0; i < nb_ParticleAdapters3; i++)
     {
         float mvt_x = 0.0f;
@@ -245,7 +249,7 @@ void GraphicContext::Render()
         __m256 scalar_x = _mm256_set1_ps(xvalue);
         __m256 scalar_y = _mm256_set1_ps(yvalue);
 
-        for(int j = 0; j < nb_ParticleAdapters3; j+=8)
+        for(int j = 0; (j+8) < nb_ParticleAdapters3; j+=8)
         {
             // load vector (other x and y)
             __m256 vecX = _mm256_load_ps(&m_ParticleAdapters3_posX[j]);
@@ -303,6 +307,13 @@ void GraphicContext::Render()
             }
         }
 
+        // calculate the rest of the particles
+        for(int i = 8*(nb_ParticleAdapters3/8); i < nb_ParticleAdapters3; i++)
+        {
+            // TODO
+            // std::cout << "TODO" << std::endl;
+        }
+
         m_ParticleAdapters3_posX[i] += mvt_x*10.0f;
         m_ParticleAdapters3_posY[i] += mvt_y*10.0f;
 
@@ -320,8 +331,129 @@ void GraphicContext::Render()
         glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
     }
 
-    
+    m_ParticleAdaptersMutex.unlock();
+}
 
+
+void GraphicContext::AddParticles(int nbParticles)
+{
+    // mutex
+    m_ParticleAdaptersMutex.lock();
+    // if(nbParticles % 8 != 0)
+    // {
+    //     std::cout << "Multiple of 8 required" << std::endl;
+    //     return;
+    // }
+
+    if(nb_ParticleAdapters3)
+    {
+
+        // Recreate the different arrays with the new size in memory, don't forget to delete the old ones and to save their values into the new one.
+        // Last size = nb_ParticleAdapters3
+        float* old_pos_x = m_ParticleAdapters3_posX;
+        float* old_pos_y = m_ParticleAdapters3_posY;
+        float* old_mass = m_ParticleAdapters3_mass;
+
+        m_ParticleAdapters3_posX = new float[nb_ParticleAdapters3 + nbParticles];
+        m_ParticleAdapters3_posY = new float[nb_ParticleAdapters3 + nbParticles];
+        m_ParticleAdapters3_mass = new float[nb_ParticleAdapters3 + nbParticles];
+
+        memcpy(m_ParticleAdapters3_posX, old_pos_x, nb_ParticleAdapters3 * sizeof(float));
+        memcpy(m_ParticleAdapters3_posY, old_pos_y, nb_ParticleAdapters3 * sizeof(float));
+        memcpy(m_ParticleAdapters3_mass, old_mass, nb_ParticleAdapters3 * sizeof(float));
+
+        delete[] old_pos_x;
+        delete[] old_pos_y;
+        delete[] old_mass;
+
+        // fill with random values between world bounds
+        for(int i = nb_ParticleAdapters3; i < nb_ParticleAdapters3 + nbParticles; i++)
+        {
+            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
+            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
+            m_ParticleAdapters3_mass[i] = 1.0f;
+        }
+
+        nb_ParticleAdapters3 += nbParticles;
+    }else
+    {
+        // Allocate the memory for the particles
+        m_ParticleAdapters3_posX = new float[nbParticles];
+        m_ParticleAdapters3_posY = new float[nbParticles];
+        m_ParticleAdapters3_mass = new float[nbParticles];
+
+        // fill with random values between world bounds
+        for(int i = 0; i < nbParticles; i++)
+        {
+            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
+            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
+            m_ParticleAdapters3_mass[i] = 1.0f;
+        }
+
+        nb_ParticleAdapters3 = nbParticles;
+    }
+
+    OnParticlesAdded.Emit(nbParticles);
+
+    m_ParticleAdaptersMutex.unlock();
+}
+
+void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles)
+{
+    m_ParticleAdaptersMutex.lock();
+    int size = particles.size();
+    if(size == 0)
+        return;
+
+    if(nb_ParticleAdapters3)
+    {
+        // Recreate the different arrays with the new size in memory, don't forget to delete the old ones and to save their values into the new one.
+        // Last size = nb_ParticleAdapters3
+        float* old_pos_x = m_ParticleAdapters3_posX;
+        float* old_pos_y = m_ParticleAdapters3_posY;
+        float* old_mass = m_ParticleAdapters3_mass;
+
+        m_ParticleAdapters3_posX = new float[nb_ParticleAdapters3 + size];
+        m_ParticleAdapters3_posY = new float[nb_ParticleAdapters3 + size];
+        m_ParticleAdapters3_mass = new float[nb_ParticleAdapters3 + size];
+
+        memcpy(m_ParticleAdapters3_posX, old_pos_x, nb_ParticleAdapters3 * sizeof(float));
+        memcpy(m_ParticleAdapters3_posY, old_pos_y, nb_ParticleAdapters3 * sizeof(float));
+        memcpy(m_ParticleAdapters3_mass, old_mass, nb_ParticleAdapters3 * sizeof(float));
+
+        delete[] old_pos_x;
+        delete[] old_pos_y;
+        delete[] old_mass;
+
+        // fill with random values between world bounds
+        for(int i = 0; i < size; i++)
+        {
+            m_ParticleAdapters3_posX[i+nb_ParticleAdapters3] = particles[i].pos_x;
+            m_ParticleAdapters3_posY[i+nb_ParticleAdapters3] = particles[i].pos_y;
+            m_ParticleAdapters3_mass[i+nb_ParticleAdapters3] = particles[i].mass;
+        }
+        
+        nb_ParticleAdapters3 += size;
+    }else
+    {
+        // Allocate the memory for the particles
+        m_ParticleAdapters3_posX = new float[size];
+        m_ParticleAdapters3_posY = new float[size];
+        m_ParticleAdapters3_mass = new float[size];
+
+        // fill with random values between world bounds
+        for(int i = 0; i < size; i++)
+        {
+            m_ParticleAdapters3_posX[i+nb_ParticleAdapters3] = particles[i].pos_x;
+            m_ParticleAdapters3_posY[i+nb_ParticleAdapters3] = particles[i].pos_y;
+            m_ParticleAdapters3_mass[i+nb_ParticleAdapters3] = particles[i].mass;
+        }
+
+        nb_ParticleAdapters3 = size;
+    }
+
+    OnParticlesAdded.Emit(size);
+    m_ParticleAdaptersMutex.unlock();
 }
 
 void GraphicContext::Update()
@@ -384,64 +516,6 @@ void GraphicContext::Update()
     shader_button->SetMat4("model", m_ModelMatrix);
 
     needUpdate = false;
-}
-
-
-void GraphicContext::AddParticles(int nbParticles)
-{
-    if(nbParticles % 8 != 0)
-    {
-        std::cout << "Multiple of 8 required" << std::endl;
-        return;
-    }
-
-    if(nb_ParticleAdapters3)
-    {
-
-        // Recreate the different arrays with the new size in memory, don't forget to delete the old ones and to save their values into the new one.
-        // Last size = nb_ParticleAdapters3
-        float* old_pos_x = m_ParticleAdapters3_posX;
-        float* old_pos_y = m_ParticleAdapters3_posY;
-        float* old_mass = m_ParticleAdapters3_mass;
-
-        m_ParticleAdapters3_posX = new float[nb_ParticleAdapters3 + nbParticles];
-        m_ParticleAdapters3_posY = new float[nb_ParticleAdapters3 + nbParticles];
-        m_ParticleAdapters3_mass = new float[nb_ParticleAdapters3 + nbParticles];
-
-        memcpy(m_ParticleAdapters3_posX, old_pos_x, nb_ParticleAdapters3 * sizeof(float));
-        memcpy(m_ParticleAdapters3_posY, old_pos_y, nb_ParticleAdapters3 * sizeof(float));
-        memcpy(m_ParticleAdapters3_mass, old_mass, nb_ParticleAdapters3 * sizeof(float));
-
-        delete[] old_pos_x;
-        delete[] old_pos_y;
-        delete[] old_mass;
-
-        // fill with random values between world bounds
-        for(int i = nb_ParticleAdapters3; i < nb_ParticleAdapters3 + nbParticles; i++)
-        {
-            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
-            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
-            m_ParticleAdapters3_mass[i] = 1.0f;
-        }
-    }else
-    {
-        // Allocate the memory for the particles
-        m_ParticleAdapters3_posX = new float[nbParticles];
-        m_ParticleAdapters3_posY = new float[nbParticles];
-        m_ParticleAdapters3_mass = new float[nbParticles];
-
-        // fill with random values between world bounds
-        for(int i = 0; i < nbParticles; i++)
-        {
-            m_ParticleAdapters3_posX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
-            m_ParticleAdapters3_posY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
-            m_ParticleAdapters3_mass[i] = 1.0f;
-        }
-
-        nb_ParticleAdapters3 = nbParticles;
-    }
-
-    OnParticlesAdded.Emit(nbParticles);
 }
 
 void GraphicContext::RenderThread(int nbOfThreads, int threadId)

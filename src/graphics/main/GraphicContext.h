@@ -1,14 +1,13 @@
 #pragma once
 
 #include <vector>
-
+#include <mutex>
 #include <glm/ext.hpp>
-
 
 #include "../../common/Signal.h"
 
 class ParticleAdapter;
-class ParticleAdapter2;
+class ParticleStruct;
 
 class GraphicObject;
 class Shader;
@@ -66,6 +65,7 @@ class GraphicContext
 
         //! \brief Add a vector of particles2 and updates the useful data.
         void AddParticles(int nbParticles);
+        void AddParticles(const std::vector<ParticleStruct>& particles);
 
         //! Zoom in the view.
         void ZoomIn(float factor);
@@ -155,5 +155,8 @@ class GraphicContext
 
         float m_MouseX;
         float m_MouseY;
+
+        // mutex for the particle adapters
+        std::mutex m_ParticleAdaptersMutex;
         
 };

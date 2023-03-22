@@ -9,6 +9,7 @@
 #include "../graphics/util/ParticleDetector.h"
 
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "Application.h"
 
@@ -115,10 +116,13 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
-                // Creat the particle.
-                Particle* particle = new Particle(glm::vec2(xCenter,yCenter));
-                ParticleAdapter* particleAdapter = new ParticleAdapter(m_Context,particle);
-                
+                ParticleStruct particle;
+                particle.pos_x = xCenter;
+                particle.pos_y = yCenter;
+                particle.mass = 1.0f;
+                std::vector<ParticleStruct> particles;
+                particles.push_back(particle);
+                m_Context->AddParticles(particles);
             }
         }
     }else if(event.GetEventType() == EventType::EVENT_WHEEL)
