@@ -85,7 +85,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
     // generator->Generate(620, ParticleClass::PARTICLE_CLASS_A);
     // generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
 
-    graphicContext->AddParticles(2000);
+    graphicContext->AddParticles(1600);
     return scene;
 }
 

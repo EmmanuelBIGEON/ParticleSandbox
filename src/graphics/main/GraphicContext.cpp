@@ -234,7 +234,7 @@ void GraphicContext::Render()
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
     glBindVertexArray(ParticleAdapter::VAO);
     
-    float repulsion_factor = 0.0025f; // You can adjust this value
+    float repulsion_factor = 0.00025f; // You can adjust this value
     float attraction_factor = 0.0001f; // You can adjust this value
 
     m_ParticleAdaptersMutex.lock();
@@ -269,13 +269,13 @@ void GraphicContext::Render()
             sub_y = _mm256_sub_ps(other_y, scalar_y);
             __m256 distance = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(sub_x, sub_x), _mm256_mul_ps(sub_y, sub_y)));
             // // Calculate the direction between the current particle and all the others
-            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(1000.0f), _CMP_LT_OQ);
+            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(50.0f), _CMP_LT_OQ);
             // Calculate the direction between the current particle and all the others
             __m256 mask_direction = _mm256_cmp_ps(distance, _mm256_setzero_ps(), _CMP_EQ_OQ);
             __m256 direction_x = _mm256_blendv_ps(_mm256_div_ps(sub_x, distance), _mm256_set1_ps(0.0f), mask_direction);
             __m256 direction_y = _mm256_blendv_ps(_mm256_div_ps(sub_y, distance), _mm256_set1_ps(0.0f), mask_direction);
             // invert direction if the particle is too close
-            __m256 mask_invert = _mm256_cmp_ps(distance, _mm256_set1_ps(200.0f), _CMP_LT_OQ);
+            __m256 mask_invert = _mm256_cmp_ps(distance, _mm256_set1_ps(50.0f), _CMP_LT_OQ);
             direction_x = _mm256_blendv_ps(direction_x, _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_invert);
             direction_y = _mm256_blendv_ps(direction_y, _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_invert);
             // normalize direction to an unit vector
@@ -286,7 +286,7 @@ void GraphicContext::Render()
 
             // Calculate the movement of the current particle, if attraction or repulsion depending
             // on the distance between the current particle and the others
-            __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(1000.0f), _CMP_GT_OQ);
+            __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(100.0f), _CMP_GT_OQ);
             __m256 attraction_x = _mm256_blendv_ps(_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
             __m256 attraction_y = _mm256_blendv_ps(_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
 
@@ -307,15 +307,15 @@ void GraphicContext::Render()
             }
         }
 
-        // calculate the rest of the particles
-        for(int i = 8*(nb_ParticleAdapters3/8); i < nb_ParticleAdapters3; i++)
-        {
-            // TODO
-            // std::cout << "TODO" << std::endl;
-        }
+        // calculate the rest of the impact of the other particles
+        // for(int i = 8*(nb_ParticleAdapters3/8); i < nb_ParticleAdapters3; i++)
+        // {
+        //     // TODO
+        //     // std::cout << "TODO" << std::endl;
+        // }
 
-        m_ParticleAdapters3_posX[i] += mvt_x*10.0f;
-        m_ParticleAdapters3_posY[i] += mvt_y*10.0f;
+        m_ParticleAdapters3_posX[i] += mvt_x*1.0f;
+        m_ParticleAdapters3_posY[i] += mvt_y*1.0f;
 
         // // Check if the particle is out of the screen
         if(m_ParticleAdapters3_posX[i] < 0.0f)
