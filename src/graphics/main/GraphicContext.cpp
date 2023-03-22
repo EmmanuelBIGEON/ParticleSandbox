@@ -370,11 +370,11 @@ void GraphicContext::Render()
     // return;
     
     shader_particle->Use();
-    shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.11, 0.01));
+    shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
     glBindVertexArray(ParticleAdapter::VAO);
 
-    float repulsion_factor = 0.008f; // You can adjust this value
-    float attraction_factor = 0.1f; // You can adjust this value
+    float repulsion_factor = 0.0025f; // You can adjust this value
+    float attraction_factor = 0.0001f; // You can adjust this value
     for(int i = 0; i < nb_ParticleAdapters3; i++)
     {
         float mvt_x = 0.0f;
@@ -394,22 +394,63 @@ void GraphicContext::Render()
             // Calculate the distance between the current particle and all the other
             __m256 sub_x = _mm256_sub_ps(vecX, scalar_x);
             __m256 sub_y = _mm256_sub_ps(vecY, scalar_y);
+            
+            // if(vect_x > 800.0f)
+            //     other_x -= 1600.0f;
+            // else if(vect_x < -800.0f)
+            //     other_x += 1600.0f;
+
+            // if(vect_y > 600.0f)
+            //     other_y -= 1200.0f;
+            // else if(vect_y < -600.0f)
+            //     other_y += 1200.0f;
+            // Apply correction of the position if the particle 
+            // is too close to the border of the screen
+            __m256 mask_x = _mm256_cmp_ps(sub_x, _mm256_set1_ps(800.0f), _CMP_GT_OQ);
+            __m256 mask_y = _mm256_cmp_ps(sub_y, _mm256_set1_ps(600.0f), _CMP_GT_OQ);
+            __m256 mask_x2 = _mm256_cmp_ps(sub_x, _mm256_set1_ps(-800.0f), _CMP_LT_OQ);
+            __m256 mask_y2 = _mm256_cmp_ps(sub_y, _mm256_set1_ps(-600.0f), _CMP_LT_OQ);
+            
+            __m256 other_x = _mm256_blendv_ps(vecX, _mm256_sub_ps(vecX, _mm256_set1_ps(1600.0f)), mask_x);
+            __m256 other_y = _mm256_blendv_ps(vecY, _mm256_sub_ps(vecY, _mm256_set1_ps(1200.0f)), mask_y);
+            other_x = _mm256_blendv_ps(other_x, _mm256_add_ps(other_x, _mm256_set1_ps(1600.0f)), mask_x2);
+            other_y = _mm256_blendv_ps(other_y, _mm256_add_ps(other_y, _mm256_set1_ps(1200.0f)), mask_y2);
+            // recalculate sub_x and sub_y
+            // copie sub x into other x (without mask)
+            sub_x = _mm256_sub_ps(other_x, scalar_x);
+            sub_y = _mm256_sub_ps(other_y, scalar_y);
 
             __m256 distance = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(sub_x, sub_x), _mm256_mul_ps(sub_y, sub_y)));
             // // Calculate the direction between the current particle and all the others
-            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(60.0f), _CMP_LT_OQ);
-            __m256 repulsion_x = _mm256_blendv_ps(_mm256_mul_ps(sub_x, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
-            __m256 repulsion_y = _mm256_blendv_ps(_mm256_mul_ps(sub_y, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(1000.0f), _CMP_LT_OQ);
             // Calculate the direction between the current particle and all the others
             __m256 mask_direction = _mm256_cmp_ps(distance, _mm256_setzero_ps(), _CMP_EQ_OQ);
             __m256 direction_x = _mm256_blendv_ps(_mm256_div_ps(sub_x, distance), _mm256_set1_ps(0.0f), mask_direction);
             __m256 direction_y = _mm256_blendv_ps(_mm256_div_ps(sub_y, distance), _mm256_set1_ps(0.0f), mask_direction);
-            // Add repulsion to direction
-            direction_x = _mm256_add_ps(direction_x, repulsion_x);
-            direction_y = _mm256_add_ps(direction_y, repulsion_y);
+            // invert direction if the particle is too close
+            __m256 mask_invert = _mm256_cmp_ps(distance, _mm256_set1_ps(200.0f), _CMP_LT_OQ);
+            direction_x = _mm256_blendv_ps(direction_x, _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_invert);
+            direction_y = _mm256_blendv_ps(direction_y, _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_invert);
+            // normalize direction to an unit vector
+            __m256 direction_norm = _mm256_sqrt_ps(_mm256_add_ps(_mm256_mul_ps(direction_x, direction_x), _mm256_mul_ps(direction_y, direction_y)));
+            __m256 mask_norm = _mm256_cmp_ps(direction_norm, _mm256_setzero_ps(), _CMP_EQ_OQ);
+            direction_x = _mm256_blendv_ps(_mm256_div_ps(direction_x, direction_norm), _mm256_set1_ps(0.0f), mask_norm);
+            direction_y = _mm256_blendv_ps(_mm256_div_ps(direction_y, direction_norm), _mm256_set1_ps(0.0f), mask_norm);
 
-            __m256 mvt_x_tmp = _mm256_mul_ps(direction_x, _mm256_set1_ps(1.0f));
-            __m256 mvt_y_tmp = _mm256_mul_ps(direction_y, _mm256_set1_ps(1.0f));
+            // Calculate the movement of the current particle, if attraction or repulsion depending
+            // on the distance between the current particle and the others
+            __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(1000.0f), _CMP_GT_OQ);
+            __m256 attraction_x = _mm256_blendv_ps(_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
+            __m256 attraction_y = _mm256_blendv_ps(_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
+
+            // calculate repulsion 
+            __m256 repulsion_x = _mm256_blendv_ps(_mm256_mul_ps(sub_x, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+            __m256 repulsion_y = _mm256_blendv_ps(_mm256_mul_ps(sub_y, _mm256_set1_ps(repulsion_factor)), _mm256_set1_ps(0.0f), mask_repulsion);
+
+            // // resulting movement
+            __m256 mvt_x_tmp = _mm256_add_ps(attraction_x, repulsion_x);
+            __m256 mvt_y_tmp = _mm256_add_ps(attraction_y, repulsion_y);
+
             float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
             float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
             for(int k = 0; k < 8; k++)
@@ -419,8 +460,8 @@ void GraphicContext::Render()
             }
         }
 
-        m_ParticleAdapters3_posX[i] += mvt_x*attraction_factor;
-        m_ParticleAdapters3_posY[i] += mvt_y*attraction_factor;
+        m_ParticleAdapters3_posX[i] += mvt_x*10.0f;
+        m_ParticleAdapters3_posY[i] += mvt_y*10.0f;
         
         // resulting movement 
         // std::cout << "Resulting movement: (" << mvt_x << "," << mvt_y << ")" << std::endl;
