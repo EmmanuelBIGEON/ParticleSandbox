@@ -249,11 +249,9 @@ void EventHandler_UI::HandleEvent(const Event& event)
             yCenter = -yCenter;
             xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
             yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
-
-            // Detect if the mouse is over an UI object.
-            // m_Context->SetMousePosition(glm::vec2(xCenter,yCenter));
             m_Context->OnMouseMoved.Emit(xCenter,yCenter);
-        }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
+        
+        }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_PRESSED)
         {
             MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
             if(mousePressedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
@@ -266,8 +264,22 @@ void EventHandler_UI::HandleEvent(const Event& event)
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
-
                 m_Context->OnMousePressed.Emit(xCenter,yCenter);
+            }
+        }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
+        {
+            MouseReleasedEvent* mouseReleasedEvent = (MouseReleasedEvent*)&event;
+            if(mouseReleasedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
+            {
+                float xCenter = (float)mouseEvent->posX;
+                float yCenter = (float)mouseEvent->posY; 
+                // Convert to OpenGL coordinates.
+                xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
+                yCenter = -yCenter;
+                xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+                yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+                m_Context->OnMouseReleased.Emit(xCenter,yCenter);
             }
         }
     }
