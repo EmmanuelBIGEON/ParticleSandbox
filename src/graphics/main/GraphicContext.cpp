@@ -83,6 +83,8 @@ void GraphicContext::Init()
     shader_particle = new Shader("shaders/particle.vs", "shaders/particle.fs");
     // SHADER_BUTTON
     shader_button = new Shader("shaders/button.vs", "shaders/button.fs");
+    // SHADER_UI
+    shader_ui = new Shader("shaders/ui.vs", "shaders/ui.fs");
     // -----------------------------
 
     // ---------- Fonts ----------
@@ -220,6 +222,13 @@ void GraphicContext::Render()
             case SHADER_BUTTON:
             {
                 shader_button->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }case SHADER_UI:
+            {
+                shader_ui->Use();
                 if(!object->IsUpdated()) // if the object is not updated, update it
                     object->Update();   
 
@@ -563,6 +572,11 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_button->SetMat4("model", m_ModelMatrix);
 
+    // shader_ui
+    shader_ui->Use();
+    // Update the model matrix
+    shader_ui->SetMat4("model", m_ModelMatrix);
+
     needUpdate = false;
 }
 
@@ -604,6 +618,8 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
             return shader_particle;
         case SHADER_BUTTON:
             return shader_button;
+        case SHADER_UI:
+            return shader_ui;
     }
     return nullptr;
 }

@@ -25,7 +25,6 @@ EventHandler::~EventHandler()
 
 void EventHandler_Test::HandleEvent(const Event& event)
 {
-    return; // silent;
     std::cout << "EventHandler_Test::HandleEvent()" << std::endl;
     switch(event.GetEventType())
     {
@@ -40,16 +39,16 @@ void EventHandler_Test::HandleEvent(const Event& event)
             MouseEvent* mouseEvent = (MouseEvent*)&event;
             if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_MOVED)
             {
-                std::cout << "EventType::EVENT_MOUSE : " << mouseEvent->posX << " " << mouseEvent->posY << std::endl;
+                // std::cout << "EventType::EVENT_MOUSE : " << mouseEvent->posX << " " << mouseEvent->posY << std::endl;
             }
             else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_PRESSED)
             {
                 MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
-                std::cout << "EventType::EVENT_MOUSE : " << mouseEvent->posX << " " << mouseEvent->posY << " " << mousePressedEvent->m_Button << std::endl;
+                std::cout << "pressed : " << mouseEvent->posX << " " << mouseEvent->posY << " " << mousePressedEvent->m_Button << std::endl;
             }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
             {
                 MouseReleasedEvent* mouseReleasedEvent = (MouseReleasedEvent*)&event;
-                std::cout << "EventType::EVENT_MOUSE : " << mouseEvent->posX << " " << mouseEvent->posY << " " << mouseReleasedEvent->m_Button << std::endl;
+                std::cout << "release : " << mouseEvent->posX << " " << mouseEvent->posY << " " << mouseReleasedEvent->m_Button << std::endl;
             }
             break;
         }
@@ -103,7 +102,21 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
     if(event.GetEventType() == EventType::EVENT_MOUSE)
     {
         MouseEvent* mouseEvent = (MouseEvent*)&event;
-        if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
+        if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_MOVED)
+        {
+            MouseMovedEvent* mousePressedEvent = (MouseMovedEvent*)&event;
+            float xCenter = (float)mouseEvent->posX;
+            float yCenter = (float)mouseEvent->posY; 
+            xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+            yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
+            yCenter = -yCenter;
+            xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+            yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+
+            // Detect if the mouse is over an UI object.
+            // m_Context->SetMousePosition(glm::vec2(xCenter,yCenter));
+            m_Context->OnMouseMoved.Emit(xCenter,yCenter);
+        }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_RELEASED)
         {
             MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
             if(mousePressedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
@@ -123,6 +136,22 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 std::vector<ParticleStruct> particles;
                 particles.push_back(particle);
                 m_Context->AddParticles(particles);
+                m_Context->OnMouseReleased.Emit(xCenter,yCenter); // TODO (create a particle on click despite the UI)
+            }
+        }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_PRESSED)
+        {
+            MousePressedEvent* mousePressedEvent = (MousePressedEvent*)&event;
+            if(mousePressedEvent->m_Button == MouseButton::MOUSE_BUTTON_LEFT)
+            {
+                float xCenter = (float)mouseEvent->posX;
+                float yCenter = (float)mouseEvent->posY; 
+                // Convert to OpenGL coordinates.
+                xCenter = (xCenter / (float)Application::viewportWidth) * 2.0f - 1.0f;
+                yCenter = (yCenter / (float)Application::viewportHeight) * 2.0f - 1.0f;
+                yCenter = -yCenter;
+                xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
+                yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
+                m_Context->OnMousePressed.Emit(xCenter,yCenter);
             }
         }
     }else if(event.GetEventType() == EventType::EVENT_WHEEL)
@@ -238,7 +267,7 @@ void EventHandler_UI::HandleEvent(const Event& event)
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
 
-                m_Context->OnMouseClicked.Emit(xCenter,yCenter);
+                m_Context->OnMousePressed.Emit(xCenter,yCenter);
             }
         }
     }

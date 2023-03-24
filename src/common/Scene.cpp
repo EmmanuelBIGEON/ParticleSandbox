@@ -11,6 +11,7 @@
 #include "../graphics/components/common/GraphicImage.h"
 #include "../graphics/components/common/GraphicLine.h"
 #include "../graphics/components/common/BezierCurve.h"
+#include "../graphics/components/ui/Slider.h"
 
 #include "../graphics/components/ui/Button.h"
 
@@ -85,7 +86,8 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
     // generator->Generate(620, ParticleClass::PARTICLE_CLASS_A);
     // generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
 
-    graphicContext->AddParticles(2500);
+    graphicContext->AddParticles(100);
+    Slider* slider = new Slider(graphicContext, 0, 1000, 500,500);
     return scene;
 }
 
@@ -118,6 +120,12 @@ void Scene::ConnectHandler(EventHandlerType handlerType)
 
     switch(handlerType)
     {
+        case EVENT_HANDLER_TEST:
+        {
+            EventHandler_Test* handler = new EventHandler_Test();
+            global_EventHandler = handler;
+            break;
+        }
         case EVENT_HANDLER_TEST2:
         {
             EventHandler_Test2* handler = new EventHandler_Test2(m_GraphicContext);

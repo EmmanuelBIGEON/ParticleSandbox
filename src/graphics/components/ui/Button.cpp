@@ -49,7 +49,7 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
         }
     });
 
-    m_Context->OnMouseClicked.Connect([this](float x, float y)
+    m_Context->OnMousePressed.Connect([this](float x, float y)
     {
         if(x > m_Pos.x && x < m_Pos.x + m_Size.x && 
            y > m_Pos.y && y < m_Pos.y + m_Size.y)

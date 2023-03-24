@@ -21,7 +21,8 @@ enum AvailableShader
     SHADER_LIGHTING,
     SHADER_LINE,
     SHADER_PARTICLE,
-    SHADER_BUTTON
+    SHADER_BUTTON, // to remove..
+    SHADER_UI
 };
 
 //! \class GraphicContext
@@ -92,7 +93,13 @@ class GraphicContext
         //! \brief Signal emitted when the mouse is clicked.
         //! Allowing UI elements to connect to it.
         // Give the position (in world coordinates) of the mouse when it was clicked.
-        Signal<float, float> OnMouseClicked;
+        Signal<float, float> OnMousePressed;
+
+        //! \brief Signal emitted when the mouse is released.
+        //! Allowing UI elements to connect to it.
+        // Give the position (in world coordinates) of the mouse when it was released.
+        Signal<float, float> OnMouseReleased;
+
 
         //! \brief Signal when a graphic object join or leave the context.
         Signal<GraphicObject*> OnObjectRegistered;
@@ -136,6 +143,7 @@ class GraphicContext
         Shader* shader_line;
         Shader* shader_particle; // Principal shader for the simulation
         Shader* shader_button;
+        Shader* shader_ui;
 
 
         //! \brief Projection matrix.
