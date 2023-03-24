@@ -83,8 +83,11 @@ class GraphicContext
 
         Font* font_main;
 
+        
         static float worldWidth;
         static float worldHeight;
+        static float repulsion_factor;
+        static float attraction_factor;
 
         //! \brief Signal emitted when the mouse is moved.
         //! Allowing UI elements to connect to it.

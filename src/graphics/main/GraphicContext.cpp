@@ -32,6 +32,9 @@
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
+float GraphicContext::repulsion_factor = 0.1f;
+float GraphicContext::attraction_factor = 0.1f;
+
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
@@ -120,7 +123,6 @@ void GraphicContext::Register(GraphicObject* object)
     OnObjectRegistered.Emit(object);
 }
 
-
 void GraphicContext::Remove(GraphicObject* object)
 {
     if(object->GetObjectType() == OBJECTGR_PARTICLE)
@@ -148,7 +150,6 @@ void GraphicContext::Remove(GraphicObject* object)
         }
     }
 }
-
 
 float GraphicContext::Convert_glX_to_WorldX(float x) const
 {
@@ -182,9 +183,7 @@ void GraphicContext::Render()
                 if(!object->IsUpdated()) // if the object is not updated, update it
                 {
                     object->Update();   
-
                 }
-
                 break;
             }
             case SHADER_TEXT:
@@ -238,13 +237,9 @@ void GraphicContext::Render()
         object->Draw();
     }
 
-    
     shader_particle->Use();
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
     glBindVertexArray(ParticleAdapter::VAO);
-    
-    float repulsion_factor = 0.1f; // You can adjust this value
-    float attraction_factor = 0.04f; // You can adjust this value
 
     m_ParticleAdaptersMutex.lock();
     for(int i = 0; i < nb_ParticleAdapters3; i++)
@@ -390,7 +385,6 @@ void GraphicContext::Render()
 
     m_ParticleAdaptersMutex.unlock();
 }
-
 
 void GraphicContext::AddParticles(int nbParticles)
 {

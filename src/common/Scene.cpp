@@ -87,7 +87,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
     // generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
 
     graphicContext->AddParticles(100);
-    Slider* slider = new Slider(graphicContext, 0, 1000, 500,500);
+    Slider* slider = new Slider(graphicContext, 0.05f, 0.5f, 500,500);
     return scene;
 }
 

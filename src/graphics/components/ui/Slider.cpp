@@ -35,7 +35,6 @@ void Slider::Update()
 {
     if(m_IsUpdated) return;
 
-    std::cout << "Slider::Update()" << std::endl;
     // draw a rectangle that represents the slider
 
     // Give (x,y) coordinates to the vertices 
@@ -72,7 +71,7 @@ void Slider::Update()
     m_boundingBoxCursor[1] = m_shiftCursorY - cursorHeight / 2.0f - padding;
     m_boundingBoxCursor[2] = m_shiftCursorX + cursorWidth / 2.0f + padding;
     m_boundingBoxCursor[3] = m_shiftCursorY + cursorHeight / 2.0f + padding;
-    
+
 
     glGenVertexArrays(1, &m_VAO);
     glGenBuffers(1, &m_VBO);
@@ -136,6 +135,8 @@ void Slider::OnMouseMoved(float x, float y)
     {
         m_shiftCursorX = x;
         m_Value = (m_shiftCursorX - m_shiftX + width/2.0f) * (m_Max - m_Min) / width;
+        // testing 
+        GraphicContext::repulsion_factor = m_Value;
         if (m_Value < m_Min) m_Value = m_Min;
         if (m_Value > m_Max) m_Value = m_Max;
         isHovered = true; 
