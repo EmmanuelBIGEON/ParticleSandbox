@@ -10,12 +10,8 @@
 class Slider : public GraphicObject
 {
     public: 
-        Slider(GraphicContext* context, float min, float max, float x, float y);
-        Slider(GraphicContext* context, float min, float max, float value, float x, float y);
+        Slider(GraphicContext* context, float min, float max, float* value, float x, float y);
         virtual ~Slider();
-
-        void SetValue(float value) { m_Value = value; m_IsUpdated = true; }
-        float GetValue() const { return m_Value; }
 
         void SetMin(float min) { m_Min = min; m_IsUpdated = false; }
         float GetMin() const { return m_Min; }
@@ -45,7 +41,7 @@ class Slider : public GraphicObject
 
         float m_Min;
         float m_Max;
-        float m_Value;
+        float* m_referencedValue;
 
         unsigned int m_VAO;
         unsigned int m_VBO;

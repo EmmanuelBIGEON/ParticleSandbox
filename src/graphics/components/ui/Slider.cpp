@@ -3,21 +3,13 @@
 #include <iostream>
 #include <glad/glad.h>
 
+#define REFVALUE *m_referencedValue
+
 float Slider::height = 5.0f;
 float Slider::width = 100.0f;
 
-Slider::Slider(GraphicContext* context, float min, float max, float x, float y)
-    : GraphicObject(context,SHADER_UI), m_Min(min), m_Max(max), m_Value(0.0f)
-    , m_shiftX(x), m_shiftY(y), m_EBO(0), m_VAO(0), m_VBO(0), isHovered(false), isPressed(false),
-     m_shiftCursorX(0.0f), m_shiftCursorY(0.0f), m_VAO_cursor(0), m_VBO_cursor(0), m_EBO_cursor(0)
-{
-    m_Shader = context->GetShader(AvailableShader::SHADER_UI);
-    m_Context->OnMouseMoved.Connect([this](float x, float y) { OnMouseMoved(x, y); });
-    m_Context->OnMousePressed.Connect([this](float x, float y) { OnMousePressed(x, y); });
-    m_Context->OnMouseReleased.Connect([this](float x, float y) { OnMouseReleased(x, y); });
-}
-Slider::Slider(GraphicContext* context, float min, float max, float value, float x, float y)
-    : GraphicObject(context,SHADER_UI), m_Min(min), m_Max(max), m_Value(value), m_shiftX(x), m_shiftY(y),
+Slider::Slider(GraphicContext* context, float min, float max, float* value, float x, float y)
+    : GraphicObject(context,SHADER_UI), m_Min(min), m_Max(max), m_referencedValue(value), m_shiftX(x), m_shiftY(y),
      m_EBO(0), m_VAO(0), m_VBO(0), isHovered(false), isPressed(false),
      m_shiftCursorX(0.0f), m_shiftCursorY(0.0f), m_VAO_cursor(0), m_VBO_cursor(0), m_EBO_cursor(0)
 {
@@ -55,7 +47,7 @@ void Slider::Update()
     // Create the cursor vertices
     float cursorWidth = 14.0f;
     float cursorHeight = 20.0f;
-    m_shiftCursorX = (m_shiftX - width/2.0f) + (m_Value * width / (m_Max - m_Min));
+    m_shiftCursorX = (m_shiftX - width/2.0f) + (REFVALUE * width / (m_Max - m_Min));
     m_shiftCursorY = m_shiftY;
     m_cursorVertices[0] = (-cursorWidth / 2.0f); // Corner
     m_cursorVertices[1] = (-cursorHeight / 2.0f); // bottom left
@@ -134,11 +126,10 @@ void Slider::OnMouseMoved(float x, float y)
     if(isPressed)
     {
         m_shiftCursorX = x;
-        m_Value = (m_shiftCursorX - m_shiftX + width/2.0f) * (m_Max - m_Min) / width;
-        // testing 
-        GraphicContext::repulsion_factor = m_Value;
-        if (m_Value < m_Min) m_Value = m_Min;
-        if (m_Value > m_Max) m_Value = m_Max;
+        float temp = (m_shiftCursorX - m_shiftX + width/2.0f) * (m_Max - m_Min) / width;
+        if (temp < m_Min) temp = m_Min;
+        if (temp > m_Max) temp = m_Max;
+        REFVALUE = temp;
         isHovered = true; 
         m_IsUpdated = false;
 
