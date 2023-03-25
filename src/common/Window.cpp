@@ -46,6 +46,11 @@ void Window::Display(Application* app)
         return;
     }
 
+    // display window at the center of the screen
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    glfwSetWindowPos(window, (mode->width - Application::viewportWidth) / 2, (mode->height - Application::viewportHeight) / 2);
+    
+
     glfwMakeContextCurrent(window);
 
     // callbacks
