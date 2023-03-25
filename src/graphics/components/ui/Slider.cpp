@@ -47,7 +47,7 @@ void Slider::Update()
     // Create the cursor vertices
     float cursorWidth = 14.0f;
     float cursorHeight = 20.0f;
-    m_shiftCursorX = (m_shiftX - width/2.0f) + (REFVALUE * width / (m_Max - m_Min));
+    m_shiftCursorX = (m_shiftX- width/2.0f) + (REFVALUE - m_Min) / (m_Max - m_Min) * width;
     m_shiftCursorY = m_shiftY;
     m_cursorVertices[0] = (-cursorWidth / 2.0f); // Corner
     m_cursorVertices[1] = (-cursorHeight / 2.0f); // bottom left
@@ -153,5 +153,6 @@ void Slider::OnMousePressed(float x, float y)
 
 void Slider::OnMouseReleased(float x, float y)
 {
+    std::cout << "refavalue: " << REFVALUE << std::endl;
     isPressed = false;
 }
