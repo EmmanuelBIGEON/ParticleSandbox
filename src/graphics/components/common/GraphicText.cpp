@@ -15,26 +15,28 @@
 #define FIXED_PADDING 5
 
 GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, float x, float y, float scale, glm::vec3 color) 
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), m_VBO(0)
+    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), 
+    m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
 {
     m_Shader = context->GetShader(SHADER_TEXT);
 }
 
 GraphicText::GraphicText(GraphicContext* context, const std::string& text, Font* font, float x, float y, float scale, glm::vec3 color) 
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), m_VBO(0)
+    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), 
+    m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
 {
     m_Shader = context->GetShader(SHADER_TEXT);
 }
 
 GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, float xstart, float ystart, float xend, float yend, glm::vec3 color)
-    : GraphicObject(context,SHADER_TEXT), 
-    m_Text(text), m_Font(font), m_xstart(xstart), m_ystart(ystart), m_xend(xend), m_yend(yend), m_scale(1.0f), m_Color(color), m_VAO(0), m_VBO(0)
+    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_xstart(xstart), m_ystart(ystart), m_xend(xend), 
+    m_yend(yend), m_scale(1.0f), m_Color(color), m_VAO(0), m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
 {
     m_Shader = context->GetShader(SHADER_TEXT);
 }
 
 GraphicText::GraphicText(GraphicContext* context, const char* text, glm::vec2 topLeft, glm::vec2 bottomRight)
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_scale(1.0f), m_VAO(0), m_VBO(0)
+    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_scale(1.0f), m_VAO(0), m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
 {
     m_Font = context->font_main;
     m_Color = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -71,12 +73,13 @@ void GraphicText::Update()
     // to determine if text is too large and to align it accordingly
     float textWidth = 0.0f;
     float textHeight = m_Font->GetSize();
-    int nbCharacters = m_Text.length();
+    m_nbCharacters = 0;
     std::string::const_iterator c;
     for (c = m_Text.begin(); c != m_Text.end(); c++) 
     {
         Character ch = m_Font->characters[*c];
         textWidth += (ch.Advance >> 6); // bitshift by 6 to get value in pixels (2^6 = 64)
+        m_nbCharacters++;
     }
     std::cout << "Text width of " << m_Text << " is " << textWidth << std::endl;
 
@@ -169,29 +172,16 @@ void GraphicText::Update()
         m_textScaledHeight = textHeight;
 
     }
-
     
+    // prepares vertices
+    if(m_vertices)
+    {
+        delete[] m_vertices;
+        m_vertices = nullptr;
+    }
 
-    glGenVertexArrays(1, &m_VAO);
-    glGenBuffers(1, &m_VBO);
-    glBindVertexArray(m_VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-
-    m_IsUpdated = true;
-}
-
-void GraphicText::Draw()
-{
-    glUniform3f(glGetUniformLocation(m_Shader->shaderID, "textColor"), m_Color.x, m_Color.y, m_Color.z);
-    glActiveTexture(GL_TEXTURE0);
-    glBindVertexArray(m_VAO);
-
+    std::cout << "Number of characters: " << m_nbCharacters << std::endl;
+    m_vertices = new float[6 * 4 * m_nbCharacters];
     int index = 0; // current index in vertices array
     for (int i = 0; i < m_linesToDraw; i++)
     {
@@ -205,30 +195,64 @@ void GraphicText::Draw()
             float ypos = y - (ch.Size.y - ch.Bearing.y) * m_scale;
             float w = ch.Size.x * m_scale;
             float h = ch.Size.y * m_scale;
-            float vertices[6][4] = {
-                { xpos,     ypos + h,   0.0f, 0.0f },            
-                { xpos,     ypos,       0.0f, 1.0f },
-                { xpos + w, ypos,       1.0f, 1.0f },
 
-                { xpos,     ypos + h,   0.0f, 0.0f },
-                { xpos + w, ypos,       1.0f, 1.0f },
-                { xpos + w, ypos + h,   1.0f, 0.0f }           
-            };
-            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            // fill m_vertices
+            m_vertices[index++] = xpos;     m_vertices[index++] = ypos + h;
+            m_vertices[index++] = 0.0f;     m_vertices[index++] = 0.0f;
+
+            m_vertices[index++] = xpos;     m_vertices[index++] = ypos;
+            m_vertices[index++] = 0.0f;     m_vertices[index++] = 1.0f;
+
+            m_vertices[index++] = xpos + w; m_vertices[index++] = ypos;
+            m_vertices[index++] = 1.0f;     m_vertices[index++] = 1.0f;
+
+            m_vertices[index++] = xpos;     m_vertices[index++] = ypos + h;
+            m_vertices[index++] = 0.0f;     m_vertices[index++] = 0.0f;
+
+            m_vertices[index++] = xpos + w; m_vertices[index++] = ypos;
+            m_vertices[index++] = 1.0f;     m_vertices[index++] = 1.0f;
+
+            m_vertices[index++] = xpos + w; m_vertices[index++] = ypos + h;
+            m_vertices[index++] = 1.0f;     m_vertices[index++] = 0.0f;
+            
+            // advance
             x += (ch.Advance >> 6) * m_scale; // bitshift by 6 to get value in pixels (2^6 = 64)
-
-            // draw
-            // glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, vertices, GL_DYNAMIC_DRAW);
-            glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-            glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            // std::cout << "Drawing character: " << *c << std::endl;
-
         }
     }
 
+    glGenVertexArrays(1, &m_VAO);
+    glGenBuffers(1, &m_VBO);
+    glBindVertexArray(m_VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    
 
-    // draw the bounding box of text
 
+    m_IsUpdated = true;
+}
+
+void GraphicText::Draw()
+{
+    glUniform3f(glGetUniformLocation(m_Shader->shaderID, "textColor"), m_Color.x, m_Color.y, m_Color.z);
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(m_VAO);
+
+    int index = 0;
+    for(int i = 0; i < m_linesToDraw; i++)
+    {
+        const std::string& line = m_lines[i];
+        for (std::string::const_iterator c = line.begin(); c != line.end(); c++) 
+        {
+            const Character& ch = m_Font->characters[*c];
+            glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+            glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 6 * 4, &m_vertices[index * 6 * 4]);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            index += 1;
+        }
+    }
 }

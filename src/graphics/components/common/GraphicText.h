@@ -65,9 +65,11 @@ class GraphicText : public GraphicObject
         unsigned int m_VAO;
         unsigned int m_VBO;
         // float m_vertices[28];
+        float* m_vertices;
 
         // Updated data
         std::vector<std::string> m_lines;
         int m_linesToDraw;
         float m_textScaledHeight;
+        int m_nbCharacters;
 };
