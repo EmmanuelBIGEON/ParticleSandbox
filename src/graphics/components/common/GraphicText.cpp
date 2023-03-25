@@ -64,6 +64,8 @@ void GraphicText::SetFont(Font* font)
 
 void GraphicText::Update()
 {
+    m_lines.clear();
+
     // Calculate size with xstart, ystart, xend, yend
     // It needs to stay in the box. Scale if needed.
     // For starter, TextAlign is always center
@@ -81,49 +83,53 @@ void GraphicText::Update()
         textWidth += (ch.Advance >> 6); // bitshift by 6 to get value in pixels (2^6 = 64)
         m_nbCharacters++;
     }
-    std::cout << "Text width of " << m_Text << " is " << textWidth << std::endl;
 
+    // ----- CALCULATION OF SCALE -----
+    m_scale = 1.0f; // default value. 
     // check if text too large
-    // If text overflows box, if height is large enough, create the text on multiple lines
     if (textWidth > (m_xend - m_xstart))
     {
-        std::cout << "Text too large, will be scaled down (text value: " << m_Text << ")" << std::endl;
+        int lineWidth = m_xend - m_xstart - FIXED_PADDING * 2;
+        int boxHeight = m_ystart - m_yend - FIXED_PADDING * 2;
 
-        // Calculate the number of lines needed
+        // Calculate the number of lines needed (textWidth / available space on x axis for one line)
         int nbLinesNeeded = ceil(textWidth / (m_xend - m_xstart));
-        std::cout << "Text need " << nbLinesNeeded << " lines" << std::endl;
 
         // Calculate lines available in box height  
-        int lineWidth = m_xend - m_xstart - FIXED_PADDING * 2;
-        int availableLines = (m_ystart - m_yend - FIXED_PADDING * 2) / textHeight;
-        std::cout << "Available lines: " << availableLines << std::endl;
+        int availableLines =  boxHeight / textHeight;
 
-        m_scale = 1.0f;
+        // Textheight is too high for the box
         if(availableLines < 0)
         {
-            // Text will be scaled down to fit the box
-            // Calculate minimum scale to fit the box
-            float availableWidth = lineWidth * (float)availableLines;
+            float availableWidth = lineWidth * availableLines;
             m_scale = availableWidth / textWidth;
-            
 
         }else if (nbLinesNeeded - availableLines > 0) // Text will be scaled down
         {
-            // Calculate minimum scale to fit the box
-            float availableWidth = lineWidth * (float)availableLines;
-            m_scale = availableWidth / textWidth;
-        }
-        
-        
+            // find a height that gives enough lines for the text to be displayed
+            // reduce line height until it fits
+            float originalTextHeight = textHeight;
+            while (nbLinesNeeded - availableLines > 0)
+            {
+                textHeight -= 1.0f;
+                m_scale = textHeight / originalTextHeight;
 
-        m_lines.clear();
-        // Split the text into words separated by spaces
+                // recalculate needed lines
+                nbLinesNeeded = ceil((textWidth*m_scale) / (m_xend - m_xstart));
+                availableLines =  boxHeight / textHeight;
+            }
+
+        }
+        // ----- END OF CALCULATION OF SCALE -----
+        // m_scale = 0.50f;
+        // -- Split the text into words separated by spaces --
         int font_spacesize = m_Font->characters[' '].Advance >> 6;
         std::vector<std::string> words;
         std::string word;
         std::istringstream iss(m_Text);
         // operator >> is used to read a word from the stream
         while (iss >> word) words.push_back(word);
+        // ---------------------------------------------------
 
         // Create the lines
         std::string line;
@@ -163,7 +169,7 @@ void GraphicText::Update()
         for (int i = 0; i < m_lines.size(); i++) std::cout << "Line " << i << ": " << m_lines[i] << std::endl;
 
         m_linesToDraw = m_lines.size();
-        m_textScaledHeight = textHeight * m_scale;
+        m_textScaledHeight = textHeight;
     }else 
     {
         // text ok on one line
