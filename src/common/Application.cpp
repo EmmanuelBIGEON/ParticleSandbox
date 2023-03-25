@@ -81,7 +81,7 @@ void Application::CreateWindow()
         ParticleAdapter::LoadParticleVAO();
 
         // Load the scene.
-        LoadScene_2();
+        LoadScene_3();
         
     });
 

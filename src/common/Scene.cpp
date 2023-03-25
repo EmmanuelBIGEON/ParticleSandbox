@@ -96,14 +96,31 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext);
+    Scene* scene = new Scene(graphicContext, false);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
-    Button* button = new Button(graphicContext, glm::vec2(100.0f, 100.0f), glm::vec2(200.0f, 200.0f), glm::vec3(1.0f, 0.0f, 0.0f), "Click me !");
-    button->OnClick.Connect([button]()
-    {
-        std::cout << "Button clicked !" << std::endl;
-    });
+    // Button* button = new Button(graphicContext, glm::vec2(100.0f, 100.0f), glm::vec2(200.0f, 200.0f), glm::vec3(1.0f, 0.0f, 0.0f), "Click me !");
+    // button->OnClick.Connect([button]()
+    // {
+    //     std::cout << "Button clicked !" << std::endl;
+    // });
+    // GraphicText* test = new GraphicText(graphicContext, "test", glm::vec2(200.0f, 200.0f), glm::vec2(100.0f, 100.0f));
+    Rectangle rect = Rectangle(Point(220.0f, 250.0f), Point(400.0f, 200.0f));
+    RectangleAdapter* recta = new RectangleAdapter(graphicContext,rect); 
+    recta->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    GraphicText* testtest = new GraphicText(graphicContext, "Un test a la con vraiment pas cool", glm::vec2(220.0f, 250.0f), glm::vec2(400.0f, 200.0f));
+
+    // test2
+    Rectangle rect2 = Rectangle(Point(420.0f, 250.0f), Point(600.0f, 200.0f));
+    RectangleAdapter* recta2 = new RectangleAdapter(graphicContext,rect2);
+    recta2->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    GraphicText* testtest2 = new GraphicText(graphicContext, "Un test a la con vraim", glm::vec2(420.0f, 250.0f), glm::vec2(600.0f, 200.0f));
+
+    // test3
+    Rectangle rect3 = Rectangle(Point(620.0f, 250.0f), Point(800.0f, 200.0f));
+    RectangleAdapter* recta3 = new RectangleAdapter(graphicContext,rect3);
+    recta3->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    GraphicText* testtest3 = new GraphicText(graphicContext, "My kind of text ! Much wow, this text describes the entire universe in one little sentence, that's impressive ! ", glm::vec2(620.0f, 250.0f), glm::vec2(800.0f, 200.0f));
 
     return scene;
 }

@@ -101,6 +101,5 @@ void RectangleAdapter::Draw()
     m_Shader->SetMat4("shiftPos", glm::mat4(1.0f));
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    std::cout << "Drawing rectangle" << std::endl;
 }
 

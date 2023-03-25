@@ -7,6 +7,9 @@
 
 #include <string>
 #include <glm/glm.hpp>
+#include <vector>
+
+class RectangleAdapter;
 
 // Allow to align text in its box.
 enum TextAlign
@@ -25,6 +28,8 @@ class GraphicText : public GraphicObject
         GraphicText(GraphicContext* context, const char* text, Font* font, float x, float y, float scale, glm::vec3 color);
         GraphicText(GraphicContext* context, const std::string& text, Font* font, float x, float y, float scale, glm::vec3 color);
         GraphicText(GraphicContext* context, const char* text, Font* font, float xstart, float ystart, float xend, float yend, glm::vec3 color);
+
+        GraphicText(GraphicContext* context, const char* text, glm::vec2 topLeft, glm::vec2 bottomRight);
         virtual ~GraphicText();
 
         void SetText(const std::string& text);
@@ -61,6 +66,8 @@ class GraphicText : public GraphicObject
         unsigned int m_VBO;
         // float m_vertices[28];
 
-        // Will contain the vertices of the text
-        float* m_vertices;
+        // Updated data
+        std::vector<std::string> m_lines;
+        int m_linesToDraw;
+        float m_textScaledHeight;
 };

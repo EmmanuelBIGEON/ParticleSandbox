@@ -82,6 +82,7 @@ class GraphicContext
         const int& GetNbParticles() const { return nb_ParticleAdapters3; }
 
         Font* font_main;
+        
 
         
         static float worldWidth;
