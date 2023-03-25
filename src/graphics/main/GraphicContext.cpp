@@ -173,69 +173,9 @@ void GraphicContext::Render()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for(auto object : m_Objects)
-    {
-        switch(object->GetShaderIndex())
-        {
-            case SHADER_BASIC:
-            {
-                shader_basic->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                {
-                    object->Update();   
-                }
-                break;
-            }
-            case SHADER_TEXT:
-            {
-                shader_text->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
+    // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                break;
-            }
-            case SHADER_TEXTURE:
-            {
-                shader_texture->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_LIGHTING:
-            {
-                shader_lighting->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_LINE:
-            {
-                shader_line->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_BUTTON:
-            {
-                shader_button->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }case SHADER_UI:
-            {
-                shader_ui->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-        }
-        object->Draw();
-    }
 
     shader_particle->Use();
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
@@ -382,6 +322,72 @@ void GraphicContext::Render()
         shader_particle->SetVec2("shiftPos", glm::vec2(m_ParticleAdapters3_posX[i], m_ParticleAdapters3_posY[i]));
         glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
     }
+
+        for(auto object : m_Objects)
+    {
+        switch(object->GetShaderIndex())
+        {
+            case SHADER_BASIC:
+            {
+                shader_basic->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                {
+                    object->Update();   
+                }
+                break;
+            }
+            case SHADER_TEXT:
+            {
+                shader_text->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_TEXTURE:
+            {
+                shader_texture->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_LIGHTING:
+            {
+                shader_lighting->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_LINE:
+            {
+                shader_line->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_BUTTON:
+            {
+                shader_button->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }case SHADER_UI:
+            {
+                shader_ui->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+        }
+        object->Draw();
+    }
+
+
 
     m_ParticleAdaptersMutex.unlock();
 }

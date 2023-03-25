@@ -69,6 +69,7 @@ void Window::Display(Application* app)
 
     // enable anti-aliasing (MSAA)
     glEnable(GL_MULTISAMPLE);  
+    // glEnable(GL_DEPTH_TEST); // No depth testing to relief the GPU
 
     // -----------------------------------------------------------
 
