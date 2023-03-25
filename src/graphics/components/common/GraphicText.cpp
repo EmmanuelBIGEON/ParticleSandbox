@@ -101,14 +101,16 @@ void GraphicText::Update()
         m_scale = 1.0f;
         if(availableLines < 0)
         {
+            // Text will be scaled down to fit the box
             // Calculate minimum scale to fit the box
-            float availableWidth = lineWidth * nbLinesNeeded;
+            float availableWidth = lineWidth * (float)availableLines;
             m_scale = availableWidth / textWidth;
+            
 
         }else if (nbLinesNeeded - availableLines > 0) // Text will be scaled down
         {
             // Calculate minimum scale to fit the box
-            float availableWidth = lineWidth * availableLines;
+            float availableWidth = lineWidth * (float)availableLines;
             m_scale = availableWidth / textWidth;
         }
         
