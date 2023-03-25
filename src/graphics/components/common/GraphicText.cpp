@@ -14,32 +14,11 @@
 // Defining the minimal padding of the box containing the text.
 #define FIXED_PADDING 5
 
-GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, float x, float y, float scale, glm::vec3 color) 
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), 
-    m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
-{
-    m_Shader = context->GetShader(SHADER_TEXT);
-}
-
-GraphicText::GraphicText(GraphicContext* context, const std::string& text, Font* font, float x, float y, float scale, glm::vec3 color) 
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_x(x), m_y(y), m_scale(scale), m_Color(color), m_VAO(0), 
-    m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
-{
-    m_Shader = context->GetShader(SHADER_TEXT);
-}
-
-GraphicText::GraphicText(GraphicContext* context, const char* text, Font* font, float xstart, float ystart, float xend, float yend, glm::vec3 color)
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_Font(font), m_xstart(xstart), m_ystart(ystart), m_xend(xend), 
-    m_yend(yend), m_scale(1.0f), m_Color(color), m_VAO(0), m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
-{
-    m_Shader = context->GetShader(SHADER_TEXT);
-}
-
 GraphicText::GraphicText(GraphicContext* context, const char* text, glm::vec2 topLeft, glm::vec2 bottomRight)
     : GraphicObject(context,SHADER_TEXT), m_Text(text), m_scale(1.0f), m_VAO(0), m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
 {
     m_Font = context->font_main;
-    m_Color = glm::vec3(0.0f, 1.0f, 0.0f);
+    m_Color = glm::vec3(1.0f, 1.0f, 1.0f);
     m_xstart = topLeft.x;
     m_ystart = topLeft.y;
     m_xend = bottomRight.x;
@@ -55,11 +34,13 @@ GraphicText::~GraphicText()
 void GraphicText::SetText(const std::string& text)
 {
     m_Text = text;
+    m_IsUpdated = false;
 }
 
 void GraphicText::SetFont(Font* font)
 {
     m_Font = font;
+    m_IsUpdated = false;
 }
 
 void GraphicText::Update()
@@ -84,7 +65,6 @@ void GraphicText::Update()
         m_nbCharacters++;
     }
 
-    // ----- CALCULATION OF SCALE -----
     m_scale = 1.0f; // default value. 
     // check if text too large
     if (textWidth > (m_xend - m_xstart))
@@ -93,35 +73,29 @@ void GraphicText::Update()
         int boxHeight = m_ystart - m_yend - FIXED_PADDING * 2;
 
         // Calculate the number of lines needed (textWidth / available space on x axis for one line)
-        int nbLinesNeeded = ceil(textWidth / (m_xend - m_xstart));
+        int nbLinesNeeded = ceil(textWidth / lineWidth);
 
         // Calculate lines available in box height  
         int availableLines =  boxHeight / textHeight;
 
         // Textheight is too high for the box
-        if(availableLines < 0)
-        {
-            float availableWidth = lineWidth * availableLines;
-            m_scale = availableWidth / textWidth;
-
-        }else if (nbLinesNeeded - availableLines > 0) // Text will be scaled down
+        if(availableLines < 0 || nbLinesNeeded - availableLines > 0) // Text will be scaled down
         {
             // find a height that gives enough lines for the text to be displayed
             // reduce line height until it fits
             float originalTextHeight = textHeight;
+            float tempTextHeight = textHeight;
             while (nbLinesNeeded - availableLines > 0)
             {
-                textHeight -= 1.0f;
-                m_scale = textHeight / originalTextHeight;
+                tempTextHeight -= 1.0f;
+                m_scale = tempTextHeight / originalTextHeight;
 
                 // recalculate needed lines
-                nbLinesNeeded = ceil((textWidth*m_scale) / (m_xend - m_xstart));
-                availableLines =  boxHeight / textHeight;
+                nbLinesNeeded = ceil((textWidth*m_scale*1.2f) / (lineWidth)); // Apply a little padding (1.2f) to reduce number of mistakes
+                availableLines =  boxHeight / tempTextHeight;
             }
-
         }
-        // ----- END OF CALCULATION OF SCALE -----
-        // m_scale = 0.50f;
+
         // -- Split the text into words separated by spaces --
         int font_spacesize = m_Font->characters[' '].Advance >> 6;
         std::vector<std::string> words;
@@ -136,7 +110,6 @@ void GraphicText::Update()
         float currentLineWidth = 0.0f;
         for (int i = 0; i < words.size(); i++)
         {
-            std::cout << "Word " << i << ": " << words[i] << std::endl;
             float wordWidth = 0.0f;
             std::string::const_iterator cword;
             for (cword = words[i].begin(); cword != words[i].end(); cword++) 
@@ -166,10 +139,8 @@ void GraphicText::Update()
         // Add the last line
         if(!line.empty()) m_lines.push_back(line);
 
-        for (int i = 0; i < m_lines.size(); i++) std::cout << "Line " << i << ": " << m_lines[i] << std::endl;
-
         m_linesToDraw = m_lines.size();
-        m_textScaledHeight = textHeight;
+        m_textScaledHeight = textHeight * m_scale;
     }else 
     {
         // text ok on one line
@@ -188,7 +159,6 @@ void GraphicText::Update()
         m_vertices = nullptr;
     }
 
-    std::cout << "Number of characters: " << m_nbCharacters << std::endl;
     m_vertices = new float[6 * 4 * m_nbCharacters];
     int index = 0; // current index in vertices array
     for (int i = 0; i < m_linesToDraw; i++)

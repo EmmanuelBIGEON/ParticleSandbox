@@ -25,10 +25,6 @@ enum TextAlign
 class GraphicText : public GraphicObject
 {
     public: 
-        GraphicText(GraphicContext* context, const char* text, Font* font, float x, float y, float scale, glm::vec3 color);
-        GraphicText(GraphicContext* context, const std::string& text, Font* font, float x, float y, float scale, glm::vec3 color);
-        GraphicText(GraphicContext* context, const char* text, Font* font, float xstart, float ystart, float xend, float yend, glm::vec3 color);
-
         GraphicText(GraphicContext* context, const char* text, glm::vec2 topLeft, glm::vec2 bottomRight);
         virtual ~GraphicText();
 

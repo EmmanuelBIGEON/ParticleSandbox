@@ -86,7 +86,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
     // generator->Generate(620, ParticleClass::PARTICLE_CLASS_A);
     // generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
 
-    graphicContext->AddParticles(1200);
+    graphicContext->AddParticles(800);
     Slider* slider = new Slider(graphicContext, 0.0f, 0.5f, &GraphicContext::repulsion_factor, 500, 500);
     Slider* slider2 = new Slider(graphicContext, 0.05f, 0.5f, &GraphicContext::attraction_factor, 500, 400);
     return scene;
@@ -98,13 +98,14 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, false);
     scene->ConnectHandler(EVENT_HANDLER_UI);
+    return scene;
+}
 
-    // Button* button = new Button(graphicContext, glm::vec2(100.0f, 100.0f), glm::vec2(200.0f, 200.0f), glm::vec3(1.0f, 0.0f, 0.0f), "Click me !");
-    // button->OnClick.Connect([button]()
-    // {
-    //     std::cout << "Button clicked !" << std::endl;
-    // });
-    // GraphicText* test = new GraphicText(graphicContext, "test", glm::vec2(200.0f, 200.0f), glm::vec2(100.0f, 100.0f));
+Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
+{
+    Scene* scene = new Scene(graphicContext, false);
+    scene->ConnectHandler(EVENT_HANDLER_UI);
+
     Rectangle rect = Rectangle(Point(220.0f, 250.0f), Point(400.0f, 200.0f));
     RectangleAdapter* recta = new RectangleAdapter(graphicContext,rect); 
     recta->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
@@ -122,6 +123,11 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
     recta3->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
     GraphicText* testtest3 = new GraphicText(graphicContext, "My kind of text ! Much wow, this text describes the entire universe in one little sentence, that's impressive ! ", glm::vec2(620.0f, 250.0f), glm::vec2(800.0f, 200.0f));
 
+    // test4
+    Rectangle rect4 = Rectangle(Point(820.0f, 250.0f), Point(1000.0f, 200.0f));
+    RectangleAdapter* recta4 = new RectangleAdapter(graphicContext,rect4);
+    recta4->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    GraphicText* testtest4 = new GraphicText(graphicContext, "My kind of text ! Much worse in one little sentence, impressive ! ", glm::vec2(820.0f, 250.0f), glm::vec2(1000.0f, 200.0f));
     return scene;
 }
 

@@ -19,8 +19,8 @@ void BasicUI::Init(GraphicContext* context)
     std::string text2 = "FPS: ";
     text2 += std::to_string(m_fps);
 
-    m_particlesCountText = new GraphicText(context, text.c_str(), context->font_main, m_startingX, m_startingY, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
-    m_fpsText = new GraphicText(context, text2.c_str(), context->font_main, m_startingX, m_startingY + 20, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
+    m_particlesCountText = new GraphicText(context, text.c_str(), glm::vec2(m_startingX, m_startingY + m_height), glm::vec2(m_startingX + m_width, m_startingY));
+    m_fpsText = new GraphicText(context, text2.c_str(), glm::vec2(m_startingX, m_startingY + m_height - 25), glm::vec2(m_startingX + m_width, m_startingY - 25));
 
     // Connect the watcher to the context
     m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)

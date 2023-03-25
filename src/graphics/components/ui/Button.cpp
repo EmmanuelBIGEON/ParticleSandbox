@@ -104,7 +104,8 @@ void Button::Update()
     int textY = m_Pos.y + m_Size.y / 2 - m_Context->font_main->GetSize() / 2;
     // Need a better way to calculate the text position
     // New constructor for GraphicText TODO
-    m_TextObject = new GraphicText(m_Context, m_Text, m_Context->font_main, textX, textY, 0.9f, glm::vec3(1.0f, 1.0f, 1.0f));
+    m_TextObject = new GraphicText(m_Context, m_Text.c_str(), glm::vec2(m_Pos.x, m_Pos.y + m_Size.y), glm::vec2(m_Pos.x + m_Size.x, m_Pos.y));
+    m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
 
     m_IsUpdated = true;
 }
