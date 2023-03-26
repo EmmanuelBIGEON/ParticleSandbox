@@ -6,6 +6,9 @@
 
 #include "../../common/Application.h"
 
+class Slider;
+class GraphicText;
+
 //! \class BasicUI
 //! \brief Display the FPS and the number of particules in the context.
 class BasicUI
@@ -32,4 +35,10 @@ class BasicUI
         // Create the slot here so they are destroyed on the destruction of the UI
         Slot<int>* m_particleAddedSlot;
         // Slot<GraphicObject*>* m_particleRemovedSlot;
+        RectangleAdapter* m_rectangleUI; // background of the UI
+        
+        GraphicText* label_repulsion;
+        Slider* slider_repulsion;
+        GraphicText* label_attraction;
+        Slider* slider_attraction;
 };

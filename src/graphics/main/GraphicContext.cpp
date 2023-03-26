@@ -91,7 +91,7 @@ void GraphicContext::Init()
     // -----------------------------
 
     // ---------- Fonts ----------
-    font_main = new Font("fonts/arial.ttf", 28);
+    font_main = new Font("fonts/arial.ttf", 22);
     // ----------------------------
 
     okRendering = true;

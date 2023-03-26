@@ -36,7 +36,7 @@ Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(gra
 {
     if (withUI)
     {
-        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 50.0f, GraphicContext::worldWidth, 50.0f);
+        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 300.0f, 170.0f, 300.0f);
         m_BasicUI->Init(graphicContext);
     }
 }
@@ -87,8 +87,6 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
     // generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
 
     graphicContext->AddParticles(800);
-    Slider* slider = new Slider(graphicContext, 0.0f, 0.5f, &GraphicContext::repulsion_factor, 500, 500);
-    Slider* slider2 = new Slider(graphicContext, 0.05f, 0.5f, &GraphicContext::attraction_factor, 500, 400);
     return scene;
 }
 
