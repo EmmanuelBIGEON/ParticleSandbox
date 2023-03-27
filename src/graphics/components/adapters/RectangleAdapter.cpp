@@ -22,11 +22,13 @@ RectangleAdapter::RectangleAdapter(GraphicContext* context, const Rectangle& rec
 void RectangleAdapter::SetColor(const glm::vec3& color)
 {
     m_Color = color;
+    m_IsUpdated = false;
 }
 
 void RectangleAdapter::SetOpacity(float alpha)
 {
     m_Alpha = alpha;
+    m_IsUpdated = false;
 }
 
 void RectangleAdapter::Update()
@@ -87,7 +89,7 @@ void RectangleAdapter::Update()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -100,7 +102,6 @@ void RectangleAdapter::Draw()
 {
     m_Shader->SetMat4("shiftPos", glm::mat4(1.0f));
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    std::cout << "Drawing rectangle" << std::endl;
+    glDrawElements(GL_TRIANGLES, 7, GL_UNSIGNED_INT, 0);
 }
 

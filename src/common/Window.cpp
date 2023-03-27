@@ -46,6 +46,11 @@ void Window::Display(Application* app)
         return;
     }
 
+    // display window at the center of the screen
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    glfwSetWindowPos(window, (mode->width - Application::viewportWidth) / 2, (mode->height - Application::viewportHeight) / 2);
+
+
     glfwMakeContextCurrent(window);
 
     // callbacks
@@ -69,6 +74,7 @@ void Window::Display(Application* app)
 
     // enable anti-aliasing (MSAA)
     glEnable(GL_MULTISAMPLE);  
+    // glEnable(GL_DEPTH_TEST); // No depth testing to relief the GPU
 
     // -----------------------------------------------------------
 

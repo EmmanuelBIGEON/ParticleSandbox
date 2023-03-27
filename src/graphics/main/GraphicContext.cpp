@@ -32,6 +32,9 @@
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
+float GraphicContext::repulsion_factor = 0.1f;
+float GraphicContext::attraction_factor = 0.1f;
+
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
@@ -83,10 +86,12 @@ void GraphicContext::Init()
     shader_particle = new Shader("shaders/particle.vs", "shaders/particle.fs");
     // SHADER_BUTTON
     shader_button = new Shader("shaders/button.vs", "shaders/button.fs");
+    // SHADER_UI
+    shader_ui = new Shader("shaders/ui.vs", "shaders/ui.fs");
     // -----------------------------
 
     // ---------- Fonts ----------
-    font_main = new Font("fonts/arial.ttf", 48);
+    font_main = new Font("fonts/arial.ttf", 22);
     // ----------------------------
 
     okRendering = true;
@@ -118,7 +123,6 @@ void GraphicContext::Register(GraphicObject* object)
     OnObjectRegistered.Emit(object);
 }
 
-
 void GraphicContext::Remove(GraphicObject* object)
 {
     if(object->GetObjectType() == OBJECTGR_PARTICLE)
@@ -147,7 +151,6 @@ void GraphicContext::Remove(GraphicObject* object)
     }
 }
 
-
 float GraphicContext::Convert_glX_to_WorldX(float x) const
 {
     return (x + 1.0f) * (worldWidth/2.0f);
@@ -170,72 +173,13 @@ void GraphicContext::Render()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for(auto object : m_Objects)
-    {
-        switch(object->GetShaderIndex())
-        {
-            case SHADER_BASIC:
-            {
-                shader_basic->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                {
-                    object->Update();   
+    // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                }
 
-                break;
-            }
-            case SHADER_TEXT:
-            {
-                shader_text->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_TEXTURE:
-            {
-                shader_texture->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_LIGHTING:
-            {
-                shader_lighting->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_LINE:
-            {
-                shader_line->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-            case SHADER_BUTTON:
-            {
-                shader_button->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
-                break;
-            }
-        }
-        object->Draw();
-    }
-
-    
     shader_particle->Use();
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
     glBindVertexArray(ParticleAdapter::VAO);
-    
-    float repulsion_factor = 0.4f; // You can adjust this value
-    float attraction_factor = 0.4f; // You can adjust this value
 
     m_ParticleAdaptersMutex.lock();
     for(int i = 0; i < nb_ParticleAdapters3; i++)
@@ -380,9 +324,74 @@ void GraphicContext::Render()
         glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
     }
 
+        for(auto object : m_Objects)
+    {
+        switch(object->GetShaderIndex())
+        {
+            case SHADER_BASIC:
+            {
+                shader_basic->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                {
+                    object->Update();   
+                }
+                break;
+            }
+            case SHADER_TEXT:
+            {
+                shader_text->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_TEXTURE:
+            {
+                shader_texture->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_LIGHTING:
+            {
+                shader_lighting->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_LINE:
+            {
+                shader_line->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+            case SHADER_BUTTON:
+            {
+                shader_button->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }case SHADER_UI:
+            {
+                shader_ui->Use();
+                if(!object->IsUpdated()) // if the object is not updated, update it
+                    object->Update();   
+
+                break;
+            }
+        }
+        object->Draw();
+    }
+
+
+
     m_ParticleAdaptersMutex.unlock();
 }
-
 
 void GraphicContext::AddParticles(int nbParticles)
 {
@@ -564,6 +573,11 @@ void GraphicContext::Update()
     // Update the model matrix
     shader_button->SetMat4("model", m_ModelMatrix);
 
+    // shader_ui
+    shader_ui->Use();
+    // Update the model matrix
+    shader_ui->SetMat4("model", m_ModelMatrix);
+
     needUpdate = false;
 }
 
@@ -605,6 +619,8 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
             return shader_particle;
         case SHADER_BUTTON:
             return shader_button;
+        case SHADER_UI:
+            return shader_ui;
     }
     return nullptr;
 }
