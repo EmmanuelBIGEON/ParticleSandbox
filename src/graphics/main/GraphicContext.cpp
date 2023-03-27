@@ -234,8 +234,8 @@ void GraphicContext::Render()
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
     glBindVertexArray(ParticleAdapter::VAO);
     
-    float repulsion_factor = 0.1f; // You can adjust this value
-    float attraction_factor = 0.04f; // You can adjust this value
+    float repulsion_factor = 0.4f; // You can adjust this value
+    float attraction_factor = 0.4f; // You can adjust this value
 
     m_ParticleAdaptersMutex.lock();
     for(int i = 0; i < nb_ParticleAdapters3; i++)
@@ -329,13 +329,13 @@ void GraphicContext::Render()
 
             // Calculate the movement of the current particle, if attraction or repulsion depending
             // on the distance between the current particle and the others
-            __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(200.0f), _CMP_GT_OQ);
+            __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(100.0f), _CMP_GT_OQ);
             __m256 attraction_x = _mm256_blendv_ps(_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
             __m256 attraction_y = _mm256_blendv_ps(_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
 
             // calculate repulsion 
             // invert direction
-            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(100.0f), _CMP_LT_OQ);
+            __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(50.0f), _CMP_LT_OQ);
             direction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_repulsion);
             direction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_repulsion);
             __m256 repulsion_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(repulsion_factor)), mask_repulsion);
@@ -355,6 +355,7 @@ void GraphicContext::Render()
         }
 
         // calculate the rest of the impact of the other particles
+        // will do once the formula is fully settled
         // for(int i = 8*(nb_ParticleAdapters3/8); i < nb_ParticleAdapters3; i++)
         // {
         //     // TODO
