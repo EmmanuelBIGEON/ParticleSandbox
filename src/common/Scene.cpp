@@ -64,15 +64,9 @@ void Scene::Update()
 Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
-    scene->ConnectHandler(EVENT_HANDLER_TEST2);
+    scene->ConnectHandler(EVENT_HANDLER_TEST);
     TriangleAdapter* adapter = new TriangleAdapter(graphicContext, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
     RectangleAdapter* adapter2 = new RectangleAdapter(graphicContext, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
-    // WigglingCircle* circle = new WigglingCircle(graphicContext, Circle(Point(800.0f, 600.0f), 200.0f));
-
-    // GraphicText* text = new GraphicText(graphicContext, "Click anywhere on the screen !", 
-    // graphicContext->font_main, 500.0f, 500.0f, 0.5f, glm::vec3(1.0f, 1.0f, 1.0f));
-
-
     return scene;
 }
 
@@ -83,9 +77,6 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 
     // generate particles
     ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    // generator->Generate(620, ParticleClass::PARTICLE_CLASS_A);
-    // generator->Generate(000, ParticleClass::PARTICLE_CLASS_B);
-
     graphicContext->AddParticles(800);
     return scene;
 }
@@ -132,12 +123,10 @@ Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
 
 void Scene::ConnectHandler(EventHandlerType handlerType)
 {
-    // It is stupid.. TODO remove.
     if(global_EventHandler != nullptr)
     {
-        EventHandler* tmp = global_EventHandler;
+        delete global_EventHandler;
         global_EventHandler = nullptr;
-        delete tmp;
     }
 
     switch(handlerType)
@@ -148,21 +137,9 @@ void Scene::ConnectHandler(EventHandlerType handlerType)
             global_EventHandler = handler;
             break;
         }
-        case EVENT_HANDLER_TEST2:
-        {
-            EventHandler_Test2* handler = new EventHandler_Test2(m_GraphicContext);
-            global_EventHandler = handler;
-            break;
-        }
         case EVENT_HANDLER_PARTICLE_CREATOR:
         {
             EventHandler_ParticleCreator* handler = new EventHandler_ParticleCreator(m_GraphicContext);
-            global_EventHandler = handler;
-            break;
-        }
-        case EVENT_HANDLER_PARTICLE_HIGHLIGHTER:
-        {
-            EventHandler_ParticleHighlighter* handler = new EventHandler_ParticleHighlighter(m_GraphicContext);
             global_EventHandler = handler;
             break;
         }

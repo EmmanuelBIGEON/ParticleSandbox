@@ -8,9 +8,8 @@
 class Scene;
 
 //! \brief Scene
-//! A scene contains scenario and act as an abstraction layer for later use.
-//! It's main purpose is to isolate the graphic context handling and functionning from the application.
-//! (i'm thinking about time events, or pause.. it should have it's own EventHandler.)
+//! For now scene are just a collection of objects.
+// It defines also the event handler.
 class Scene
 {
     public:
@@ -36,9 +35,6 @@ class Scene
 
     private:
 
-        // Do not destroy. It's owned by the application.
         GraphicContext* m_GraphicContext;
-
-        // BasicUI : Allow to display the FPS and the number of particles.
         BasicUI* m_BasicUI;
 };

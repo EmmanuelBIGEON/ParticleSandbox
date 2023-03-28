@@ -68,28 +68,25 @@ void Window::Display(Application* app)
     }
 
     // --------------------- OpenGL settings ---------------------
-    // Enable alpha blending
+    // - Enable alpha blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
-    // enable anti-aliasing (MSAA)
+    // - enable anti-aliasing (MSAA)
     glEnable(GL_MULTISAMPLE);  
+    // - Depth testing
+    // Won't do because of performance.
     // glEnable(GL_DEPTH_TEST); // No depth testing to relief the GPU
 
     // -----------------------------------------------------------
-
     OnWindowReady.Emit();
-
     // Apparently already capped at 60 fps
     // https://stackoverflow.com/questions/50412575/is-there-a-way-to-remove-60-fps-cap-in-glfw
     // For now 60 fps is okay.
-
-    // lets count fps
     double lastTime = glfwGetTime();
     int nbFrames = 0;
     while (!glfwWindowShouldClose(window))
     {
-
         double currentTime = glfwGetTime();
         nbFrames++;
         if (currentTime - lastTime >= 1.0) 
@@ -98,12 +95,10 @@ void Window::Display(Application* app)
             Application::fps = nbFrames;
             nbFrames = 0;
         }
-
         app->Render();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 }
 
 

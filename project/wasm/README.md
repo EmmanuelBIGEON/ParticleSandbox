@@ -1,5 +1,5 @@
 # ParticleSandbox
-**A WASM compilation with Emscripten**
+**A WASM compilation with Emscripten NOT WORKING NOT MAINTAINED**
 
 ![Preview ParticleSandbox](previewwasm.png)
 

@@ -30,8 +30,6 @@ void Chrono::Reset()
 {
   started = false;
   finished = false;
-  // m_startTime = std::chrono::system_clock::time_point();
-  // m_stopTime = std::chrono::system_clock::time_point();
 }
 
 double Chrono::GetElapsedTime()
