@@ -71,7 +71,8 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_UI);
-    graphicContext->AddParticles(1600);
+    graphicContext->AddParticles(1500);
+    graphicContext->AddParticles(100, PART_CLASS_2);
     return scene;
 }
 
@@ -89,27 +90,18 @@ Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
     Scene* scene = new Scene(graphicContext, false);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
-    Rectangle rect = Rectangle(Point(220.0f, 250.0f), Point(400.0f, 200.0f));
-    RectangleAdapter* recta = new RectangleAdapter(graphicContext,rect); 
-    recta->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    glm::vec3 color = glm::vec3(0.2f, 0.2f, 0.2f);
+
+    RectangleAdapter* rect_testtest = new RectangleAdapter(graphicContext, {220.0f, 250.0f}, {400.0f, 200.0f}, color);
     GraphicText* testtest = new GraphicText(graphicContext, "Un test a la con vraiment pas cool", glm::vec2(220.0f, 250.0f), glm::vec2(400.0f, 200.0f));
 
-    // test2
-    Rectangle rect2 = Rectangle(Point(420.0f, 250.0f), Point(600.0f, 200.0f));
-    RectangleAdapter* recta2 = new RectangleAdapter(graphicContext,rect2);
-    recta2->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    RectangleAdapter* rect_testtest2 = new RectangleAdapter(graphicContext, {420.0f, 250.0f}, {600.0f, 200.0f}, color);
     GraphicText* testtest2 = new GraphicText(graphicContext, "Un test a la con vraim", glm::vec2(420.0f, 250.0f), glm::vec2(600.0f, 200.0f));
 
-    // test3
-    Rectangle rect3 = Rectangle(Point(620.0f, 250.0f), Point(800.0f, 200.0f));
-    RectangleAdapter* recta3 = new RectangleAdapter(graphicContext,rect3);
-    recta3->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    RectangleAdapter* rect_testtest3 = new RectangleAdapter(graphicContext, {620.0f, 250.0f}, {800.0f, 200.0f}, color);
     GraphicText* testtest3 = new GraphicText(graphicContext, "My kind of text ! Much wow, this text describes the entire universe in one little sentence, that's impressive ! ", glm::vec2(620.0f, 250.0f), glm::vec2(800.0f, 200.0f));
 
-    // test4
-    Rectangle rect4 = Rectangle(Point(820.0f, 250.0f), Point(1000.0f, 200.0f));
-    RectangleAdapter* recta4 = new RectangleAdapter(graphicContext,rect4);
-    recta4->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
+    RectangleAdapter* rect_testtest4 = new RectangleAdapter(graphicContext, {820.0f, 250.0f}, {1000.0f, 200.0f}, color);
     GraphicText* testtest4 = new GraphicText(graphicContext, "My kind of text ! Much worse in one little sentence, impressive ! ", glm::vec2(820.0f, 250.0f), glm::vec2(1000.0f, 200.0f));
     return scene;
 }

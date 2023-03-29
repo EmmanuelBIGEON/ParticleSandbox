@@ -5,9 +5,7 @@
 #include <glm/ext.hpp>
 
 #include "../../common/Signal.h"
-
-class ParticleAdapter;
-class ParticleStruct;
+#include "ParticleImpl.h"
 
 class GraphicObject;
 class Shader;
@@ -65,21 +63,15 @@ class GraphicContext
         virtual void Update(); // placeholder function for now, might be used later
 
         //! \brief Add a vector of particles2 and updates the useful data.
-        void AddParticles(int nbParticles);
-        void AddParticles(const std::vector<ParticleStruct>& particles);
-
-        //! Zoom in the view.
-        void ZoomIn(float factor);
-        //! Zoom out the view.
-        void ZoomOut(float factor);
+        void AddParticles(int nbParticles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
+        void AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
 
         // For TextRendering
         Shader* GetShader(AvailableShader shader);
 
         const std::vector<GraphicObject*> GetObjects() const { return m_Objects; }
-        const std::vector<ParticleAdapter*> GetParticleAdapters() const { return m_ParticleAdapters; }
 
-        const int& GetNbParticles() const { return nb_ParticleAdapters3; }
+        const int& GetNbParticles_type1() const { return m_nb_PA1; }
 
         Font* font_main;
         
@@ -115,30 +107,40 @@ class GraphicContext
 
     protected:
 
-        //! Render particles in multiple threads
-        virtual void RenderThread(int nbOfThreads, int threadId);
+        //! Main function for rendering Particle, take particles of same class, and other class.
+        // For now, act the same way for all the particles, but later, each class will have a behavior depending on the targeted class.
+        void RenderParticles(ParticleClass particleClass);
         
         bool okRendering;
         bool needUpdate;
 
         float zoomFactor;
+
         //! \brief List of all the objects to be rendered.
         //! This structure might be changed later.
         std::vector<GraphicObject*> m_Objects;
 
-        //! subvector containing only hovered objects
-
-        // render separately the particles for efficiency
-        std::vector<ParticleAdapter*> m_ParticleAdapters;
-
-        // ---- EXPERIMENTAL ----
         // Using SIMD operations to render particles
         // Need to split attributes in 3 arrays
-        float* m_ParticleAdapters3_posX;
-        float* m_ParticleAdapters3_posY;
-        float* m_ParticleAdapters3_mass;
-        int nb_ParticleAdapters3;
-        // Maybe i can save the distance between the particles for even more efficiency. TODO
+        float* m_PA1_posX;
+        float* m_PA1_posY;
+        float* m_PA1_mass;
+        int m_nb_PA1;
+
+        float* m_PA2_posX;
+        float* m_PA2_posY;
+        float* m_PA2_mass;
+        int m_nb_PA2;
+
+        float* m_PA3_posX;
+        float* m_PA3_posY;
+        float* m_PA3_mass;
+        int m_nb_PA3;
+
+        std::vector<ParticleClass> m_ParticleClasses;
+
+        // mutex for the particle adapters
+        std::mutex m_ParticleAdaptersMutex;
 
         Shader* shader_basic;
         Shader* shader_text;
@@ -168,7 +170,5 @@ class GraphicContext
         float m_MouseX;
         float m_MouseY;
 
-        // mutex for the particle adapters
-        std::mutex m_ParticleAdaptersMutex;
         
 };

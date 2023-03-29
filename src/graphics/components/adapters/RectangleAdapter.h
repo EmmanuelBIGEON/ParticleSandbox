@@ -12,6 +12,7 @@ class RectangleAdapter : public GraphicObject
 {
     public:
         RectangleAdapter(GraphicContext* context, const Rectangle& rectangle);
+        RectangleAdapter(GraphicContext* context, glm::vec2 p1, glm::vec2 p2, glm::vec3 color = glm::vec3(0.0f, 1.0f, 1.0f), float alpha = 1.0f);
         virtual ~RectangleAdapter();
 
         const Rectangle& GetRectangle() const { return m_Rectangle;}

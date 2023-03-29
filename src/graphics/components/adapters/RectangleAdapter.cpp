@@ -7,11 +7,20 @@
 #endif
 
 
+
 RectangleAdapter::RectangleAdapter(GraphicContext* context, const Rectangle& rectangle) : GraphicObject(context, SHADER_BASIC),
  m_Rectangle(rectangle), m_Color(glm::vec3(0.0f, 1.0f, 1.0f)), m_Alpha(1.0f), m_VAO(0), m_VBO(0), m_EBO(0)
 {
     m_Shader = context->GetShader(SHADER_BASIC);
 }
+
+RectangleAdapter::RectangleAdapter(GraphicContext* context, glm::vec2 p1, glm::vec2 p2, glm::vec3 color, float alpha) : GraphicObject(context, SHADER_BASIC),
+ m_Color(color), m_Alpha(alpha), m_VAO(0), m_VBO(0), m_EBO(0)
+{
+    m_Shader = context->GetShader(SHADER_BASIC);
+    m_Rectangle = Rectangle(p1, p2);
+}
+
 
  RectangleAdapter::~RectangleAdapter()
 {

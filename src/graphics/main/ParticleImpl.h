@@ -2,6 +2,12 @@
 
 #include <glm/glm.hpp>
 
+enum ParticleClass {
+    PART_CLASS_1,
+    PART_CLASS_2,
+    PART_CLASS_3
+};
+
 // This file is used to define the particle VAO
 // It replaced the previous (ParticleAdapter.cpp)
 namespace Particle_OPENGL

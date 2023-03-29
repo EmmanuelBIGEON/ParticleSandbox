@@ -109,13 +109,13 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
     }else if(event.GetEventType() == EventType::EVENT_WHEEL)
     {
         WheelEvent* wheelEvent = (WheelEvent*)&event;
-        if(wheelEvent->m_OffsetY > 0)
-        {
-            m_Context->ZoomIn(0.0f);
-        }else if(wheelEvent->m_OffsetY < 0)
-        {
-            m_Context->ZoomOut(0.0f);
-        }
+        // if(wheelEvent->m_OffsetY > 0)
+        // {
+        //     m_Context->ZoomIn(0.0f);
+        // }else if(wheelEvent->m_OffsetY < 0)
+        // {
+        //     m_Context->ZoomOut(0.0f);
+        // }
 
     }
 }

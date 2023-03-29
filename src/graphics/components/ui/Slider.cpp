@@ -6,7 +6,7 @@
 #define REFVALUE *m_referencedValue
 
 float Slider::height = 5.0f;
-float Slider::width = 100.0f;
+float Slider::width = 130.0f;
 
 Slider::Slider(GraphicContext* context, float min, float max, float* value, float x, float y)
     : GraphicObject(context,SHADER_UI), m_Min(min), m_Max(max), m_referencedValue(value), m_shiftX(x), m_shiftY(y),
