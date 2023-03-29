@@ -338,59 +338,42 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass)
 
 void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass)
 {
+        // mutex
     m_ParticleAdaptersMutex.lock();
-    int size = particles.size();
-    if(size == 0)
-        return;
 
     float* PA_PosX = nullptr;
     float* PA_PosY = nullptr;
     float* PA_Mass = nullptr;
-    int nb_Particles = 0;
-
+    int PA_CurrentNB = 0;
+    int size = particles.size();
+        
     switch(particleClass)
     {
-        case PART_CLASS_1:
-        {
-            PA_PosX = m_PA1_posX;
-            PA_PosY = m_PA1_posY;
-            PA_Mass = m_PA1_mass;
-            nb_Particles = m_nb_PA1;
-            break;
+        case PART_CLASS_1:{
+            PA_PosX = m_PA1_posX; PA_PosY = m_PA1_posY; PA_Mass = m_PA1_mass; PA_CurrentNB = m_nb_PA1; break;
         }
-        case PART_CLASS_2:
-        {
-            PA_PosX = m_PA2_posX;
-            PA_PosY = m_PA2_posY;
-            PA_Mass = m_PA2_mass;
-            nb_Particles = m_nb_PA2;
-            break;
+        case PART_CLASS_2:{
+            PA_PosX = m_PA2_posX; PA_PosY = m_PA2_posY; PA_Mass = m_PA2_mass; PA_CurrentNB = m_nb_PA2; break;
         }
-        case PART_CLASS_3:
-        {
-            PA_PosX = m_PA3_posX;
-            PA_PosY = m_PA3_posY;
-            PA_Mass = m_PA3_mass;
-            nb_Particles = m_nb_PA3;
-            break;
+        case PART_CLASS_3:{
+            PA_PosX = m_PA3_posX; PA_PosY = m_PA3_posY; PA_Mass = m_PA3_mass; PA_CurrentNB = m_nb_PA3; break;
         }
     }
 
-    if(nb_Particles)
+    if(PA_CurrentNB)
     {
         // Recreate the different arrays with the new size in memory, don't forget to delete the old ones and to save their values into the new one.
-        // Last size = m_nb_PA1
-        float* old_pos_x = m_PA1_posX;
-        float* old_pos_y = m_PA1_posY;
-        float* old_mass = m_PA1_mass;
+        float* old_pos_x = PA_PosX;
+        float* old_pos_y = PA_PosY;
+        float* old_mass = PA_Mass;
 
-        m_PA1_posX = new float[m_nb_PA1 + size];
-        m_PA1_posY = new float[m_nb_PA1 + size];
-        m_PA1_mass = new float[m_nb_PA1 + size];
+        PA_PosX = new float[(PA_CurrentNB) + size];
+        PA_PosY = new float[(PA_CurrentNB) + size];
+        PA_Mass = new float[(PA_CurrentNB) + size];
 
-        memcpy(m_PA1_posX, old_pos_x, m_nb_PA1 * sizeof(float));
-        memcpy(m_PA1_posY, old_pos_y, m_nb_PA1 * sizeof(float));
-        memcpy(m_PA1_mass, old_mass, m_nb_PA1 * sizeof(float));
+        memcpy(PA_PosX, old_pos_x, (PA_CurrentNB) * sizeof(float));
+        memcpy(PA_PosY, old_pos_y, (PA_CurrentNB) * sizeof(float));
+        memcpy(PA_Mass, old_mass, PA_CurrentNB * sizeof(float));
 
         delete[] old_pos_x;
         delete[] old_pos_y;
@@ -399,28 +382,40 @@ void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, 
         // fill with random values between world bounds
         for(int i = 0; i < size; i++)
         {
-            m_PA1_posX[i+m_nb_PA1] = particles[i].pos_x;
-            m_PA1_posY[i+m_nb_PA1] = particles[i].pos_y;
-            m_PA1_mass[i+m_nb_PA1] = particles[i].mass;
+            PA_PosX[i+PA_CurrentNB] = particles[i].pos_x;
+            PA_PosY[i+PA_CurrentNB] = particles[i].pos_y;
+            PA_Mass[i+PA_CurrentNB] = particles[i].mass;
         }
-        
-        m_nb_PA1 += size;
+
+       PA_CurrentNB += size;
     }else
     {
         // Allocate the memory for the particles
-        m_PA1_posX = new float[size];
-        m_PA1_posY = new float[size];
-        m_PA1_mass = new float[size];
-
+        PA_PosX = new float[size];
+        PA_PosY = new float[size];
+        PA_Mass = new float[size];
+        
         // fill with random values between world bounds
         for(int i = 0; i < size; i++)
         {
-            m_PA1_posX[i+m_nb_PA1] = particles[i].pos_x;
-            m_PA1_posY[i+m_nb_PA1] = particles[i].pos_y;
-            m_PA1_mass[i+m_nb_PA1] = particles[i].mass;
+            PA_PosX[i] = particles[i].pos_x;
+            PA_PosY[i] = particles[i].pos_y;
+            PA_Mass[i] = particles[i].mass;
         }
+       PA_CurrentNB = size;
+    }
 
-        m_nb_PA1 = size;
+    switch(particleClass)
+    {
+        case PART_CLASS_1:{
+            m_nb_PA1 = PA_CurrentNB; m_PA1_posX = PA_PosX; m_PA1_posY = PA_PosY; m_PA1_mass = PA_Mass; break;
+        }
+        case PART_CLASS_2:{
+            m_nb_PA2 = PA_CurrentNB; m_PA2_posX = PA_PosX; m_PA2_posY = PA_PosY; m_PA2_mass = PA_Mass;break;
+        }
+        case PART_CLASS_3:{
+            m_nb_PA3 = PA_CurrentNB; m_PA3_posX = PA_PosX; m_PA3_posY = PA_PosY; m_PA3_mass = PA_Mass;break;
+        }
     }
 
     OnParticlesAdded.Emit(size);
