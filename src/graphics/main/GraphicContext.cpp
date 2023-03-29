@@ -10,7 +10,7 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "../components/adapters/ParticleAdapter.h"
+#include "ParticleImpl.h"
 
 #include <iostream>
 #include <mutex>
@@ -112,41 +112,19 @@ void GraphicContext::Clear(bool DeleteObjects)
 
 void GraphicContext::Register(GraphicObject* object)
 {
-    if(object->GetObjectType() == OBJECTGR_PARTICLE)
-    {
-        ParticleAdapter* adapter = static_cast<ParticleAdapter*>(object);
-        m_ParticleAdapters.push_back(adapter);
-    }else
-    {
-        m_Objects.push_back(object);
-    }
+    m_Objects.push_back(object);
     OnObjectRegistered.Emit(object);
 }
 
 void GraphicContext::Remove(GraphicObject* object)
 {
-    if(object->GetObjectType() == OBJECTGR_PARTICLE)
+    for(auto it = m_Objects.begin(); it != m_Objects.end(); it++)
     {
-        for(auto it = m_ParticleAdapters.begin(); it != m_ParticleAdapters.end(); it++)
+        if(*it == object)
         {
-            if(*it == object)
-            {
-                m_ParticleAdapters.erase(it);
-                OnObjectRemoved.Emit(object);
-                return;
-            }
-        }
-    }
-    else
-    {
-        for(auto it = m_Objects.begin(); it != m_Objects.end(); it++)
-        {
-            if(*it == object)
-            {
-                m_Objects.erase(it);
-                OnObjectRemoved.Emit(object);
-                return;
-            }
+            m_Objects.erase(it);
+            OnObjectRemoved.Emit(object);
+            return;
         }
     }
 }
@@ -179,7 +157,7 @@ void GraphicContext::Render()
 
     shader_particle->Use();
     shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
-    glBindVertexArray(ParticleAdapter::VAO);
+    glBindVertexArray(Particle_OPENGL::VAO);
 
     m_ParticleAdaptersMutex.lock();
     for(int i = 0; i < nb_ParticleAdapters3; i++)
@@ -319,69 +297,54 @@ void GraphicContext::Render()
         else if(m_ParticleAdapters3_posY[i] >= 1200.0f)
             m_ParticleAdapters3_posY[i] = m_ParticleAdapters3_posY[i] - 1200.0f;
 
-        // std::cout << "drawing at " << m_ParticleAdapters3_posX[i] << " " << m_ParticleAdapters3_posY[i] << std::endl;
         shader_particle->SetVec2("shiftPos", glm::vec2(m_ParticleAdapters3_posX[i], m_ParticleAdapters3_posY[i]));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, ParticleAdapter::nbVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
     }
+    m_ParticleAdaptersMutex.unlock();
 
-        for(auto object : m_Objects)
+    for(auto object : m_Objects)
     {
         switch(object->GetShaderIndex())
         {
             case SHADER_BASIC:
             {
                 shader_basic->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                {
-                    object->Update();   
-                }
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }
             case SHADER_TEXT:
             {
                 shader_text->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }
             case SHADER_TEXTURE:
             {
                 shader_texture->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }
             case SHADER_LIGHTING:
             {
                 shader_lighting->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }
             case SHADER_LINE:
             {
                 shader_line->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }
             case SHADER_BUTTON:
             {
                 shader_button->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }case SHADER_UI:
             {
                 shader_ui->Use();
-                if(!object->IsUpdated()) // if the object is not updated, update it
-                    object->Update();   
-
+                if(!object->IsUpdated()) object->Update();   
                 break;
             }
         }
@@ -390,7 +353,6 @@ void GraphicContext::Render()
 
 
 
-    m_ParticleAdaptersMutex.unlock();
 }
 
 void GraphicContext::AddParticles(int nbParticles)
@@ -583,22 +545,22 @@ void GraphicContext::Update()
 
 void GraphicContext::RenderThread(int nbOfThreads, int threadId)
 {
-    int size = m_ParticleAdapters.size();
-    int firstObject = (size / nbOfThreads) * threadId;
-    int maxRenderObject = (size / nbOfThreads) * (threadId + 1);
+    // int size = m_ParticleAdapters.size();
+    // int firstObject = (size / nbOfThreads) * threadId;
+    // int maxRenderObject = (size / nbOfThreads) * (threadId + 1);
 
-    if(threadId == nbOfThreads - 1)
-    {
-        size = size % nbOfThreads;
-        maxRenderObject += size;
-    }
+    // if(threadId == nbOfThreads - 1)
+    // {
+    //     size = size % nbOfThreads;
+    //     maxRenderObject += size;
+    // }
 
-    ParticleAdapter* adapter;
-    for(int i = firstObject; i < maxRenderObject; i++)
-    {
-        adapter = m_ParticleAdapters[i];
-        adapter->Update();   
-    }
+    // ParticleAdapter* adapter;
+    // for(int i = firstObject; i < maxRenderObject; i++)
+    // {
+    //     adapter = m_ParticleAdapters[i];
+    //     adapter->Update();   
+    // }
 }
 
 Shader* GraphicContext::GetShader(AvailableShader shader)

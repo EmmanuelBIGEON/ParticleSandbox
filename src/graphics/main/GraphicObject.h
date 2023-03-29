@@ -11,7 +11,6 @@ class GraphicObject : public Object
 {
     public:
         GraphicObject(GraphicContext* context, AvailableShader shaderIndex);
-        GraphicObject(GraphicContext* context, AvailableShader shaderIndex, ObjectType type);
         virtual ~GraphicObject();
 
         //! \brief Compute graphical representation of the object.

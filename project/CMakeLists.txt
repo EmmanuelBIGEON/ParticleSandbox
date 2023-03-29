@@ -26,23 +26,19 @@ set(SOURCES
     ../src/common/Object.cpp
     ../src/common/Chrono.cpp
 
-    ../src/core/Particle.cpp
-
     ../src/graphics/main/GraphicContext.cpp
     ../src/graphics/main/GraphicObject.cpp
     ../src/graphics/main/Shader.cpp
     ../src/graphics/main/Font.cpp
+    ../src/graphics/main/ParticleImpl.cpp
 
-    ../src/graphics/util/ParticleDetector.cpp
     ../src/graphics/util/BasicUI.cpp
-    ../src/graphics/util/generators/ParticleGenerator.cpp
 
     ../src/graphics/components/adapters/TriangleAdapter.cpp
     ../src/graphics/components/adapters/AdvancedRectangle.cpp
     ../src/graphics/components/adapters/RectangleAdapter.cpp
     ../src/graphics/components/adapters/CircleAdapter.cpp
     ../src/graphics/components/adapters/PanickedCircle.cpp
-    ../src/graphics/components/adapters/ParticleAdapter.cpp
     ../src/graphics/components/adapters/WigglingCircle.cpp
     ../src/graphics/components/common/GraphicText.cpp
     ../src/graphics/components/common/GraphicImage.cpp

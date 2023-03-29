@@ -6,7 +6,6 @@
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
 #include "../graphics/components/adapters/WigglingCircle.h"
-#include "../graphics/components/adapters/ParticleAdapter.h"
 #include "../graphics/components/common/GraphicText.h"
 #include "../graphics/components/common/GraphicImage.h"
 #include "../graphics/components/common/GraphicLine.h"
@@ -14,8 +13,6 @@
 #include "../graphics/components/ui/Slider.h"
 
 #include "../graphics/components/ui/Button.h"
-
-#include "../graphics/util/generators/ParticleGenerator.h"
 
 #include "EventHandler.h"
 
@@ -74,10 +71,7 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_UI);
-
-    // generate particles
-    ParticleGenerator* generator = new ParticleGenerator(graphicContext, glm::vec2(50.0f, 50.0f), glm::vec2(1500.0f, 1100.0f));
-    graphicContext->AddParticles(800);
+    graphicContext->AddParticles(1600);
     return scene;
 }
 

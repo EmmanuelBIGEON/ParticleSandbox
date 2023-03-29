@@ -13,8 +13,6 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
     : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),
     m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr)
 {
-    // SHADER_BASIC is not the shader for it. It's just a default value.
-    // TODO shader, thinking..
     m_Shader = m_Context->GetShader(SHADER_BUTTON);
 
     // default calculation of m_HoveringColor
@@ -95,15 +93,13 @@ void Button::Update()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // m_TextObject later..
     if(m_TextObject)
     {
         delete m_TextObject;
     }
     int textX = m_Pos.x + m_Size.x / 2 - m_Text.length() * 10;
     int textY = m_Pos.y + m_Size.y / 2 - m_Context->font_main->GetSize() / 2;
-    // Need a better way to calculate the text position
-    // New constructor for GraphicText TODO
+    
     m_TextObject = new GraphicText(m_Context, m_Text.c_str(), glm::vec2(m_Pos.x, m_Pos.y + m_Size.y), glm::vec2(m_Pos.x + m_Size.x, m_Pos.y));
     m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
 

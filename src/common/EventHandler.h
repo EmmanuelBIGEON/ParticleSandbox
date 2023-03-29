@@ -6,8 +6,6 @@
 
 class GraphicContext;
 
-class ParticleDetector;
-
 enum EventHandlerType
 {
     EVENT_HANDLER_TEST,

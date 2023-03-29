@@ -1,13 +1,11 @@
 #include "EventHandler.h"
 
 #include "../graphics/main/GraphicContext.h"
+#include "../graphics/main/ParticleImpl.h"
 
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
 #include "../graphics/components/adapters/WigglingCircle.h"
-#include "../graphics/components/adapters/ParticleAdapter.h"
-#include "../graphics/util/ParticleDetector.h"
-
 #include <glm/glm.hpp>
 #include <vector>
 

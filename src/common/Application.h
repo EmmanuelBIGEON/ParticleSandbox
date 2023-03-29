@@ -14,7 +14,7 @@ class Application
         void Run();
 
         //! \brief Render the current scene.
-        //! This function is called by the window. (tick = 1/60s)
+        //! This function is called by the window loop.
         void Render(); 
         
         void LoadScene_1();

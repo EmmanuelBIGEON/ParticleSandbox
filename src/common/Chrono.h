@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+//! \class Chrono
+//! \brief Class to measure time.
 class Chrono
 {
 public:

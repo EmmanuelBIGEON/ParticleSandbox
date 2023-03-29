@@ -7,12 +7,6 @@ GraphicObject::GraphicObject(GraphicContext* context, AvailableShader shaderInde
     context->Register(this);
 }
 
-GraphicObject::GraphicObject(GraphicContext* context, AvailableShader shaderIndex, ObjectType type)
-    : Object(type), m_Context(context), m_ShaderIndex(shaderIndex), m_IsUpdated(false)
-{
-    context->Register(this);
-}
-
 GraphicObject::~GraphicObject()
 {
     m_Context->Remove(this);

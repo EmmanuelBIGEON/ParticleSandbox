@@ -2,7 +2,7 @@
 #include "Window.h"
 
 #include "../graphics/main/GraphicContext.h"
-#include "../graphics/components/adapters/ParticleAdapter.h"
+#include "../graphics/main/ParticleImpl.h"
 #include "Scene.h"
 
 
@@ -60,7 +60,7 @@ void Application::CreateWasmView()
 {
     m_WasmView = new Wasm_View();
     m_GraphicContext->Init();
-    ParticleAdapter::LoadParticleVAO();
+    Particle_OPENGL::LoadParticleVAO();
 
     // Load the scene.
     LoadScene_2();
@@ -78,7 +78,7 @@ void Application::CreateWindow()
         m_GraphicContext->Init();
 
         // Initiliaze needed objects.
-        ParticleAdapter::LoadParticleVAO();
+        Particle_OPENGL::LoadParticleVAO();
 
         // Load the scene.
         LoadScene_2();
