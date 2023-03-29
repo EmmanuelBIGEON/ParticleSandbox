@@ -33,7 +33,7 @@ Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(gra
 {
     if (withUI)
     {
-        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 300.0f, 170.0f, 300.0f);
+        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 500.0f, 170.0f, 500.0f);
         m_BasicUI->Init(graphicContext);
     }
 }

@@ -34,6 +34,8 @@ float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
 float GraphicContext::repulsion_factor = 0.1f;
 float GraphicContext::attraction_factor = 0.1f;
+float GraphicContext::repulsion_maximum_distance = 50.0f;
+float GraphicContext::attraction_threshold_distance = 100.0f;
 
 
 GraphicContext::GraphicContext() 
@@ -587,7 +589,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         } 
         int sizeConfig = vec_scalarXY_config.size();
 
-        
         float mvt_x = 0.0f;
         float mvt_y = 0.0f;
         // -- Prepare targeted data --
@@ -608,10 +609,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             // -- begin calculations --
             for(int j = 0; (j+8) <= targetPA_nb; j+=8)
             {
-                
-
-                
-                
                 // load vector (other x and y)
                 __m256 vecX = _mm256_load_ps(&targetPA_x[j]);
                 __m256 vecY = _mm256_load_ps(&targetPA_y[j]);
@@ -645,13 +642,13 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
                 // Calculate the movement of the current particle, if attraction or repulsion depending
                 // on the distance between the current particle and the others
-                __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(100.0f), _CMP_GT_OQ);
+                __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(attraction_threshold_distance), _CMP_GT_OQ);
                 __m256 attraction_x = _mm256_blendv_ps(_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
                 __m256 attraction_y = _mm256_blendv_ps(_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
 
                 // calculate repulsion 
                 // invert direction
-                __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(50.0f), _CMP_LT_OQ);
+                __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(repulsion_maximum_distance), _CMP_LT_OQ);
                 direction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_repulsion);
                 direction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_repulsion);
                 __m256 repulsion_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(repulsion_factor)), mask_repulsion);

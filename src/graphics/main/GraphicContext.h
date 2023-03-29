@@ -81,6 +81,8 @@ class GraphicContext
         static float worldHeight;
         static float repulsion_factor;
         static float attraction_factor;
+        static float repulsion_maximum_distance;
+        static float attraction_threshold_distance;
 
         //! \brief Signal emitted when the mouse is moved.
         //! Allowing UI elements to connect to it.

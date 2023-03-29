@@ -41,4 +41,8 @@ class BasicUI
         Slider* slider_repulsion;
         GraphicText* label_attraction;
         Slider* slider_attraction;
+        GraphicText* label_repulsiondistance;
+        Slider* slider_repulsiondistance;
+        GraphicText* label_attractiondistance;
+        Slider* slider_attractiondistance;
 };
