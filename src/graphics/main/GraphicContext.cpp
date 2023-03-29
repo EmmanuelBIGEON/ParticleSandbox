@@ -29,6 +29,8 @@
 
 #include <immintrin.h>
 
+#include "../../arch_support.h"
+
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
@@ -170,9 +172,15 @@ void GraphicContext::Render()
     // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    RenderParticles(PART_CLASS_1);
-    RenderParticles(PART_CLASS_2);
-    RenderParticles(PART_CLASS_3);
+    if(IsAVX512Supported())
+    {
+        RenderParticles(PART_CLASS_1);
+        RenderParticles(PART_CLASS_2);
+        RenderParticles(PART_CLASS_3);
+    }else 
+    {
+        RenderParticles_without_avx(PART_CLASS_1);
+    }
 
     for(auto object : m_Objects)
     {
@@ -695,4 +703,10 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
     m_ParticleAdaptersMutex.unlock();
     
+}
+   
+   
+void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
+{
+    // std::cout << "rendering without AVX" << std::endl;
 }

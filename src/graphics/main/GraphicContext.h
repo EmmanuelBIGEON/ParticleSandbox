@@ -112,6 +112,10 @@ class GraphicContext
         //! Main function for rendering Particle, take particles of same class, and other class.
         // For now, act the same way for all the particles, but later, each class will have a behavior depending on the targeted class.
         void RenderParticles(ParticleClass particleClass);
+
+        // incredibly slow method but, allow the program to run on all machines
+        // in dire need of multithread.
+        void RenderParticles_without_avx(ParticleClass particleClass);
         
         bool okRendering;
         bool needUpdate;
