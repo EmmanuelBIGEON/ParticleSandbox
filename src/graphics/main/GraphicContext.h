@@ -116,6 +116,10 @@ class GraphicContext
         // incredibly slow method but, allow the program to run on all machines
         // in dire need of multithread.
         void RenderParticles_without_avx(ParticleClass particleClass);
+
+        // Works with RenderParticles_without_avx
+        // Allow to render particles in a multithreaded way
+        void RenderParticles_thread(ParticleClass particleClass, int start, int end);
         
         bool okRendering;
         bool needUpdate;
