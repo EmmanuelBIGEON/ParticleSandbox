@@ -65,6 +65,8 @@ class GraphicText : public GraphicObject
 
         // Updated data
         std::vector<std::string> m_lines;
+        float m_remainingHeight;
+
         int m_linesToDraw;
         float m_textScaledHeight;
         int m_nbCharacters;

@@ -24,6 +24,8 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
     else
         m_HoveringColor = m_Color - glm::vec3(0.3f, 0.3f, 0.3f);
 
+    
+
     // Connect to mouve move of the context
 
     m_Context->OnMouseMoved.Connect([this](float x, float y)

@@ -65,12 +65,12 @@ void GraphicText::Update()
         m_nbCharacters++;
     }
 
+    int lineWidth = m_xend - m_xstart - FIXED_PADDING * 2;
+    int boxHeight = m_ystart - m_yend - FIXED_PADDING * 2;
     m_scale = 1.0f; // default value. 
     // check if text too large
     if (textWidth > (m_xend - m_xstart))
     {
-        int lineWidth = m_xend - m_xstart - FIXED_PADDING * 2;
-        int boxHeight = m_ystart - m_yend - FIXED_PADDING * 2;
 
         // Calculate the number of lines needed (textWidth / available space on x axis for one line)
         int nbLinesNeeded = ceil(textWidth / lineWidth);
@@ -161,8 +161,10 @@ void GraphicText::Update()
 
     m_vertices = new float[6 * 4 * m_nbCharacters];
     int index = 0; // current index in vertices array
+    int index2 = 0;
     for (int i = 0; i < m_linesToDraw; i++)
     {
+        float currentLineWidth = 0.0f;
         std::string line = m_lines[i];
         float x = m_xstart + FIXED_PADDING;
         float y = m_ystart - FIXED_PADDING - (m_textScaledHeight * (i+1));
@@ -173,6 +175,7 @@ void GraphicText::Update()
             float ypos = y - (ch.Size.y - ch.Bearing.y) * m_scale;
             float w = ch.Size.x * m_scale;
             float h = ch.Size.y * m_scale;
+            currentLineWidth += (ch.Advance >> 6) * m_scale;
 
             // fill m_vertices
             m_vertices[index++] = xpos;     m_vertices[index++] = ypos + h;
@@ -195,6 +198,51 @@ void GraphicText::Update()
             
             // advance
             x += (ch.Advance >> 6) * m_scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        }
+
+        // apply alignment
+        float offset = (lineWidth - currentLineWidth);
+
+        if(text_align == ALIGN_CENTER && offset>0.0f)
+        {
+            offset /= 2.0f;
+
+            while(index2 < index)
+            {
+                m_vertices[index2] += offset;
+                index2 += 4;
+            }
+        }
+        else if(text_align == ALIGN_RIGHT && offset>0.0f)
+        {
+            while(index2 < index)
+            {
+                m_vertices[index2] += offset;
+                index2 += 4;
+            }
+        }
+    }
+
+    // calculate remaining height
+    m_remainingHeight = boxHeight - (m_textScaledHeight * m_linesToDraw) - (FIXED_PADDING * 2);
+    float offset = m_remainingHeight / 2.0f;
+    // auto apply vertical alignment
+    if(m_remainingHeight > 0)
+    {
+        int index =0;
+        for (int i = 0; i < m_linesToDraw; i++)
+        {
+            std::string line = m_lines[i];
+            for (std::string::const_iterator c = line.begin(); c != line.end(); c++) 
+            {
+                m_vertices[(index * 6 * 4) + 1] -= offset;
+                m_vertices[(index * 6 * 4) + 5] -= offset;
+                m_vertices[(index * 6 * 4) + 9] -= offset;
+                m_vertices[(index * 6 * 4) + 13] -= offset;
+                m_vertices[(index * 6 * 4) + 17] -= offset;
+                m_vertices[(index * 6 * 4) + 21] -= offset;
+                index++;
+            }
         }
     }
 

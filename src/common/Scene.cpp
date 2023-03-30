@@ -82,6 +82,8 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, false);
     scene->ConnectHandler(EVENT_HANDLER_UI);
+
+    Button* button = new Button(graphicContext, glm::vec2(0.0f, 0.0f), glm::vec2(200.0f, 200.0f), glm::vec3(0.2f, 0.2f, 0.2f), "Test");
     return scene;
 }
 
@@ -105,7 +107,6 @@ Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
     GraphicText* testtest4 = new GraphicText(graphicContext, "My kind of text ! Much worse in one little sentence, impressive ! ", glm::vec2(820.0f, 250.0f), glm::vec2(1000.0f, 200.0f));
     return scene;
 }
-
 
 void Scene::ConnectHandler(EventHandlerType handlerType)
 {
