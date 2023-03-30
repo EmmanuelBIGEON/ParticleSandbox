@@ -24,6 +24,11 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
     else
         m_HoveringColor = m_Color - glm::vec3(0.3f, 0.3f, 0.3f);
 
+    int textX = m_Pos.x + m_Size.x / 2 - m_Text.length() * 10;
+    int textY = m_Pos.y + m_Size.y / 2 - m_Context->font_main->GetSize() / 2;
+    
+    m_TextObject = new GraphicText(m_Context, m_Text.c_str(), glm::vec2(m_Pos.x, m_Pos.y + m_Size.y), glm::vec2(m_Pos.x + m_Size.x, m_Pos.y));
+    m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
     
 
     // Connect to mouve move of the context
@@ -36,7 +41,8 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
             if(!m_isHovered)
             {
                 m_isHovered = true;
-                m_TextObject->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
+                if(m_TextObject)
+                    m_TextObject->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
             }
         }
         else
@@ -44,7 +50,8 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
             if(m_isHovered)
             {
                 m_isHovered = false;
-                m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
+                if(m_TextObject)
+                    m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
             }
         }
     });
@@ -94,16 +101,6 @@ void Button::Update()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    if(m_TextObject)
-    {
-        delete m_TextObject;
-    }
-    int textX = m_Pos.x + m_Size.x / 2 - m_Text.length() * 10;
-    int textY = m_Pos.y + m_Size.y / 2 - m_Context->font_main->GetSize() / 2;
-    
-    m_TextObject = new GraphicText(m_Context, m_Text.c_str(), glm::vec2(m_Pos.x, m_Pos.y + m_Size.y), glm::vec2(m_Pos.x + m_Size.x, m_Pos.y));
-    m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
 
     m_IsUpdated = true;
 }

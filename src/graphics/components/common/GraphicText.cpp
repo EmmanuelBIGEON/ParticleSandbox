@@ -45,6 +45,11 @@ void GraphicText::SetFont(Font* font)
 
 void GraphicText::Update()
 {
+    if(m_Text.empty())
+    {
+        m_IsUpdated = true;
+        return;
+    }
     m_lines.clear();
 
     // Calculate size with xstart, ystart, xend, yend
@@ -263,6 +268,9 @@ void GraphicText::Update()
 
 void GraphicText::Draw()
 {
+    if(m_Text.empty())
+        return;
+        
     glUniform3f(glGetUniformLocation(m_Shader->shaderID, "textColor"), m_Color.x, m_Color.y, m_Color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_VAO);

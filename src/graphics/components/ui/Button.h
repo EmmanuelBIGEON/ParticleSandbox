@@ -15,7 +15,7 @@
 class Button : public GraphicObject
 {
     public: 
-        Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text);
+        Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text = "");
         virtual ~Button();
 
         virtual void Update() override;

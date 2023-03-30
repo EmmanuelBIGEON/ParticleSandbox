@@ -52,7 +52,6 @@ void Window::Display(Application* app)
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     glfwSetWindowPos(window, (mode->width - Application::viewportWidth) / 2, (mode->height - Application::viewportHeight) / 2);
 
-
     glfwMakeContextCurrent(window);
 
     // callbacks
