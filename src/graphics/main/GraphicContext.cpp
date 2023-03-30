@@ -172,7 +172,7 @@ void GraphicContext::Render()
     // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(IsAVX512Supported())
+    if(IsAVX2Supported())
     {
         RenderParticles(PART_CLASS_1);
         RenderParticles(PART_CLASS_2);
@@ -553,6 +553,13 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     float* targetPA_mass = nullptr;
     int targetPA_nb = 0;
 
+    // prepare main variables
+    __m256 mm_attraction_factor = _mm256_set1_ps(attraction_factor);
+    __m256 mm_repulsion_factor = _mm256_set1_ps(repulsion_factor);
+    __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(repulsion_maximum_distance);
+    __m256 mm_attraction_threshold_distance = _mm256_set1_ps(attraction_threshold_distance);
+    
+
     for(int i = 0; i < currentPA_nb; i++)
     {
         
@@ -652,19 +659,19 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
                 // Calculate the movement of the current particle, if attraction or repulsion depending
                 // on the distance between the current particle and the others
-                __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(attraction_threshold_distance), _CMP_GT_OQ);
-                __m256 attraction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), mask_attraction);
-                __m256 attraction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), mask_attraction);
+                __m256 mask_attraction = _mm256_cmp_ps(distance, mm_attraction_threshold_distance, _CMP_GT_OQ);
+                __m256 attraction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_x, mm_attraction_factor), mask_attraction);
+                __m256 attraction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_y, mm_attraction_factor), mask_attraction);
 
                 // calculate repulsion 
                 // invert direction
-                __m256 mask_repulsion = _mm256_cmp_ps(distance, _mm256_set1_ps(repulsion_maximum_distance), _CMP_LT_OQ);
+                __m256 mask_repulsion = _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
                 direction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_repulsion);
                 direction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_repulsion);
-                __m256 repulsion_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(repulsion_factor)), mask_repulsion);
-                __m256 repulsion_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, _mm256_set1_ps(repulsion_factor)), mask_repulsion);
+                __m256 repulsion_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, mm_repulsion_factor), mask_repulsion);
+                __m256 repulsion_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, mm_repulsion_factor), mask_repulsion);
 
-                // // resulting movement mask
+                // resulting movement mask
                 __m256 mvt_x_tmp = _mm256_add_ps(attraction_x, repulsion_x);
                 __m256 mvt_y_tmp = _mm256_add_ps(attraction_y, repulsion_y);
 
@@ -737,26 +744,54 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
     int start_thread4 = end_thread3;
     int end_thread4 = nb_particles;
 
-    std::thread thread1(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread1, end_thread1);
-    std::thread thread2(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread2, end_thread2);
-    std::thread thread3(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread3, end_thread3);
-    std::thread thread4(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread4, end_thread4);
+    std::thread thread1(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread1, end_thread1);
+    std::thread thread2(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread2, end_thread2);
+    std::thread thread3(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread3, end_thread3);
+    std::thread thread4(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread4, end_thread4);
 
     thread1.join();
     thread2.join();
     thread3.join();
     thread4.join();
 
+    // draw
+    shader_particle->Use();
 
-    std::cout << "nb particles: " << nb_particles << std::endl;
+    float* currentPA_x = nullptr;
+    float* currentPA_y = nullptr;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            currentPA_x = m_PA1_posX;
+            currentPA_y = m_PA1_posY;
+            shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
+            break;
+        case ParticleClass::PART_CLASS_2:
+            currentPA_x = m_PA2_posX;
+            currentPA_y = m_PA2_posY;
+            shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.41, 0.21));
+            break;
+        case ParticleClass::PART_CLASS_3:
+            currentPA_x = m_PA3_posX;
+            currentPA_y = m_PA3_posY;
+            shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.91, 0.41));
+            break;
+    }
 
+    // draw
+    glBindVertexArray(Particle_OPENGL::VAO);
+    for(int i = 0; i < nb_particles; i++)
+    {
+        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+    }
 
 
     m_ParticleAdaptersMutex.unlock();
 }
 
 
-void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int start, int end)
+void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int start, int end)
 {
     shader_particle->Use();
     glBindVertexArray(Particle_OPENGL::VAO);
@@ -834,6 +869,10 @@ void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int sta
 
         float mvt_x = 0.0f;
         float mvt_y = 0.0f;
+        float attraction_x = 0.0f; 
+        float attraction_y = 0.0f; 
+        float repulsion_x = 0.0f;
+        float repulsion_y = 0.0f;
 
         // -- Prepare targeted data --
         for(auto particle_class : m_ParticleClasses)
@@ -851,14 +890,14 @@ void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int sta
             }
 
             // -- begin calculations --
-            for(int j = 0; j<= targetPA_nb; j++)
+            for(int j = 0; j< targetPA_nb; j++)
             {
 
                 float targetX = targetPA_x[j];
                 float targetY = targetPA_y[j];
 
-                float sub_x = xvalue - targetX;
-                float sub_y = yvalue - targetY;
+                float sub_x = targetX - xvalue;
+                float sub_y = targetY - yvalue;
                 
                 float distance = (sub_x * sub_x) + (sub_y * sub_y);
 
@@ -883,8 +922,10 @@ void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int sta
 
                 // Calculate the movement of the current particle, if attraction or repulsion depending
                 // on the distance between the current particle and the others
-                float attraction_x = 0.0f; 
-                float attraction_y = 0.0f; 
+                attraction_x = 0.0f;
+                attraction_y = 0.0f;
+                repulsion_x = 0.0f;
+                repulsion_y = 0.0f;
 
                 if(distance > attraction_threshold_distance)
                 {
@@ -892,8 +933,6 @@ void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int sta
                     attraction_y = (attraction_factor > 0.0f) ? direction_y * attraction_factor : 0.0f;
                 }
 
-                float repulsion_x = 0.0f;
-                float repulsion_y = 0.0f;
 
                 if(distance < repulsion_maximum_distance)
                 {
@@ -922,8 +961,5 @@ void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int sta
             currentPA_y[i] = currentPA_y[i] + 1200.0f;
         else if(currentPA_y[i] >= 1200.0f)
             currentPA_y[i] = currentPA_y[i] - 1200.0f;
-
-        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
     }
 }

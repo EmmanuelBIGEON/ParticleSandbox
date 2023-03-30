@@ -119,7 +119,7 @@ class GraphicContext
 
         // Works with RenderParticles_without_avx
         // Allow to render particles in a multithreaded way
-        void RenderParticles_thread(ParticleClass particleClass, int start, int end);
+        void ComputeParticles_thread(ParticleClass particleClass, int start, int end);
         
         bool okRendering;
         bool needUpdate;
