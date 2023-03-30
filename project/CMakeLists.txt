@@ -5,8 +5,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox")
 
-# /Ox
-
 project(ParticleSandbox)
 
 include_directories(
@@ -67,4 +65,5 @@ endif()
 # install shaders
 install(DIRECTORY ${MAIN_DIR}/src/graphics/shaders DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${MAIN_DIR}/fonts DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${MAIN_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${MAIN_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})

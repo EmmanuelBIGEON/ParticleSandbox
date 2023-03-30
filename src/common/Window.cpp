@@ -9,6 +9,8 @@
 
 #include "Event.h"
 
+#include "stb_image.h"
+
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -60,6 +62,10 @@ void Window::Display(Application* app)
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
+    GLFWimage images[1]; 
+    images[0].pixels = stbi_load("data/img/favicon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+    glfwSetWindowIcon(window, 1, images); 
+    stbi_image_free(images[0].pixels);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
