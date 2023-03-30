@@ -42,12 +42,12 @@ void BasicUI::Init(GraphicContext* context)
     cursorY -= 120.0f;
     label_attraction = new GraphicText(context, "Attraction", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_attraction = new Slider(context, 0.0f, 1.0f, &GraphicContext::attraction_factor, m_startingX+ 75.0f, cursorY -20.0f);
-    cursorY -= 120.0f;
+    cursorY -= 90.0f;
     label_repulsiondistance = new GraphicText(context, "Repulsion Distance", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_repulsiondistance = new Slider(context, 0.0f, 200.0f, &GraphicContext::repulsion_maximum_distance, m_startingX+ 75.0f, cursorY -20.0f);
-    cursorY -= 120.0f;
+    slider_repulsiondistance = new Slider(context, 0.0f, 200.0f, &GraphicContext::repulsion_maximum_distance, m_startingX+ 75.0f, cursorY -40.0f);
+    cursorY -= 100.0f;
     label_attractiondistance = new GraphicText(context, "Attraction Distance", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 75.0f, cursorY -20.0f);
+    slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 75.0f, cursorY -40.0f);
 
     // Connect the watcher to the context
     m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)
@@ -73,6 +73,15 @@ void BasicUI::Update()
     std::string attraction = "Attraction: ";
     attraction += std::to_string(GraphicContext::attraction_factor);
     label_attraction->SetText(attraction.c_str());
+
+    std::string repulsiondistance = "Repulsion Distance: ";
+    repulsiondistance += std::to_string(GraphicContext::repulsion_maximum_distance);
+    label_repulsiondistance->SetText(repulsiondistance.c_str());
+
+    std::string attractiondistance = "Attraction Distance: ";
+    attractiondistance += std::to_string(GraphicContext::attraction_threshold_distance);
+    label_attractiondistance->SetText(attractiondistance.c_str());
+
 
     m_particlesCountText->SetText(text.c_str());
     m_fpsText->SetText(text2.c_str());
