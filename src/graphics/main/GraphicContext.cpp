@@ -643,8 +643,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 // Calculate the movement of the current particle, if attraction or repulsion depending
                 // on the distance between the current particle and the others
                 __m256 mask_attraction = _mm256_cmp_ps(distance, _mm256_set1_ps(attraction_threshold_distance), _CMP_GT_OQ);
-                __m256 attraction_x = _mm256_blendv_ps(_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
-                __m256 attraction_y = _mm256_blendv_ps(_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), _mm256_set1_ps(0.0f), mask_attraction);
+                __m256 attraction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_x, _mm256_set1_ps(attraction_factor)), mask_attraction);
+                __m256 attraction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_y, _mm256_set1_ps(attraction_factor)), mask_attraction);
 
                 // calculate repulsion 
                 // invert direction
