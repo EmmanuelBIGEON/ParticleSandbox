@@ -166,9 +166,6 @@ void EventHandler_UI::HandleEvent(const Event& event)
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
                 m_Context->OnMouseReleased.Emit(xCenter,yCenter);
-
-                // print position
-                std::cout << "Mouse released at: " << xCenter << " " << yCenter << std::endl;
             }
         }
     }
