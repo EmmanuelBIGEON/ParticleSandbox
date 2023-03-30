@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox")
@@ -16,6 +17,9 @@ include_directories(
 string(REPLACE "\\" "/" MAIN_DIR ${MAIN_DIR})
 
 set(SOURCES
+
+    ../src/arch_support.cpp
+    
     ../src/glad/glad.c
     ../src/main.cpp
     

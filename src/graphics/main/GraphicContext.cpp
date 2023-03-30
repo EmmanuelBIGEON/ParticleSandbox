@@ -29,6 +29,8 @@
 
 #include <immintrin.h>
 
+#include "../../arch_support.h"
+
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
@@ -170,9 +172,17 @@ void GraphicContext::Render()
     // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    RenderParticles(PART_CLASS_1);
-    RenderParticles(PART_CLASS_2);
-    RenderParticles(PART_CLASS_3);
+    if(IsAVX512Supported())
+    {
+        RenderParticles(PART_CLASS_1);
+        RenderParticles(PART_CLASS_2);
+        RenderParticles(PART_CLASS_3);
+    }else 
+    {
+        RenderParticles_without_avx(PART_CLASS_1);
+        RenderParticles_without_avx(PART_CLASS_2);
+        RenderParticles_without_avx(PART_CLASS_3);
+    }
 
     for(auto object : m_Objects)
     {
@@ -695,4 +705,225 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
     m_ParticleAdaptersMutex.unlock();
     
+}
+   
+   
+void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
+{
+    // std::cout << "rendering without AVX" << std::endl;
+    m_ParticleAdaptersMutex.lock();
+
+    // split particles size into 4
+    int nb_particles = 0;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            nb_particles = m_nb_PA1;
+            break;
+        case ParticleClass::PART_CLASS_2:
+            nb_particles = m_nb_PA2;
+            break;
+        case ParticleClass::PART_CLASS_3:
+            nb_particles = m_nb_PA3;
+            break;
+    }
+
+    int start_thread1 = 0;
+    int end_thread1 = nb_particles/4;
+    int start_thread2 = end_thread1;
+    int end_thread2 = 2*nb_particles/4;
+    int start_thread3 = end_thread2;
+    int end_thread3 = 3*nb_particles/4;
+    int start_thread4 = end_thread3;
+    int end_thread4 = nb_particles;
+
+    std::thread thread1(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread1, end_thread1);
+    std::thread thread2(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread2, end_thread2);
+    std::thread thread3(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread3, end_thread3);
+    std::thread thread4(&GraphicContext::RenderParticles_thread, this, particleClass, start_thread4, end_thread4);
+
+    thread1.join();
+    thread2.join();
+    thread3.join();
+    thread4.join();
+
+
+    std::cout << "nb particles: " << nb_particles << std::endl;
+
+
+
+    m_ParticleAdaptersMutex.unlock();
+}
+
+
+void GraphicContext::RenderParticles_thread(ParticleClass particleClass, int start, int end)
+{
+    shader_particle->Use();
+    glBindVertexArray(Particle_OPENGL::VAO);
+    
+    float* currentPA_x = nullptr;
+    float* currentPA_y = nullptr;
+    float* currentPA_mass = nullptr;
+    int currentPA_nb = 0;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            currentPA_x = m_PA1_posX;
+            currentPA_y = m_PA1_posY;
+            currentPA_mass = m_PA1_mass;
+            currentPA_nb = m_nb_PA1;
+            break;
+        case ParticleClass::PART_CLASS_2:
+            currentPA_x = m_PA2_posX;
+            currentPA_y = m_PA2_posY;
+            currentPA_mass = m_PA2_mass;
+            currentPA_nb = m_nb_PA2;
+            break;
+        case ParticleClass::PART_CLASS_3:
+            currentPA_x = m_PA3_posX;
+            currentPA_y = m_PA3_posY;
+            currentPA_mass = m_PA3_mass;
+            currentPA_nb = m_nb_PA3;
+            break;
+    }
+
+    
+    float* targetPA_x = nullptr;
+    float* targetPA_y = nullptr;
+    float* targetPA_mass = nullptr;
+    int targetPA_nb = 0;
+
+    for(int i = start; i< end; i++)
+    {
+        // -- initialize configuration -- 
+        // load scalar (current x and y)
+        float xvalue = currentPA_x[i];
+        float yvalue = currentPA_y[i];
+
+        std::vector<std::pair<float, float>> XY_config;
+        XY_config.push_back(std::make_pair(xvalue, yvalue));
+
+        float left_to_right = xvalue + worldWidth;
+        float right_to_left = xvalue - worldWidth;
+        float bottom_to_top = yvalue + worldHeight;
+        float top_to_bottom = yvalue - worldHeight;
+
+        if(xvalue < (worldWidth / 2))
+        {
+            if(yvalue < (worldHeight / 2)){
+                // Bottom left corner.
+                XY_config.push_back(std::make_pair(xvalue, bottom_to_top)); // repetition of y on (top)
+                XY_config.push_back(std::make_pair(left_to_right, yvalue)); // repetition of x on (right)
+            }else{
+                // Top left corner.
+                XY_config.push_back(std::make_pair(xvalue, top_to_bottom)); // repetition of y on (top transported to bottom)
+                XY_config.push_back(std::make_pair(left_to_right, yvalue)); // repetition of x on (right)
+            }
+        }else{
+            if(yvalue < (worldHeight / 2)){
+                // Bottom right corner.
+                XY_config.push_back(std::make_pair(xvalue, bottom_to_top)); // repetition of y on (bottom)
+                XY_config.push_back(std::make_pair(right_to_left, yvalue)); // repetition of x on (left)
+            }else{
+                // Top right corner.
+                XY_config.push_back(std::make_pair(xvalue, top_to_bottom)); // repetition of y on (top transported to bottom)
+                XY_config.push_back(std::make_pair(right_to_left, yvalue)); // repetition of x on (left)
+            }
+        } 
+        int sizeConfig = XY_config.size();
+
+        float mvt_x = 0.0f;
+        float mvt_y = 0.0f;
+
+        // -- Prepare targeted data --
+        for(auto particle_class : m_ParticleClasses)
+        {
+
+            if(particle_class == PART_CLASS_1)
+            {
+                targetPA_x = m_PA1_posX; targetPA_y = m_PA1_posY; targetPA_mass = m_PA1_mass; targetPA_nb = m_nb_PA1;
+            }else if(particle_class == PART_CLASS_2)
+            {
+                targetPA_x = m_PA2_posX; targetPA_y = m_PA2_posY; targetPA_mass = m_PA2_mass; targetPA_nb = m_nb_PA2;
+            }else if(particle_class == PART_CLASS_3)
+            {
+                targetPA_x = m_PA3_posX; targetPA_y = m_PA3_posY; targetPA_mass = m_PA3_mass; targetPA_nb = m_nb_PA3;
+            }
+
+            // -- begin calculations --
+            for(int j = 0; j<= targetPA_nb; j++)
+            {
+
+                float targetX = targetPA_x[j];
+                float targetY = targetPA_y[j];
+
+                float sub_x = xvalue - targetX;
+                float sub_y = yvalue - targetY;
+                
+                float distance = (sub_x * sub_x) + (sub_y * sub_y);
+
+                for(int k= 0; k < sizeConfig; k++)
+                {
+                    float tempsub_x = targetX - XY_config[k].first;
+                    float tempsub_y = targetY - XY_config[k].second;
+                    float distance_temp = (tempsub_x * tempsub_x) + (tempsub_y * tempsub_y);
+                    if(distance_temp < distance)
+                    {
+                        distance = distance_temp;
+                        sub_x = tempsub_x;
+                        sub_y = tempsub_y;
+                    }
+                }
+
+                distance = sqrt(distance);
+
+                // // Calculate the direction between the current particle and all the others
+                float direction_x = (distance > 0.0f) ? sub_x / distance : 0.0f;
+                float direction_y = (distance > 0.0f) ? sub_y / distance : 0.0f;
+
+                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // on the distance between the current particle and the others
+                float attraction_x = 0.0f; 
+                float attraction_y = 0.0f; 
+
+                if(distance > attraction_threshold_distance)
+                {
+                    attraction_x = (attraction_factor > 0.0f) ? direction_x * attraction_factor : 0.0f;
+                    attraction_y = (attraction_factor > 0.0f) ? direction_y * attraction_factor : 0.0f;
+                }
+
+                float repulsion_x = 0.0f;
+                float repulsion_y = 0.0f;
+
+                if(distance < repulsion_maximum_distance)
+                {
+                    repulsion_x = (repulsion_factor > 0.0f) ? direction_x * -repulsion_factor : 0.0f;
+                    repulsion_y = (repulsion_factor > 0.0f) ? direction_y * -repulsion_factor : 0.0f;
+                }
+
+                // // resulting movement mask
+                float mvt_x_tmp = attraction_x + repulsion_x;
+                float mvt_y_tmp = attraction_y + repulsion_y;
+                mvt_x += mvt_x_tmp;
+                mvt_y += mvt_y_tmp;
+
+            } // end calculations with targeted buffer
+        }
+        
+        currentPA_x[i] += mvt_x;
+        currentPA_y[i] += mvt_y;
+
+        // // Check if the particle is out of the screen
+        if(currentPA_x[i] < 0.0f)
+            currentPA_x[i] = currentPA_x[i] + 1600.0f;
+        else if(currentPA_x[i] >= 1600.0f)
+            currentPA_x[i] = currentPA_x[i] - 1600.0f;
+        if(currentPA_y[i] < 0.0f)
+            currentPA_y[i] = currentPA_y[i] + 1200.0f;
+        else if(currentPA_y[i] >= 1200.0f)
+            currentPA_y[i] = currentPA_y[i] - 1200.0f;
+
+        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+    }
 }
