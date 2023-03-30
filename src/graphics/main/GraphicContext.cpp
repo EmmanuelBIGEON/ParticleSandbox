@@ -559,7 +559,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(repulsion_maximum_distance);
     __m256 mm_attraction_threshold_distance = _mm256_set1_ps(attraction_threshold_distance);
     
-
     for(int i = 0; i < currentPA_nb; i++)
     {
         
@@ -577,29 +576,33 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         std::vector<std::pair<__m256, __m256>> vec_scalarXY_config;
         vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalar_y));
 
-        __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
-        __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
-        __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
-        __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
 
         if(xvalue < (worldWidth / 2))
         {
             if(yvalue < (worldHeight / 2)){
                 // Bottom left corner.
+                __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
+                __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
             }else{
                 // Top left corner.
+                __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
+                __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
             }
         }else{
             if(yvalue < (worldHeight / 2)){
                 // Bottom right corner.
+                __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
+                __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
             }else{
                 // Top right corner.
+                __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
+                __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
             }
