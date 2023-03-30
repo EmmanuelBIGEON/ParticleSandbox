@@ -31,6 +31,8 @@ BezierCurve::~BezierCurve()
 void BezierCurve::SetColor(const glm::vec3& color)
 {
     m_Color = color;
+    m_IsUpdated=false;
+
 }
 
 void BezierCurve::SetLine(const Line& line)

@@ -40,7 +40,6 @@ class BezierCurve : public GraphicObject
 
         glm::vec3 m_Color;
         
-
         unsigned int m_VAO;
         unsigned int m_VBO;
 

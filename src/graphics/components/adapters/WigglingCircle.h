@@ -8,6 +8,8 @@
 
 #include <glm/glm.hpp>
 
+//! \class WigglingCircle
+//! \brief Draw a circle on the screen that moves around
 class WigglingCircle : public GraphicObject
 {
     public:

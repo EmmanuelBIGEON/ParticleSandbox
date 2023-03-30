@@ -72,6 +72,8 @@ class GraphicContext
         const std::vector<GraphicObject*> GetObjects() const { return m_Objects; }
 
         const int& GetNbParticles_type1() const { return m_nb_PA1; }
+        const int& GetNbParticles_type2() const { return m_nb_PA2; }
+        const int& GetNbParticles_type3() const { return m_nb_PA3; }
 
         Font* font_main;
         
@@ -113,8 +115,7 @@ class GraphicContext
         // For now, act the same way for all the particles, but later, each class will have a behavior depending on the targeted class.
         void RenderParticles(ParticleClass particleClass);
 
-        // incredibly slow method but, allow the program to run on all machines
-        // in dire need of multithread.
+        // incredibly slow method but, allow the program to run on all machines (using multithreading)
         void RenderParticles_without_avx(ParticleClass particleClass);
 
         // Works with RenderParticles_without_avx
@@ -134,17 +135,17 @@ class GraphicContext
         // Need to split attributes in 3 arrays
         float* m_PA1_posX;
         float* m_PA1_posY;
-        float* m_PA1_mass;
+        float* m_PA1_mass; // not used, maybe later
         int m_nb_PA1;
 
         float* m_PA2_posX;
         float* m_PA2_posY;
-        float* m_PA2_mass;
+        float* m_PA2_mass; // not used, maybe later
         int m_nb_PA2;
 
         float* m_PA3_posX;
         float* m_PA3_posY;
-        float* m_PA3_mass;
+        float* m_PA3_mass; // not used, maybe later
         int m_nb_PA3;
 
         std::vector<ParticleClass> m_ParticleClasses;
@@ -157,7 +158,7 @@ class GraphicContext
         Shader* shader_texture;
         Shader* shader_lighting; // [won't be reshapped, kept for testing purposes]
         Shader* shader_line;
-        Shader* shader_particle; // Principal shader for the simulation
+        Shader* shader_particle; // Main shader for the simulation
         Shader* shader_button;
         Shader* shader_ui;
 

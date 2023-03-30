@@ -8,6 +8,8 @@
 
 #include <glm/glm.hpp>
 
+//! \class RectangleAdapter
+//! \brief Draw a rectangle on the screen.
 class RectangleAdapter : public GraphicObject
 {
     public:
@@ -28,7 +30,7 @@ class RectangleAdapter : public GraphicObject
         Shader* m_Shader;
         Rectangle m_Rectangle;
 
-        unsigned int m_VAO; // Might be possible to optimize 
+        unsigned int m_VAO; 
         unsigned int m_VBO;
         unsigned int m_EBO;
 

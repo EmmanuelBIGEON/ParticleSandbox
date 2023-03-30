@@ -114,7 +114,7 @@ void PanickedCircle::Update()
     // need a benchmark if it matters with bigger context.
     glBindVertexArray(0);
 
-    // Perpetually update the circle to make it wiggle in panick !
+    // Perpetually update the circle to make it wiggle in panic !
     // It is covering in fear !
     // m_IsUpdated = true;
 }

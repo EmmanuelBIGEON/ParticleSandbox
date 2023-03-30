@@ -8,7 +8,7 @@
 #include <glm/vec3.hpp>
 
 //! \class TriangleAdapter
-//! \brief A class that adapts a triangle to the graphics context for it to be displayed.
+//! \brief Draw a triangle on the screen.
 class TriangleAdapter : public GraphicObject
 {
     public: 
