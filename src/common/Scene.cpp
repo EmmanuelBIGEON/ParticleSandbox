@@ -71,8 +71,14 @@ Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_UI);
-    graphicContext->AddParticles(1500);
-    graphicContext->AddParticles(100, PART_CLASS_2);
+
+    float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
+    float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
+    float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
+    float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
+
+    graphicContext->AddParticles(1600, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    // graphicContext->AddParticles(100, PART_CLASS_2, xmin, xmax, ymin, ymax);
     return scene;
 }
 
@@ -83,10 +89,20 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
     Scene* scene = new Scene(graphicContext, false);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
-    Button* button = new Button(graphicContext, glm::vec2(0.0f, 0.0f), glm::vec2(200.0f, 200.0f), glm::vec3(0.2f, 0.2f, 0.2f), "Test");
+    // Button* button = new Button(graphicContext, glm::vec2(0.0f, 0.0f), glm::vec2(200.0f, 200.0f), glm::vec3(0.2f, 0.2f, 0.2f), "Test");
 
-    glm::vec3 color = glm::vec3(0.2f, 0.7f, 0.2f);
-    Button* button2 = new Button(graphicContext, glm::vec2(0.0f, 200.0f), glm::vec2(200.0f, 50.0f), color);
+    // glm::vec3 color = glm::vec3(0.2f, 0.7f, 0.2f);
+    // Button* button2 = new Button(graphicContext, glm::vec2(0.0f, 200.0f), glm::vec2(200.0f, 50.0f), color);
+
+    // RectangleAdapter* rect = new RectangleAdapter(graphicContext, glm::vec2(400.0f, 400.0f), glm::vec2(1000.0f, 1000.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+
+    // GraphicImage* image = new GraphicImage(graphicContext, "data/img/play.png", 600.0f, 600.0f, 50.0f, 50.0f);
+    // GraphicImage* image2 = new GraphicImage(graphicContext, "data/img/stop.png", 400.0f, 600.0f, 50.0f, 50.0f);
+
+    Button* button3 = new Button(graphicContext, glm::vec2(400.0f, 300.0f), glm::vec2(200.0f, 50.0f), glm::vec3(0.2f, 0.2f, 0.2f), "");
+    button3->SetPathIcon("data/img/play.png");
+    button3->SetColor(glm::vec3(0.2f, 0.2f, 0.4f));
+
     return scene;
 }
 

@@ -1,8 +1,9 @@
 #include "BasicUI.h"
 
 #include "../components/adapters/RectangleAdapter.h"
-#include "../components/ui/Slider.h"
 #include "../components/common/GraphicText.h"
+#include "../components/ui/Button.h"
+#include "../components/ui/Slider.h"
 
 BasicUI::BasicUI(int startingX, int startingY, int width, int height)
     : m_startingX(startingX), m_startingY(startingY), m_width(width), m_height(height), m_particlesCount(0), m_fps(0)
@@ -49,10 +50,43 @@ void BasicUI::Init(GraphicContext* context)
     label_attractiondistance = new GraphicText(context, "Attraction Distance", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 75.0f, cursorY -40.0f);
 
+    // create two buttons with play and stop icons under the basic ui.
+    float cursorX = m_startingX;
+    cursorY = m_startingY - 30;
+    button_play = new Button(context, glm::vec2(cursorX, cursorY), glm::vec2(m_width/2, 30));
+    button_play->SetPathIcon("data/img/play.png");
+    button_play->SetInvertIconOnActive(true);
+    button_play->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
+
+    cursorX += m_width/2;
+    button_pause = new Button(context, glm::vec2(cursorX, cursorY), glm::vec2(m_width/2, 30));
+    button_pause->SetPathIcon("data/img/stop.png");
+    button_pause->SetInvertIconOnActive(true);
+    button_pause->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
+
+    button_play->SetActive(true);
+
     // Connect the watcher to the context
     m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)
     {
         m_particlesCount += nb;
+    });
+
+    // connect play and stop
+    button_play->OnClick.Connect([this, context]()
+    {
+        button_play->SetActive(true);
+        button_pause->SetActive(false);
+
+        context->Resume();
+    });
+
+    button_pause->OnClick.Connect([this, context]()
+    {
+        button_play->SetActive(false);
+        button_pause->SetActive(true);
+
+        context->Pause();
     });
 }
 

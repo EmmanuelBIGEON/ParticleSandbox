@@ -62,8 +62,15 @@ class GraphicContext
         
         virtual void Update(); // placeholder function for now, might be used later
 
+        //! \brief Pause the rendering of particles.
+        void Pause() { m_Pause = true; }
+
+        //! \brief Resume the rendering of particles.
+        void Resume() { m_Pause = false; }
+
         //! \brief Add a vector of particles2 and updates the useful data.
-        void AddParticles(int nbParticles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
+        void AddParticles(int nbParticles, ParticleClass particleClass = ParticleClass::PART_CLASS_1, 
+            float rangex_min = 0.0f, float rangex_max = GraphicContext::worldWidth, float rangey_min = 0.0f, float rangey_max = GraphicContext::worldHeight);
         void AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
 
         // For TextRendering
@@ -121,6 +128,9 @@ class GraphicContext
         // Works with RenderParticles_without_avx
         // Allow to render particles in a multithreaded way
         void ComputeParticles_thread(ParticleClass particleClass, int start, int end);
+
+        // Simply draw the particles
+        void DrawParticles(ParticleClass particleClass);
         
         bool okRendering;
         bool needUpdate;
@@ -180,6 +190,8 @@ class GraphicContext
 
         float m_MouseX;
         float m_MouseY;
+
+        bool m_Pause;
 
         
 };

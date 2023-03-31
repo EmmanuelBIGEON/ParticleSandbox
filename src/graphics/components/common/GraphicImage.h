@@ -19,6 +19,12 @@ class GraphicImage : public GraphicObject
         virtual void Update() override;
         virtual void Draw() override;
 
+        void SetPosition(float x, float y);
+        void SetWidth(float width);
+        void SetHeight(float height);
+        void SetImage(const std::string& path);
+        void SetToInvertColor(bool invert);
+
     private:
         Shader* m_Shader;
 
@@ -28,6 +34,7 @@ class GraphicImage : public GraphicObject
         float m_y;
         float m_width;
         float m_height;
+        bool m_imageloaded;
 
         float m_vertices[32];
         int m_indices[6];
@@ -36,5 +43,7 @@ class GraphicImage : public GraphicObject
         unsigned int m_VBO;
         unsigned int m_EBO;
         unsigned int m_Texture;
+
+        bool m_ToInvert;
         
 };

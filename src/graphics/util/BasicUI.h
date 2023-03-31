@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../components/common/GraphicText.h"
 #include "../main/GraphicContext.h"
 #include "../main/GraphicObject.h"
-
 #include "../../common/Application.h"
 
+class Button;
 class Slider;
 class GraphicText;
+class RectangleAdapter;
 
 //! \class BasicUI
 //! \brief Display the FPS and the number of particules in the context.
@@ -45,4 +45,7 @@ class BasicUI
         Slider* slider_repulsiondistance;
         GraphicText* label_attractiondistance;
         Slider* slider_attractiondistance;
+
+        Button* button_play;
+        Button* button_pause;
 };

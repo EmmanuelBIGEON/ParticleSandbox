@@ -11,7 +11,7 @@
 
 Button::Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text)
     : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),
-    m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr)
+    m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr), m_isActive(false), m_ImageObject(nullptr), m_ActiveColor(color), m_InvertIconOnActive(false)
 {
     m_Shader = m_Context->GetShader(SHADER_BUTTON);
 
@@ -29,6 +29,11 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
     
     m_TextObject = new GraphicText(m_Context, m_Text.c_str(), glm::vec2(m_Pos.x, m_Pos.y + m_Size.y), glm::vec2(m_Pos.x + m_Size.x, m_Pos.y));
     m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
+
+    float image_posx = m_Pos.x + m_Size.x / 2 - 12.5f;
+    float image_posy = m_Pos.y + m_Size.y / 2 - 12.5f;
+    m_ImageObject = new GraphicImage(m_Context, "", image_posx, image_posy, 25.0f, 25.0f);
+
     
 
     // Connect to mouve move of the context
@@ -108,10 +113,16 @@ void Button::Update()
 void Button::Draw()
 {
     glBindVertexArray(m_VAO);
-    if(m_isHovered)
-        m_Shader->SetVec3("buttonColor", m_HoveringColor);
-    else
-        m_Shader->SetVec3("buttonColor", m_Color);
+    if(m_isActive)
+    {
+        m_Shader->SetVec3("buttonColor", m_ActiveColor);
+    }else
+    {
+        if(m_isHovered)
+            m_Shader->SetVec3("buttonColor", m_HoveringColor);
+        else
+            m_Shader->SetVec3("buttonColor", m_Color);
+    }
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
 }
@@ -144,4 +155,36 @@ void Button::SetHoveringColor(const glm::vec3& color)
 {
     m_HoveringColor = color;
     m_IsUpdated = false;
+}
+
+void Button::SetPathIcon(const std::string& pathicon)
+{
+    m_ImageObject->SetImage(pathicon);
+}
+
+void Button::SetIconWidth(float width)
+{
+    m_ImageObject->SetWidth(width);
+}
+
+void Button::SetIconHeight(float height)
+{
+    m_ImageObject->SetHeight(height);
+}
+
+void Button::SetActive(bool active)
+{
+    m_isActive = active;
+    if(m_ImageObject && m_InvertIconOnActive)
+        m_ImageObject->SetToInvertColor(active);
+}
+
+void Button::SetActiveColor(const glm::vec3& color)
+{
+    m_ActiveColor = color;
+}
+
+void Button::SetInvertIconOnActive(bool invertIconOnActive)
+{
+    m_InvertIconOnActive = invertIconOnActive;
 }

@@ -34,15 +34,16 @@
 
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
-float GraphicContext::repulsion_factor = 0.1f;
-float GraphicContext::attraction_factor = 0.1f;
-float GraphicContext::repulsion_maximum_distance = 50.0f;
-float GraphicContext::attraction_threshold_distance = 100.0f;
+float GraphicContext::repulsion_factor = 1.21f;
+float GraphicContext::attraction_factor = 0.381f;
+float GraphicContext::repulsion_maximum_distance = 19.23f;
+float GraphicContext::attraction_threshold_distance = 700.0f;
 
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
-    shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), shader_particle(nullptr), zoomFactor(1.0f)
+    shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), 
+    shader_particle(nullptr), zoomFactor(1.0f), m_Pause(false)
 {
     glm::mat4 model = glm::mat4(1.0f);
     // translate for the center of the screen (because OpenGL is in [-1, 1])
@@ -160,6 +161,7 @@ float GraphicContext::Convert_glY_to_WorldY(float y) const
 
 void GraphicContext::Render()
 {
+
     if(needUpdate)
         Update();
 
@@ -172,16 +174,24 @@ void GraphicContext::Render()
     // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(IsAVX2Supported())
+    if(!m_Pause)
     {
-        RenderParticles(PART_CLASS_1);
-        RenderParticles(PART_CLASS_2);
-        RenderParticles(PART_CLASS_3);
+        if(IsAVX2Supported())
+        {
+            RenderParticles(PART_CLASS_1);
+            RenderParticles(PART_CLASS_2);
+            RenderParticles(PART_CLASS_3);
+        }else 
+        {
+            RenderParticles_without_avx(PART_CLASS_1);
+            RenderParticles_without_avx(PART_CLASS_2);
+            RenderParticles_without_avx(PART_CLASS_3);
+        }
     }else 
     {
-        RenderParticles_without_avx(PART_CLASS_1);
-        RenderParticles_without_avx(PART_CLASS_2);
-        RenderParticles_without_avx(PART_CLASS_3);
+        DrawParticles(PART_CLASS_1);
+        DrawParticles(PART_CLASS_2);
+        DrawParticles(PART_CLASS_3);
     }
 
     for(auto object : m_Objects)
@@ -234,7 +244,8 @@ void GraphicContext::Render()
     }
 }
 
-void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass)
+void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
+    float rangex_min, float rangex_max, float rangey_min, float rangey_max)
 {
     // mutex
     m_ParticleAdaptersMutex.lock();
@@ -286,11 +297,18 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass)
         delete[] old_pos_y;
         delete[] old_mass;
 
+
+        float modulox = rangex_max - rangex_min;
+        float moduloy = rangey_max - rangey_min;
         // fill with random values between world bounds
         for(int i = PA_CurrentNB; i < PA_CurrentNB + nbParticles; i++)
         {
-            PA_PosX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
-            PA_PosY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
+            PA_PosX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(modulox)));
+            PA_PosX[i] += rangex_min;
+
+            PA_PosY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(moduloy)));
+            PA_PosY[i] += rangey_min;
+            
             m_PA1_mass[i] = 1.0f;
         }
 
@@ -302,11 +320,16 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass)
         PA_PosY = new float[nbParticles];
         PA_Mass = new float[nbParticles];
 
+        float modulox = rangex_max - rangex_min;
+        float moduloy = rangey_max - rangey_min;
         // fill with random values between world bounds
         for(int i = 0; i < nbParticles; i++)
         {
-            PA_PosX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1600.0f)));
-            PA_PosY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(1200.0f)));
+            PA_PosX[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(modulox)));
+            PA_PosX[i] += rangex_min;
+
+            PA_PosY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(moduloy)));
+            PA_PosY[i] += rangey_min;
             PA_Mass[i] = 1.0f;
         }
 
@@ -447,8 +470,6 @@ void GraphicContext::Update()
 
     // Shader_texture
     shader_texture->Use();
-    shader_texture->SetMat4("projection", m_ProjectionMatrix);
-    shader_texture->SetMat4("view", m_ViewMatrix);
     shader_texture->SetMat4("model", m_ModelMatrix);
     
     // Shader_lighting [won't be reshapped, kept for testing purposes]
@@ -965,5 +986,36 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             currentPA_y[i] = currentPA_y[i] + 1200.0f;
         else if(currentPA_y[i] >= 1200.0f)
             currentPA_y[i] = currentPA_y[i] - 1200.0f;
+    }
+}
+
+
+void GraphicContext::DrawParticles(ParticleClass particleClass)
+{
+    shader_particle->Use();
+    glBindVertexArray(Particle_OPENGL::VAO);
+
+    float* currentPA_x = nullptr;
+    float* currentPA_y = nullptr;
+    int nb_particles = 0;
+
+    if(particleClass == PART_CLASS_1)
+    {
+        currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY; nb_particles = m_nb_PA1;
+        shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
+    }else if(particleClass == PART_CLASS_2)
+    {
+        currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY; nb_particles = m_nb_PA2;
+            shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.41, 0.21));
+    }else if(particleClass == PART_CLASS_3)
+    {
+        currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY; nb_particles = m_nb_PA3;
+        shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.91, 0.41));
+    }
+
+    for(int i = 0; i < nb_particles; i++)
+    {
+        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
     }
 }
