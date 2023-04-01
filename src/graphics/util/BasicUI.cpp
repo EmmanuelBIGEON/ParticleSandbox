@@ -39,16 +39,16 @@ void BasicUI::Init(GraphicContext* context)
     cursorY -= context->font_main->GetSize()*4;
     
     label_repulsion = new GraphicText(context, "Repulsion", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_repulsion = new Slider(context, 0.0f, 1.4f, &GraphicContext::repulsion_factor, m_startingX+ 75.0f, cursorY- 20.0f);
-    cursorY -= 120.0f;
+    slider_repulsion = new Slider(context, 0.0f, 1.4f, &GraphicContext::repulsion_factor, m_startingX+ 85.0f, cursorY- 20.0f);
+    cursorY -= 90.0f;
     label_attraction = new GraphicText(context, "Attraction", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_attraction = new Slider(context, 0.0f, 1.0f, &GraphicContext::attraction_factor, m_startingX+ 75.0f, cursorY -20.0f);
+    slider_attraction = new Slider(context, 0.0f, 1.0f, &GraphicContext::attraction_factor, m_startingX+ 85.0f, cursorY -20.0f);
     cursorY -= 90.0f;
     label_repulsiondistance = new GraphicText(context, "Repulsion Distance", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_repulsiondistance = new Slider(context, 0.0f, 200.0f, &GraphicContext::repulsion_maximum_distance, m_startingX+ 75.0f, cursorY -40.0f);
+    slider_repulsiondistance = new Slider(context, 0.0f, 200.0f, &GraphicContext::repulsion_maximum_distance, m_startingX+ 85.0f, cursorY -40.0f);
     cursorY -= 100.0f;
     label_attractiondistance = new GraphicText(context, "Attraction Distance", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 75.0f, cursorY -40.0f);
+    slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 85.0f, cursorY -40.0f);
 
     // create two buttons with play and stop icons under the basic ui.
     float cursorX = m_startingX;
