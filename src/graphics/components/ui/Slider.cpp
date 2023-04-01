@@ -104,7 +104,6 @@ void Slider::Draw()
     m_Shader->Use();
     m_Shader->SetVec3("elementColor", glm::vec3(0.74f, 0.74f, 0.74f));
     m_Shader->SetVec2("shiftPos", glm::vec2(m_shiftX, m_shiftY));
-    m_Shader->SetFloat("shiftZ", 1.0f); 
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

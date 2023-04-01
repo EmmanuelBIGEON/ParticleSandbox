@@ -35,6 +35,7 @@ class GraphicText : public GraphicObject
         const Font* GetFont() const { return m_Font; }
 
         void SetColor(glm::vec3 color) { m_Color = color; m_IsUpdated=false;}
+        void SetAlignment(TextAlign align) { m_Alignment = align; m_IsUpdated=false;}
 
         virtual void Update() override;
         virtual void Draw() override;
@@ -53,6 +54,7 @@ class GraphicText : public GraphicObject
         float m_ystart;
         float m_xend;
         float m_yend;
+        TextAlign m_Alignment;
 
         float m_scale;
 

@@ -17,6 +17,8 @@ static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
+void HeldDownKey_Handling();
+
 double lastMouseX = 0, lastMouseY = 0;
 Window::Window()
 {
@@ -92,6 +94,8 @@ void Window::Display(Application* app)
     int nbFrames = 0;
     while (!glfwWindowShouldClose(window))
     {
+        HeldDownKey_Handling();
+
         double currentTime = glfwGetTime();
         nbFrames++;
         if (currentTime - lastTime >= 1.0) 
@@ -114,6 +118,13 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     Application::viewportHeight = height;
 }
 
+bool keyhelddown = false;
+double timeBetweenKeyPress = 0;
+double timeBetweenKeyPressMax = 0.45;
+int rememberedKey = 0;
+bool longpress = false;
+double timeBetweenKeyPressMaxLong = 0.045;
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -125,10 +136,34 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     {
         KeyPressedEvent event(key);
         global_EventHandler->HandleEvent(event);
+        timeBetweenKeyPress = glfwGetTime();
+        rememberedKey = key;
+        keyhelddown = true;
     }else if(action == GLFW_RELEASE)
     {
         KeyReleasedEvent event(key);
         global_EventHandler->HandleEvent(event);
+        keyhelddown = false;
+        longpress = false;
+    }
+}
+
+void HeldDownKey_Handling()
+{
+    if(keyhelddown)
+    {
+        if(!longpress && glfwGetTime() - timeBetweenKeyPress > timeBetweenKeyPressMax)
+        {
+            KeyPressedEvent event(rememberedKey);
+            global_EventHandler->HandleEvent(event);
+            longpress = true;
+            timeBetweenKeyPress = glfwGetTime();
+        }else if(longpress && glfwGetTime() - timeBetweenKeyPress > timeBetweenKeyPressMaxLong)
+        {
+            KeyPressedEvent event(rememberedKey);
+            global_EventHandler->HandleEvent(event);
+            timeBetweenKeyPress = glfwGetTime();
+        }
     }
 }
 

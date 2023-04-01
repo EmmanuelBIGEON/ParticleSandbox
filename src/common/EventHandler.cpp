@@ -130,6 +130,16 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
         //     m_Context->ZoomOut(0.0f);
         // }
 
+    }else if(event.GetEventType() == EventType::EVENT_KEY)
+    {
+        KeyEvent* keyEvent = (KeyEvent*)&event;
+        if(keyEvent->GetKeyType() == EventKeyType::EVENT_KEY_PRESSED)
+        {
+            KeyPressedEvent* keyPressedEvent = (KeyPressedEvent*)&event;
+            int value = keyPressedEvent->key;
+
+            std::cout << "key pressed : " << value << std::endl;
+        }
     }
 }
 
@@ -180,6 +190,17 @@ void EventHandler_UI::HandleEvent(const Event& event)
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
                 m_Context->OnMouseReleased.Emit(xCenter,yCenter);
             }
+        }
+    }else if(event.GetEventType() == EventType::EVENT_KEY)
+    {
+        KeyEvent* keyEvent = (KeyEvent*)&event;
+        if(keyEvent->GetKeyType() == EventKeyType::EVENT_KEY_PRESSED)
+        {
+            KeyPressedEvent* keyPressedEvent = (KeyPressedEvent*)&event;
+            int value = keyPressedEvent->key;
+            char c = (char)value;
+
+            m_Context->OnKeyPressed.Emit(c);
         }
     }
 }

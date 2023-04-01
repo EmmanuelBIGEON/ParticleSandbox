@@ -55,7 +55,7 @@ void GraphicText::Update()
     // Calculate size with xstart, ystart, xend, yend
     // It needs to stay in the box. Scale if needed.
     // For starter, TextAlign is always center
-    int text_align = TextAlign::ALIGN_CENTER;
+    TextAlign text_align = m_Alignment;
 
     // Calculate size of all characters
     // to determine if text is too large and to align it accordingly

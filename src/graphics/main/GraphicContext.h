@@ -114,6 +114,10 @@ class GraphicContext
         // Give the position (in world coordinates) of the mouse when it was released.
         Signal<float, float> OnMouseReleased;
 
+        //! \brief Signal emitted when a key is pressed.
+        //! Allowing UI elements to connect to it.
+        Signal<char> OnKeyPressed;
+
 
         //! \brief Signal when a graphic object join or leave the context.
         Signal<GraphicObject*> OnObjectRegistered;

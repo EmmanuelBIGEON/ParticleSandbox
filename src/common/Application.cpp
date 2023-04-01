@@ -118,6 +118,14 @@ void Application::LoadScene_Main()
     m_currentScene = Scene::CreateScene_Main(m_GraphicContext);
 }
 
+void Application::LoadScene_Testing()
+{
+    if(m_currentScene)
+        delete(m_currentScene);
+
+    m_currentScene = Scene::CreateScene_Testing(m_GraphicContext);
+}
+
 void Application::LoadScene_3()
 {
     if(m_currentScene)

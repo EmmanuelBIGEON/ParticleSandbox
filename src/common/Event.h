@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 enum EventType
 {
     EVENT_NONE,
@@ -75,7 +77,26 @@ class WheelEvent : public Event
 class KeyEvent : public Event
 {
     public:
-        KeyEvent(int input_key) : key(input_key) { m_KeyType = EVENT_KEY_PRESSED; m_EventType = EVENT_KEY; }
+        KeyEvent(int input_key) : key(input_key) 
+        { 
+            m_KeyType = EVENT_KEY_PRESSED; 
+            m_EventType = EVENT_KEY; 
+
+            // GLFW doesn't detect keyboard configuration, this is problematic for AZERTY and QWERTY. 
+            // However in this application there's no need to go further than implementing key numbers.
+            // Convert numpad keys to numbers.
+            // (I work with an AZERTY, QWWERTY can directly the numbers above the letters)
+            if(key == 320) key = 48;
+            else if(key == 321) key = 49;
+            else if(key == 322) key = 50;
+            else if(key == 323) key = 51;
+            else if(key == 324) key = 52;
+            else if(key == 325) key = 53;
+            else if(key == 326) key = 54;
+            else if(key == 327) key = 55;
+            else if(key == 328) key = 56;
+            else if(key == 329) key = 57;
+        }
         virtual ~KeyEvent() {}
 
         virtual EventType GetEventType() const { return EVENT_KEY; }
