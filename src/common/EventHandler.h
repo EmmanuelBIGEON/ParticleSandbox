@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "Event.h"
+#include "Signal.h"
 
 #include <iostream>
 
@@ -42,13 +43,17 @@ class EventHandler_Test : public EventHandler
 class EventHandler_ParticleCreator : public EventHandler
 {
     public:
-        EventHandler_ParticleCreator(GraphicContext* context) : m_Context(context) {}
-        virtual ~EventHandler_ParticleCreator() {}
+        EventHandler_ParticleCreator(GraphicContext* context);
+        virtual ~EventHandler_ParticleCreator();
 
         virtual void HandleEvent(const Event& event);
 
     private: 
         GraphicContext* m_Context;
+
+        // Keeping it in the class allow to remove it when the class is destroyed.
+        // Preventing the signal from calling a function on a deleted object.
+        Slot<float, float>* m_SlotParticleCreator;
 
 };
 

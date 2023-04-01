@@ -48,6 +48,26 @@ void EventHandler_Test::HandleEvent(const Event& event)
     }
 }
 
+
+EventHandler_ParticleCreator::EventHandler_ParticleCreator(GraphicContext* context) : m_Context(context)
+{
+    m_SlotParticleCreator = m_Context->OnMouseReleased.Connect([this](float x, float y) {
+        ParticleStruct particle;
+        particle.pos_x = x;
+        particle.pos_y = y;
+        particle.mass = 1.0f;
+        std::vector<ParticleStruct> particles;
+        particles.push_back(particle);
+        m_Context->AddParticles(particles);
+    });
+}
+
+EventHandler_ParticleCreator::~EventHandler_ParticleCreator() 
+{
+    m_Context->OnMouseReleased.Disconnect(m_SlotParticleCreator);
+}
+
+
 //! \brief Create a particle on click
 void EventHandler_ParticleCreator::HandleEvent(const Event& event)
 {
@@ -81,13 +101,6 @@ void EventHandler_ParticleCreator::HandleEvent(const Event& event)
                 yCenter = -yCenter;
                 xCenter = m_Context->Convert_glX_to_WorldX(xCenter);
                 yCenter = m_Context->Convert_glY_to_WorldY(yCenter);
-                ParticleStruct particle;
-                particle.pos_x = xCenter;
-                particle.pos_y = yCenter;
-                particle.mass = 1.0f;
-                std::vector<ParticleStruct> particles;
-                particles.push_back(particle);
-                m_Context->AddParticles(particles);
                 m_Context->OnMouseReleased.Emit(xCenter,yCenter); // TODO (create a particle on click despite the UI)
             }
         }else if(mouseEvent->GetMouseEventType() == EventMouseType::EVENT_MOUSE_PRESSED)

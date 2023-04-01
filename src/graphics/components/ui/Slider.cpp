@@ -14,9 +14,9 @@ Slider::Slider(GraphicContext* context, float min, float max, float* value, floa
      m_shiftCursorX(0.0f), m_shiftCursorY(0.0f), m_VAO_cursor(0), m_VBO_cursor(0), m_EBO_cursor(0)
 {
     m_Shader = context->GetShader(AvailableShader::SHADER_UI);
-    m_Context->OnMouseMoved.Connect([this](float x, float y) { OnMouseMoved(x, y); });
-    m_Context->OnMousePressed.Connect([this](float x, float y) { OnMousePressed(x, y); });
-    m_Context->OnMouseReleased.Connect([this](float x, float y) { OnMouseReleased(x, y); });
+    m_Context->OnMouseMoved.Connect([this](float x, float y) { OnMouseMoved(x, y);});
+    m_Context->OnMousePressed.Connect([this](float x, float y) { OnMousePressed(x, y);});
+    m_Context->OnMouseReleased.Connect([this](float x, float y) { if(OnMouseReleased(x, y)) m_Context->OnMouseReleased.PreventDefault();});
 }
 
 Slider::~Slider()
@@ -151,7 +151,15 @@ void Slider::OnMousePressed(float x, float y)
         isPressed = true;
 }
 
-void Slider::OnMouseReleased(float x, float y)
+bool Slider::OnMouseReleased(float x, float y)
 {
+    if(isPressed)
+    {
+        std::cout << "Rekelsed" << std::endl;
+        isPressed = false;
+        return true;
+    }
     isPressed = false;
+    return false;
+    
 }

@@ -31,7 +31,9 @@ class Slider : public GraphicObject
 
         void OnMouseMoved(float x, float y);
         void OnMousePressed(float x, float y);
-        void OnMouseReleased(float x, float y);
+
+        // return true if the sider is released
+        bool OnMouseReleased(float x, float y);
         
     private:
         float m_shiftX;
