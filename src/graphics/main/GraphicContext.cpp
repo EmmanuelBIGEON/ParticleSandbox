@@ -38,7 +38,6 @@ float GraphicContext::repulsion_factor = 1.21f;
 float GraphicContext::attraction_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
 float GraphicContext::attraction_threshold_distance = 700.0f;
-// glm::vec3
 glm::vec3 GraphicContext::PA1_color = glm::vec3(0.21, 0.41, 0.91);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
