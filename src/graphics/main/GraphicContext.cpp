@@ -994,11 +994,14 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
                     }
                 }
 
+                if(distance == 0.0f)
+                    continue;
+
                 distance = sqrt(distance);
 
                 // // Calculate the direction between the current particle and all the others
-                float direction_x = (distance > 0.0f) ? sub_x / distance : 0.0f;
-                float direction_y = (distance > 0.0f) ? sub_y / distance : 0.0f;
+                float direction_x = sub_x / distance;
+                float direction_y = sub_y / distance;
 
                 // Calculate the movement of the current particle, if attraction or repulsion depending
                 // on the distance between the current particle and the others
@@ -1007,25 +1010,22 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
                 repulsion_x = 0.0f;
                 repulsion_y = 0.0f;
 
-                if(distance > attraction_threshold_distance)
+                if(distance < attraction_threshold_distance)
                 {
-                    attraction_x = (attraction_factor > 0.0f) ? direction_x * attraction_factor : 0.0f;
-                    attraction_y = (attraction_factor > 0.0f) ? direction_y * attraction_factor : 0.0f;
+                    attraction_x = direction_x * attraction_factor;
+                    attraction_y = direction_y * attraction_factor;
+                    mvt_x += attraction_x;
+                    mvt_y += attraction_y;
                 }
 
 
                 if(distance < repulsion_maximum_distance)
                 {
-                    repulsion_x = (repulsion_factor > 0.0f) ? direction_x * -repulsion_factor : 0.0f;
-                    repulsion_y = (repulsion_factor > 0.0f) ? direction_y * -repulsion_factor : 0.0f;
+                    repulsion_x = -direction_x * repulsion_factor;
+                    repulsion_y = -direction_y * repulsion_factor;
+                    mvt_x += repulsion_x;
+                    mvt_y += repulsion_y;
                 }
-
-                // // resulting movement mask
-                float mvt_x_tmp = attraction_x + repulsion_x;
-                float mvt_y_tmp = attraction_y + repulsion_y;
-                mvt_x += mvt_x_tmp;
-                mvt_y += mvt_y_tmp;
-
             } // end calculations with targeted buffer
         }
         
