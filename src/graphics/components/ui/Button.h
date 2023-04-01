@@ -82,4 +82,6 @@ class Button : public GraphicObject
 
         bool m_isActive;
         bool m_InvertIconOnActive;
+
+        bool beingClicked;
 };

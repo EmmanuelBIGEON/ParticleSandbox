@@ -10,7 +10,7 @@
 #include "../../main/Font.h"
 
 Button::Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text)
-    : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false),
+    : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false), beingClicked(false),
     m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr), m_isActive(false), m_ImageObject(nullptr), m_ActiveColor(color), m_InvertIconOnActive(false)
 {
     m_Shader = m_Context->GetShader(SHADER_BUTTON);
@@ -67,7 +67,18 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
            y > m_Pos.y && y < m_Pos.y + m_Size.y)
         {
             OnClick.Emit();
+            beingClicked = true;
+            m_Context->OnMousePressed.PreventDefault();
         }   
+    });
+
+    m_Context->OnMouseReleased.Connect([this](float x, float y)
+    {
+        if(beingClicked)
+        {
+            m_Context->OnMouseReleased.PreventDefault();
+            beingClicked = false;
+        }
     });
 }
 
