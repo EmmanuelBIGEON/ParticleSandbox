@@ -81,7 +81,7 @@ void Application::CreateWindow()
         Particle_OPENGL::LoadParticleVAO();
 
         // Load the scene.
-        LoadScene_2();
+        LoadScene_Main();
         
     });
 
@@ -110,12 +110,12 @@ void Application::LoadScene_1()
     m_currentScene = Scene::CreateScene_1(m_GraphicContext);
 }
 
-void Application::LoadScene_2()
+void Application::LoadScene_Main()
 {
     if(m_currentScene)
         delete(m_currentScene);
 
-    m_currentScene = Scene::CreateScene_2(m_GraphicContext);
+    m_currentScene = Scene::CreateScene_Main(m_GraphicContext);
 }
 
 void Application::LoadScene_3()

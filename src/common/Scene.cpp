@@ -67,17 +67,17 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
     return scene;
 }
 
-Scene* Scene::CreateScene_2(GraphicContext* graphicContext)
+Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
-    scene->ConnectHandler(EVENT_HANDLER_UI);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
 
     float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
     float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
     float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
     float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
 
-    graphicContext->AddParticles(1600, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    // graphicContext->AddParticles(1600, PART_CLASS_1, xmin, xmax, ymin, ymax);
     // graphicContext->AddParticles(100, PART_CLASS_2, xmin, xmax, ymin, ymax);
     return scene;
 }

@@ -579,6 +579,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     __m256 mm_repulsion_factor = _mm256_set1_ps(repulsion_factor);
     __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(repulsion_maximum_distance);
     __m256 mm_attraction_threshold_distance = _mm256_set1_ps(attraction_threshold_distance);
+    __m256 mm_zeros = _mm256_set1_ps(0.0f);
     
     for(int i = 0; i < currentPA_nb; i++)
     {
@@ -596,6 +597,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         // Ignoring first configuration (scalar_x, scalar_y), it will be the first calculation.
         std::vector<std::pair<__m256, __m256>> vec_scalarXY_config;
         vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalar_y));
+        std::vector<std::pair<float, float>> vec_x_y_config; // used for remaining particles unable to fit into the 8 float buffer
+        vec_x_y_config.push_back(std::make_pair(xvalue, yvalue));
 
 
         if(xvalue < (worldWidth / 2))
@@ -606,12 +609,16 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue + worldHeight)); // repetition of y on (bottom transported to top)
+                vec_x_y_config.push_back(std::make_pair(xvalue + worldWidth, yvalue)); // repetition of x on (left transported to right)
             }else{
                 // Top left corner.
                 __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue - worldHeight)); // repetition of y on (top transported to bottom)
+                vec_x_y_config.push_back(std::make_pair(xvalue + worldWidth, yvalue)); // repetition of x on (left transported to right)
             }
         }else{
             if(yvalue < (worldHeight / 2)){
@@ -620,12 +627,16 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue + worldHeight)); // repetition of y on (bottom transported to top)
+                vec_x_y_config.push_back(std::make_pair(xvalue - worldWidth, yvalue)); // repetition of x on (right transported to left)
             }else{
                 // Top right corner.
                 __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue - worldHeight)); // repetition of y on (top transported to bottom)
+                vec_x_y_config.push_back(std::make_pair(xvalue - worldWidth, yvalue)); // repetition of x on (right transported to left)
             }
         } 
         int sizeConfig = vec_scalarXY_config.size();
@@ -672,8 +683,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 }
 
                 // sqrt
-                __m256 mask_sqrt = _mm256_cmp_ps(distance, _mm256_set1_ps(0.0f), _CMP_GT_OQ); // prevent division by 0
-                distance = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_sqrt_ps(distance), mask_sqrt);
+                __m256 mask_sqrt = _mm256_cmp_ps(distance, mm_zeros, _CMP_GT_OQ); // prevent division by 0
+                distance = _mm256_blendv_ps(mm_zeros, _mm256_sqrt_ps(distance), mask_sqrt);
 
                 // // Calculate the direction between the current particle and all the others
                 // Calculate the direction between the current particle and all the others normalisation of the vector
@@ -685,16 +696,16 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 // on the distance between the current particle and the others
                 __m256 mask_attraction = _mm256_cmp_ps(distance, mm_attraction_threshold_distance, _CMP_LT_OQ);
                 // apply minimum distance
-                __m256 attraction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_x, mm_attraction_factor), mask_attraction);
-                __m256 attraction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f),_mm256_mul_ps(direction_y, mm_attraction_factor), mask_attraction);
+                __m256 attraction_x = _mm256_blendv_ps(mm_zeros,_mm256_mul_ps(direction_x, mm_attraction_factor), mask_attraction);
+                __m256 attraction_y = _mm256_blendv_ps(mm_zeros,_mm256_mul_ps(direction_y, mm_attraction_factor), mask_attraction);
 
                 // calculate repulsion 
                 // invert direction
                 __m256 mask_repulsion = _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
-                direction_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_repulsion);
-                direction_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_repulsion);
-                __m256 repulsion_x = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_x, mm_repulsion_factor), mask_repulsion);
-                __m256 repulsion_y = _mm256_blendv_ps(_mm256_set1_ps(0.0f), _mm256_mul_ps(direction_y, mm_repulsion_factor), mask_repulsion);
+                direction_x = _mm256_blendv_ps(mm_zeros, _mm256_mul_ps(direction_x, _mm256_set1_ps(-1.0f)), mask_repulsion);
+                direction_y = _mm256_blendv_ps(mm_zeros, _mm256_mul_ps(direction_y, _mm256_set1_ps(-1.0f)), mask_repulsion);
+                __m256 repulsion_x = _mm256_blendv_ps(mm_zeros, _mm256_mul_ps(direction_x, mm_repulsion_factor), mask_repulsion);
+                __m256 repulsion_y = _mm256_blendv_ps(mm_zeros, _mm256_mul_ps(direction_y, mm_repulsion_factor), mask_repulsion);
 
                 // resulting movement mask
                 __m256 mvt_x_tmp = _mm256_add_ps(attraction_x, repulsion_x);
@@ -709,13 +720,57 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 }
             } // end calculations with targeted buffer
 
-            // calculate the rest of the impact of the other particles
-            // will do once the formula is fully settled
-            // for(int i = 8*(m_nb_PA1/8); i < m_nb_PA1; i++)
-            // {
-            //     // TODO
-            //     // std::cout << "TODO" << std::endl;
-            // }
+            for(int j = 8*(targetPA_nb/8); j < targetPA_nb; j++)
+            {
+                // do the same thing than above
+                // Calculate the minimal distance considering the available configurations
+                // init distance, sub_x, sub_y
+                float sub_x = targetPA_x[j] - currentPA_x[i];
+                float sub_y = targetPA_y[j] - currentPA_y[i];
+                float distance = sub_x*sub_x + sub_y*sub_y;
+
+                for(int k= 0; k < sizeConfig; k++)
+                {
+                    float temp_sub_x = targetPA_x[j] - vec_x_y_config[k].first;
+                    float temp_sub_y = targetPA_y[j] - vec_x_y_config[k].second;
+                    float temp_distance = temp_sub_x*temp_sub_x + temp_sub_y*temp_sub_y;
+                    if(temp_distance < distance)
+                    {
+                        distance = temp_distance;
+                        sub_x = temp_sub_x;
+                        sub_y = temp_sub_y;
+                    }
+                }
+
+                distance = sqrt(distance);
+
+                // Calculate the direction between the current particle and all the others
+                // Calculate the direction between the current particle and all the others normalisation of the vector
+                // use mask to avoid division by 0
+                float direction_x = 0.0f;
+                float direction_y = 0.0f;
+                if(distance > 0.0f)
+                {
+                    direction_x = sub_x/distance;
+                    direction_y = sub_y/distance;
+                }
+                if(distance < GraphicContext::attraction_threshold_distance)
+                {
+                    mvt_x += direction_x* GraphicContext::attraction_factor;
+                    mvt_y += direction_y* GraphicContext::attraction_factor;
+                }
+                
+                if(distance < GraphicContext::repulsion_maximum_distance)
+                {
+                    // invert direction
+                    direction_x = -direction_x;
+                    direction_y = -direction_y;
+                    mvt_x += direction_x* GraphicContext::repulsion_factor;
+                    mvt_y += direction_y* GraphicContext::repulsion_factor;
+                }
+                // Calculate the movement of the current particle, if attraction or repulsion depending
+                
+            }
         }
         
         currentPA_x[i] += mvt_x;

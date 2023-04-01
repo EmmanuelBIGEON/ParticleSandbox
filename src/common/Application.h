@@ -17,10 +17,13 @@ class Application
         //! This function is called by the window loop.
         void Render(); 
         
-        void LoadScene_1();
-        void LoadScene_2();
-        void LoadScene_3();
+        
+        // see Scene.h for details about scene and their purpose.
+
+        void LoadScene_Main();
         void LoadScene_Text();
+        void LoadScene_1();
+        void LoadScene_3();
 
         static int viewportWidth;
         static int viewportHeight;
