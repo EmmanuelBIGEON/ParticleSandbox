@@ -73,6 +73,10 @@ class GraphicContext
             float rangex_min = 0.0f, float rangex_max = GraphicContext::worldWidth, float rangey_min = 0.0f, float rangey_max = GraphicContext::worldHeight);
         void AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
 
+        void SetColor_particles_type1(const glm::vec3& color) { PA1_color = color; }
+        void SetColor_particles_type2(const glm::vec3& color) { PA2_color = color; }
+        void SetColor_particles_type3(const glm::vec3& color) { PA3_color = color; }
+
         // For TextRendering
         Shader* GetShader(AvailableShader shader);
 
@@ -92,6 +96,9 @@ class GraphicContext
         static float attraction_factor;
         static float repulsion_maximum_distance;
         static float attraction_threshold_distance;
+        static glm::vec3 PA1_color;
+        static glm::vec3 PA2_color;
+        static glm::vec3 PA3_color;
 
         //! \brief Signal emitted when the mouse is moved.
         //! Allowing UI elements to connect to it.

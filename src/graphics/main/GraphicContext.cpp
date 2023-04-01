@@ -38,6 +38,10 @@ float GraphicContext::repulsion_factor = 1.21f;
 float GraphicContext::attraction_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
 float GraphicContext::attraction_threshold_distance = 700.0f;
+// glm::vec3
+glm::vec3 GraphicContext::PA1_color = glm::vec3(0.21, 0.41, 0.91);
+glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
+glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
 
 
 GraphicContext::GraphicContext() 
@@ -542,7 +546,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     {
         case PART_CLASS_1:
         {
-            shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
+            shader_particle->SetVec3("particleColor", PA1_color);
             // Would normally look for behavior here, for now, behavior is static.
             currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY;
             currentPA_mass = m_PA1_mass;
@@ -551,7 +555,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         }
         case PART_CLASS_2:
         {
-            shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.41, 0.21));
+            shader_particle->SetVec3("particleColor", PA2_color);
             
             currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY;
             currentPA_mass = m_PA2_mass;
@@ -560,7 +564,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         }
         case PART_CLASS_3:
         {
-            shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.91, 0.41));
+            shader_particle->SetVec3("particleColor", PA3_color);
             
             currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY;
             currentPA_mass = m_PA3_mass;
@@ -844,17 +848,17 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
         case ParticleClass::PART_CLASS_1:
             currentPA_x = m_PA1_posX;
             currentPA_y = m_PA1_posY;
-            shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
+            shader_particle->SetVec3("particleColor", PA1_color);
             break;
         case ParticleClass::PART_CLASS_2:
             currentPA_x = m_PA2_posX;
             currentPA_y = m_PA2_posY;
-            shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.41, 0.21));
+            shader_particle->SetVec3("particleColor", PA2_color);
             break;
         case ParticleClass::PART_CLASS_3:
             currentPA_x = m_PA3_posX;
             currentPA_y = m_PA3_posY;
-            shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.91, 0.41));
+            shader_particle->SetVec3("particleColor", PA3_color);
             break;
     }
 
@@ -1057,15 +1061,15 @@ void GraphicContext::DrawParticles(ParticleClass particleClass)
     if(particleClass == PART_CLASS_1)
     {
         currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY; nb_particles = m_nb_PA1;
-        shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.41, 0.91));
+        shader_particle->SetVec3("particleColor", PA1_color);
     }else if(particleClass == PART_CLASS_2)
     {
         currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY; nb_particles = m_nb_PA2;
-            shader_particle->SetVec3("particleColor", glm::vec3(0.91, 0.41, 0.21));
+            shader_particle->SetVec3("particleColor", PA2_color);
     }else if(particleClass == PART_CLASS_3)
     {
         currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY; nb_particles = m_nb_PA3;
-        shader_particle->SetVec3("particleColor", glm::vec3(0.21, 0.91, 0.41));
+        shader_particle->SetVec3("particleColor", PA3_color);
     }
 
     for(int i = 0; i < nb_particles; i++)
