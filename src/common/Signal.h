@@ -48,9 +48,15 @@ class Signal
 
         //! \brief Clears all connections to the signal
         virtual void ClearConnections();
+
+        //! \brief Prevent signal from calling other connected slots when called during Emit.
+        //! Be wary of the order of the slots in the vector to prevent unwanted behavior.
+        void PreventDefault();
+
         
     private:
         std::vector<Slot<Args...>*> m_Slots;
+        bool m_preventDefault;
 };
 
 
@@ -78,7 +84,7 @@ void Slot<Args...>::Call(Args... args)
 }
 
 template <typename... Args>
-Signal<Args...>::Signal()
+Signal<Args...>::Signal() : m_preventDefault(false), m_Slots()
 {
 }
 
@@ -93,6 +99,13 @@ void Signal<Args...>::Emit(Args... args)
     for(Slot<Args...>* slot : m_Slots)
     {
         slot->Call(std::forward<Args>(args)...);
+
+        // Stop the execution of the signal if PreventDefault().
+        if(m_preventDefault)
+        {
+            m_preventDefault = false;
+            break;
+        }
     }
 }
 
@@ -121,6 +134,13 @@ template <typename... Args>
 void Signal<Args...>::ClearConnections()
 {
     m_Slots.clear();
+}
+
+template <typename... Args>
+void Signal<Args...>::PreventDefault()
+{
+    m_preventDefault = true;
+    std::cout << "PreventDefault" << std::endl;
 }
 
 
