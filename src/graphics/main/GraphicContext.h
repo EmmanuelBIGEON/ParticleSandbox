@@ -203,6 +203,4 @@ class GraphicContext
         float m_MouseY;
 
         bool m_Pause;
-
-        
 };

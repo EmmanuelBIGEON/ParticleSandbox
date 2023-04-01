@@ -43,6 +43,7 @@ glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
 
 
+
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
     shader_basic(nullptr), shader_text(nullptr), shader_texture(nullptr), shader_lighting(nullptr), shader_line(nullptr), 
@@ -541,6 +542,25 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     float* currentPA_y = nullptr;
     float* currentPA_mass = nullptr;
     int currentPA_nb = 0;
+    
+    // Reduce time to access memory by advancing the cursor instead of always accessing the element of array.
+    // Since the size of x and y are the same, we can use the same cursor for both.
+    float* targetend_cursor = nullptr; 
+    float* currentend_cursor = nullptr;
+
+    // resulting movement to apply to the particle
+    float mvt_x = 0.0f;
+    float mvt_y = 0.0f;
+
+    // performance variables to reduce time acess and repetition of the same operation
+    float worldWidthDividedBy2 = worldWidth / 2.0f;
+    float worldHeightDividedBy2 = worldHeight / 2.0f;
+    float perf_repulsion_factor = repulsion_factor;
+    float perf_attraction_factor = attraction_factor;
+    float perf_repulsion_maximum_distance = repulsion_maximum_distance;
+    float perf_attraction_threshold_distance = attraction_threshold_distance;
+
+
     switch(particleClass)
     {
         case PART_CLASS_1:
@@ -550,6 +570,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY;
             currentPA_mass = m_PA1_mass;
             currentPA_nb = m_nb_PA1;
+            currentend_cursor = m_PA1_posX + m_nb_PA1;
             break;
         }
         case PART_CLASS_2:
@@ -559,6 +580,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY;
             currentPA_mass = m_PA2_mass;
             currentPA_nb = m_nb_PA2;
+            currentend_cursor = m_PA2_posX + m_nb_PA2;
             break;
         }
         case PART_CLASS_3:
@@ -568,6 +590,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY;
             currentPA_mass = m_PA3_mass;
             currentPA_nb = m_nb_PA3;
+            currentend_cursor = m_PA3_posX + m_nb_PA3;
             break;
         }
     }
@@ -578,21 +601,19 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     int targetPA_nb = 0;
 
     // prepare main variables
-    __m256 mm_attraction_factor = _mm256_set1_ps(attraction_factor);
-    __m256 mm_repulsion_factor = _mm256_set1_ps(repulsion_factor);
-    __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(repulsion_maximum_distance);
-    __m256 mm_attraction_threshold_distance = _mm256_set1_ps(attraction_threshold_distance);
+    __m256 mm_attraction_factor = _mm256_set1_ps(perf_attraction_factor);
+    __m256 mm_repulsion_factor = _mm256_set1_ps(perf_repulsion_factor);
+    __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(perf_repulsion_maximum_distance);
+    __m256 mm_attraction_threshold_distance = _mm256_set1_ps(perf_attraction_threshold_distance);
     __m256 mm_zeros = _mm256_set1_ps(0.0f);
-    
-    for(int i = 0; i < currentPA_nb; i++)
+
+    while(currentPA_x < currentend_cursor)
     {
         
         // -- initialize configuration -- 
         // load scalar (current x and y)
-        float xvalue = currentPA_x[i];
-        float yvalue = currentPA_y[i];
-        __m256 scalar_x = _mm256_set1_ps(xvalue);
-        __m256 scalar_y = _mm256_set1_ps(yvalue);
+        __m256 scalar_x = _mm256_set1_ps(*currentPA_x);
+        __m256 scalar_y = _mm256_set1_ps(*currentPA_y);
 
         // Do each configuration considering the repetition of the world
         // Careful, for each configuration, sometimes the configuration is within worldbounds, you can't apply it.
@@ -601,51 +622,51 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         std::vector<std::pair<__m256, __m256>> vec_scalarXY_config;
         vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalar_y));
         std::vector<std::pair<float, float>> vec_x_y_config; // used for remaining particles unable to fit into the 8 float buffer
-        vec_x_y_config.push_back(std::make_pair(xvalue, yvalue));
+        vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y));
 
 
-        if(xvalue < (worldWidth / 2))
+        if(*currentPA_x < worldWidthDividedBy2)
         {
-            if(yvalue < (worldHeight / 2)){
+            if(*currentPA_y < worldHeightDividedBy2){
                 // Bottom left corner.
                 __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
-                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue + worldHeight)); // repetition of y on (bottom transported to top)
-                vec_x_y_config.push_back(std::make_pair(xvalue + worldWidth, yvalue)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
             }else{
                 // Top left corner.
                 __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
-                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue - worldHeight)); // repetition of y on (top transported to bottom)
-                vec_x_y_config.push_back(std::make_pair(xvalue + worldWidth, yvalue)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
             }
         }else{
-            if(yvalue < (worldHeight / 2)){
+            if(*currentPA_y < (worldHeight / 2)){
                 // Bottom right corner.
                 __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
-                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue + worldHeight)); // repetition of y on (bottom transported to top)
-                vec_x_y_config.push_back(std::make_pair(xvalue - worldWidth, yvalue)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
             }else{
                 // Top right corner.
                 __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
-                vec_x_y_config.push_back(std::make_pair(xvalue, yvalue - worldHeight)); // repetition of y on (top transported to bottom)
-                vec_x_y_config.push_back(std::make_pair(xvalue - worldWidth, yvalue)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
             }
         } 
         int sizeConfig = vec_scalarXY_config.size();
 
-        float mvt_x = 0.0f;
-        float mvt_y = 0.0f;
+        mvt_x = 0.0f;
+        mvt_y = 0.0f;
         // -- Prepare targeted data --
         for(auto particle_class : m_ParticleClasses)
         {
@@ -653,20 +674,24 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             if(particle_class == PART_CLASS_1)
             {
                 targetPA_x = m_PA1_posX; targetPA_y = m_PA1_posY; targetPA_mass = m_PA1_mass; targetPA_nb = m_nb_PA1;
+                targetend_cursor = m_PA1_posX + m_nb_PA1;
             }else if(particle_class == PART_CLASS_2)
             {
                 targetPA_x = m_PA2_posX; targetPA_y = m_PA2_posY; targetPA_mass = m_PA2_mass; targetPA_nb = m_nb_PA2;
+                targetend_cursor = m_PA2_posX + m_nb_PA2;
             }else if(particle_class == PART_CLASS_3)
             {
                 targetPA_x = m_PA3_posX; targetPA_y = m_PA3_posY; targetPA_mass = m_PA3_mass; targetPA_nb = m_nb_PA3;
+                targetend_cursor = m_PA3_posX + m_nb_PA3;
             }
 
             // -- begin calculations --
-            for(int j = 0; (j+8) <= targetPA_nb; j+=8)
+
+            while(targetPA_x < targetend_cursor)
             {
                 // load vector (other x and y)
-                __m256 vecX = _mm256_load_ps(&targetPA_x[j]);
-                __m256 vecY = _mm256_load_ps(&targetPA_y[j]);
+                __m256 vecX = _mm256_load_ps(targetPA_x);
+                __m256 vecY = _mm256_load_ps(targetPA_y);
                 // Calculate the minimal distance considering the available configurations
                 // init distance, sub_x, sub_y
                 __m256 sub_x = _mm256_sub_ps(vecX, scalar_x);
@@ -718,24 +743,32 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
                 for(int k = 0; k < 8; k++)
                 {
-                    mvt_x += mvt_x_tmp_ptr[k];
-                    mvt_y += mvt_y_tmp_ptr[k];
+                    mvt_x += *mvt_x_tmp_ptr;
+                    mvt_y += *mvt_y_tmp_ptr;
+                    mvt_x_tmp_ptr++;
+                    mvt_y_tmp_ptr++;
                 }
+
+                targetPA_x += 8;
+                targetPA_y += 8;
             } // end calculations with targeted buffer
+
+            float direction_x = 0.0f;
+            float direction_y = 0.0f;
 
             for(int j = 8*(targetPA_nb/8); j < targetPA_nb; j++)
             {
                 // do the same thing than above
                 // Calculate the minimal distance considering the available configurations
                 // init distance, sub_x, sub_y
-                float sub_x = targetPA_x[j] - currentPA_x[i];
-                float sub_y = targetPA_y[j] - currentPA_y[i];
+                float sub_x = *targetPA_x - *currentPA_x;
+                float sub_y = *targetPA_y - *currentPA_y;
                 float distance = sub_x*sub_x + sub_y*sub_y;
 
                 for(int k= 0; k < sizeConfig; k++)
                 {
-                    float temp_sub_x = targetPA_x[j] - vec_x_y_config[k].first;
-                    float temp_sub_y = targetPA_y[j] - vec_x_y_config[k].second;
+                    float temp_sub_x = *targetPA_x - vec_x_y_config[k].first;
+                    float temp_sub_y = *targetPA_y - vec_x_y_config[k].second;
                     float temp_distance = temp_sub_x*temp_sub_x + temp_sub_y*temp_sub_y;
                     if(temp_distance < distance)
                     {
@@ -750,47 +783,52 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 // Calculate the direction between the current particle and all the others
                 // Calculate the direction between the current particle and all the others normalisation of the vector
                 // use mask to avoid division by 0
-                float direction_x = 0.0f;
-                float direction_y = 0.0f;
+                direction_x = 0.0f;
+                direction_y = 0.0f;
                 if(distance > 0.0f)
                 {
                     direction_x = sub_x/distance;
                     direction_y = sub_y/distance;
                 }
-                if(distance < GraphicContext::attraction_threshold_distance)
+                if(distance < perf_attraction_threshold_distance)
                 {
-                    mvt_x += direction_x* GraphicContext::attraction_factor;
-                    mvt_y += direction_y* GraphicContext::attraction_factor;
+                    mvt_x += direction_x* perf_attraction_factor;
+                    mvt_y += direction_y* perf_attraction_factor;
                 }
                 
-                if(distance < GraphicContext::repulsion_maximum_distance)
+                if(distance < perf_repulsion_maximum_distance)
                 {
                     // invert direction
                     direction_x = -direction_x;
                     direction_y = -direction_y;
-                    mvt_x += direction_x* GraphicContext::repulsion_factor;
-                    mvt_y += direction_y* GraphicContext::repulsion_factor;
+                    mvt_x += direction_x* perf_repulsion_factor;
+                    mvt_y += direction_y* perf_repulsion_factor;
                 }
                 // Calculate the movement of the current particle, if attraction or repulsion depending
                 
+                targetPA_x++;
+                targetPA_y++;
             }
         }
         
-        currentPA_x[i] += mvt_x;
-        currentPA_y[i] += mvt_y;
+        *currentPA_x += mvt_x;
+        *currentPA_y += mvt_y;
 
         // // Check if the particle is out of the screen
-        if(currentPA_x[i] < 0.0f)
-            currentPA_x[i] = currentPA_x[i] + 1600.0f;
-        else if(currentPA_x[i] >= 1600.0f)
-            currentPA_x[i] = currentPA_x[i] - 1600.0f;
-        if(currentPA_y[i] < 0.0f)
-            currentPA_y[i] = currentPA_y[i] + 1200.0f;
-        else if(currentPA_y[i] >= 1200.0f)
-            currentPA_y[i] = currentPA_y[i] - 1200.0f;
+        if(*currentPA_x < 0.0f)
+            *currentPA_x = *currentPA_x + worldWidth;
+        else if(*currentPA_x >= worldWidth)
+            *currentPA_x = *currentPA_x - worldWidth;
+        if(*currentPA_y < 0.0f)
+            *currentPA_y = *currentPA_y + worldHeight;
+        else if(*currentPA_y >= worldHeight)
+            *currentPA_y = *currentPA_y - worldHeight;
 
-        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
+        shader_particle->SetVec2("shiftPos", glm::vec2(*currentPA_x, *currentPA_y));
         glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+
+        currentPA_x++;
+        currentPA_y++;
     }
 
     m_ParticleAdaptersMutex.unlock();
