@@ -41,6 +41,8 @@ glm::vec3 GraphicContext::PA1_color = glm::vec3(0.21, 0.41, 0.91);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
 
+#define LOSE_ACCELERATION_FACTOR 0.60f
+
 
 
 GraphicContext::GraphicContext() 
@@ -745,8 +747,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             }
 
             // Apply current velocity to current particle.
-            mvt_x = *currentPA_velX;
-            mvt_y = *currentPA_velY;
+            mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
+            mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR;
 
             // -- begin calculations --
 
@@ -878,8 +880,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         *currentPA_y += mvt_y;
 
         // Update current particle velocity
-        *currentPA_velX = mvt_x;
-        *currentPA_velY = mvt_y;
+        *currentPA_velX = mvt_x * LOSE_ACCELERATION_FACTOR;
+        *currentPA_velY = mvt_y * LOSE_ACCELERATION_FACTOR;
 
         // // Check if the particle is out of the screen
         if(*currentPA_x < 0.0f)
@@ -1151,8 +1153,8 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
         currentPA_y[i] += mvt_y;
 
         // Update velocity
-        currentPA_velX[i] = mvt_x;
-        currentPA_velY[i] = mvt_y;
+        currentPA_velX[i] = mvt_x * LOSE_ACCELERATION_FACTOR;
+        currentPA_velY[i] = mvt_y * LOSE_ACCELERATION_FACTOR;
 
         // // Check if the particle is out of the screen
         if(currentPA_x[i] < 0.0f)
