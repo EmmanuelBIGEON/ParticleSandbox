@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
-float particleRadius = 10.0f;
+float particleRadius = 5.0f;
 
 namespace Particle_OPENGL
 {
@@ -29,8 +29,6 @@ namespace Particle_OPENGL
         }
 
         // Create the VAO and VBO for the particle.
-        // Default size is 10.0f radius.
-        std::cout << "Loadparticle : " << particleRadius << std::endl;
         float radius = particleRadius;
 
         // Calculate the number of vertices depending on the radius (for a better circle)

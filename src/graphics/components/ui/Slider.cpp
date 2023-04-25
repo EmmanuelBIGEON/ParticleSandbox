@@ -157,7 +157,6 @@ bool Slider::OnMouseReleased(float x, float y)
 {
     if(isPressed)
     {
-        std::cout << "Rekelsed" << std::endl;
         isPressed = false;
         return true;
     }

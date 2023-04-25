@@ -80,7 +80,7 @@ Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
     float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
     float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
 
-    graphicContext->AddParticles(1000, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(3000, PART_CLASS_1, xmin, xmax, ymin, ymax);
 
     return scene;
 }

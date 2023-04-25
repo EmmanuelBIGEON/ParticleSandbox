@@ -140,7 +140,6 @@ template <typename... Args>
 void Signal<Args...>::PreventDefault()
 {
     m_preventDefault = true;
-    std::cout << "PreventDefault" << std::endl;
 }
 
 
