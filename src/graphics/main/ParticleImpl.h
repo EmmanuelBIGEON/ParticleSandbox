@@ -33,3 +33,12 @@ struct ParticleStruct
     float pos_y;
     float mass;
 };
+
+// This struct is used in GraphicContext to define the behaviour between particles.
+struct ParticleBehaviour
+{
+    float repulsion;
+    float attraction;
+    float repulsion_distance;
+    float attraction_distance;
+};

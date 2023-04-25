@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <mutex>
+#include <map>
 #include <glm/ext.hpp>
 
 #include "../../common/Signal.h"
@@ -100,6 +101,7 @@ class GraphicContext
         static glm::vec3 PA2_color;
         static glm::vec3 PA3_color;
         static bool useVelocity;
+        static bool behaviorDriven;
 
         //! \brief Signal emitted when the mouse is moved.
         //! Allowing UI elements to connect to it.
@@ -143,6 +145,9 @@ class GraphicContext
 
         // Simply draw the particles
         void DrawParticles(ParticleClass particleClass);
+
+        // Instanciate behavior of particles
+        void InitBehaviors();
         
         bool okRendering;
         bool needUpdate;
@@ -176,7 +181,13 @@ class GraphicContext
         float* m_PA3_velocityY;
         int m_nb_PA3;
 
+        // List of all the particle classes 
+        // used for calculation.
         std::vector<ParticleClass> m_ParticleClasses;
+
+        // List behaviour for each particle class, the left one is the source and the behavior affect how the right one affect the left one.
+        // For instance, to give a behavior for particleClass1, define (PART_CLASS_1, PART_CLASS_1) and (PART_CLASS_1, PART_CLASS_2) and (PART_CLASS_1, PART_CLASS_3)
+        std::map<std::pair<ParticleClass, ParticleClass>, ParticleBehaviour> m_ParticleBehaviours;
 
         // mutex for the particle adapters
         std::mutex m_ParticleAdaptersMutex;
