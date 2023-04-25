@@ -14,6 +14,7 @@
 
 #include "../graphics/components/ui/Button.h"
 #include "../graphics/components/ui/Input.h"
+#include "../graphics/components/ui/Checkbox.h"
 
 #include "EventHandler.h"
 
@@ -34,7 +35,7 @@ Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(gra
 {
     if (withUI)
     {
-        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 500.0f, 170.0f, 500.0f);
+        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 550.0f, 170.0f, 550.0f);
         m_BasicUI->Init(graphicContext);
     }
 }
@@ -78,7 +79,7 @@ Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
     float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
     float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
 
-    // graphicContext->AddParticles(1000, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(1700, PART_CLASS_1, xmin, xmax, ymin, ymax);
     // graphicContext->Pause();
     // GraphicContext::PA1_color = glm::vec3(0.0f, 0.40f, 0.0f);
     // // graphicContext->AddParticles(100, PART_CLASS_2, xmin, xmax, ymin, ymax);
@@ -102,12 +103,14 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, false);
+    Scene* scene = new Scene(graphicContext, true);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
     Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
     input->SetNumberOnly(true);
     input->SetMaxSize(5);
+
+    Checkbox* checkbox = new Checkbox(graphicContext, &GraphicContext::useVelocity,glm::vec2(700.0f, 700.0f));
 
     return scene;
 }

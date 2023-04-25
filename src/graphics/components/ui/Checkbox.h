@@ -16,7 +16,7 @@
 class Checkbox : public GraphicObject
 {
     public: 
-        Checkbox(GraphicContext* context, bool* referencedValue, const glm::vec2& position, const glm::vec3& colorChecked = glm::vec3(0.2f,0.2f,0.7f));
+        Checkbox(GraphicContext* context, bool* referencedValue, const glm::vec2& position, const glm::vec3& colorChecked = glm::vec3(0.0f,1.0f,1.0f));
         virtual ~Checkbox();
 
         virtual void Update() override;

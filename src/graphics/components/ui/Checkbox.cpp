@@ -101,7 +101,7 @@ void Checkbox::Draw()
     if(*m_isChecked)
         m_Shader->SetVec3("buttonColor", m_ColorChecked);
     else
-        m_Shader->SetVec3("buttonColor", glm::vec3(0.0f, 1.0f, 1.0f));
+        m_Shader->SetVec3("buttonColor", glm::vec3(0.0f, 0.2f, 0.35f));
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         

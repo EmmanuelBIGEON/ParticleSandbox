@@ -6,6 +6,7 @@
 
 class Button;
 class Slider;
+class Checkbox;
 class GraphicText;
 class RectangleAdapter;
 
@@ -46,6 +47,10 @@ class BasicUI
         GraphicText* label_attractiondistance;
         Slider* slider_attractiondistance;
 
+        GraphicText* label_useVelocity;
+        Checkbox* checkbox_velocityActivation;
+
         Button* button_play;
         Button* button_pause;
+        
 };

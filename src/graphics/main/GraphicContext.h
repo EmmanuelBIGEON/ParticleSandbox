@@ -99,6 +99,7 @@ class GraphicContext
         static glm::vec3 PA1_color;
         static glm::vec3 PA2_color;
         static glm::vec3 PA3_color;
+        static bool useVelocity;
 
         //! \brief Signal emitted when the mouse is moved.
         //! Allowing UI elements to connect to it.

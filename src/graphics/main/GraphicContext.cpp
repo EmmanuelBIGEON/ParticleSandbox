@@ -40,6 +40,7 @@ float GraphicContext::attraction_threshold_distance = 700.0f;
 glm::vec3 GraphicContext::PA1_color = glm::vec3(0.21, 0.41, 0.91);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
+bool GraphicContext::useVelocity = true;
 
 #define LOSE_ACCELERATION_FACTOR 0.60f
 
@@ -747,8 +748,15 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             }
 
             // Apply current velocity to current particle.
-            mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
-            mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR;
+            if(useVelocity)
+            {
+                mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
+                mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR; 
+            }else
+            {
+                mvt_x = 0.0f;
+                mvt_y = 0.0f;
+            }
 
             // -- begin calculations --
 
@@ -880,8 +888,11 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         *currentPA_y += mvt_y;
 
         // Update current particle velocity
-        *currentPA_velX = mvt_x * LOSE_ACCELERATION_FACTOR;
-        *currentPA_velY = mvt_y * LOSE_ACCELERATION_FACTOR;
+        if(useVelocity)
+        {
+            *currentPA_velX = mvt_x * LOSE_ACCELERATION_FACTOR;
+            *currentPA_velY = mvt_y * LOSE_ACCELERATION_FACTOR;
+        }
 
         // // Check if the particle is out of the screen
         if(*currentPA_x < 0.0f)
@@ -1067,8 +1078,15 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
         } 
         int sizeConfig = XY_config.size();
 
-        float mvt_x = currentPA_velX[i]; // velocity x
-        float mvt_y = currentPA_velY[i]; // velocity y
+        float mvt_x = 0.0f;
+        float mvt_y = 0.0f;
+
+        if(useVelocity)
+        {
+            mvt_x = currentPA_velX[i]; // velocity x
+            mvt_y = currentPA_velY[i]; // velocity y
+        }
+
         float attraction_x = 0.0f; 
         float attraction_y = 0.0f; 
         float repulsion_x = 0.0f;
@@ -1153,8 +1171,11 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
         currentPA_y[i] += mvt_y;
 
         // Update velocity
-        currentPA_velX[i] = mvt_x * LOSE_ACCELERATION_FACTOR;
-        currentPA_velY[i] = mvt_y * LOSE_ACCELERATION_FACTOR;
+        if(useVelocity)
+        {
+            currentPA_velX[i] = mvt_x * LOSE_ACCELERATION_FACTOR;
+            currentPA_velY[i] = mvt_y * LOSE_ACCELERATION_FACTOR;
+        }
 
         // // Check if the particle is out of the screen
         if(currentPA_x[i] < 0.0f)

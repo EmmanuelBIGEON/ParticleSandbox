@@ -4,6 +4,7 @@
 #include "../components/common/GraphicText.h"
 #include "../components/ui/Button.h"
 #include "../components/ui/Slider.h"
+#include "../components/ui/Checkbox.h"
 
 BasicUI::BasicUI(int startingX, int startingY, int width, int height)
     : m_startingX(startingX), m_startingY(startingY), m_width(width), m_height(height), m_particlesCount(0), m_fps(0)
@@ -49,7 +50,9 @@ void BasicUI::Init(GraphicContext* context)
     cursorY -= 100.0f;
     label_attractiondistance = new GraphicText(context, "Attraction Distance", glm::vec2(m_startingX+ 10.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 85.0f, cursorY -40.0f);
-
+    cursorY -= 100.0f;
+    label_useVelocity = new GraphicText(context, "Use Velocity:", glm::vec2(m_startingX+ 6.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 35.0f));
+    checkbox_velocityActivation = new Checkbox(context, &GraphicContext::useVelocity,glm::vec2(m_startingX + m_width - 25.0f, cursorY));
     // create two buttons with play and stop icons under the basic ui.
     float cursorX = m_startingX;
     cursorY = m_startingY - 30;
@@ -63,8 +66,10 @@ void BasicUI::Init(GraphicContext* context)
     button_pause->SetPathIcon("data/img/stop.png");
     button_pause->SetInvertIconOnActive(true);
     button_pause->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
-
     button_play->SetActive(true);
+
+    
+    
 
     // Connect the watcher to the context
     m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)
