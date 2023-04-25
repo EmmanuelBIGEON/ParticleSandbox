@@ -8,6 +8,9 @@ enum ParticleClass {
     PART_CLASS_3
 };
 
+// Particle radius
+extern float particleRadius;
+
 // This file is used to define the particle VAO
 // It replaced the previous (ParticleAdapter.cpp)
 namespace Particle_OPENGL
@@ -20,6 +23,7 @@ namespace Particle_OPENGL
     extern unsigned int VBO;
     extern float* vertices;
     extern int nbVertices;
+    
 };
 
 // alternative particle adapter for optimization

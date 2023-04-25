@@ -16,8 +16,9 @@
 #include "../graphics/components/ui/Input.h"
 #include "../graphics/components/ui/Checkbox.h"
 
-#include "EventHandler.h"
+#include "../graphics/main/ParticleImpl.h"
 
+#include "EventHandler.h"
 
 #ifdef __EMSCRIPTEN__
 #include <GLES3/gl3.h>
@@ -79,15 +80,10 @@ Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
     float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
     float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
 
-    graphicContext->AddParticles(1700, PART_CLASS_1, xmin, xmax, ymin, ymax);
-    // graphicContext->Pause();
-    // GraphicContext::PA1_color = glm::vec3(0.0f, 0.40f, 0.0f);
-    // // graphicContext->AddParticles(100, PART_CLASS_2, xmin, xmax, ymin, ymax);
-    // GraphicImage* image = new GraphicImage(graphicContext, "data/img/merry_christmas_a_bit_late.png", 400.0f, 300.0f, 200.0f, 200.0f);
+    graphicContext->AddParticles(1000, PART_CLASS_1, xmin, xmax, ymin, ymax);
+
     return scene;
 }
-
-
 
 Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {

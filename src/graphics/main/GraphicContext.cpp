@@ -40,11 +40,9 @@ float GraphicContext::attraction_threshold_distance = 700.0f;
 glm::vec3 GraphicContext::PA1_color = glm::vec3(0.21, 0.41, 0.91);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
-bool GraphicContext::useVelocity = true;
+bool GraphicContext::useVelocity = false;
 
 #define LOSE_ACCELERATION_FACTOR 0.60f
-
-
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 

@@ -46,6 +46,8 @@ class BasicUI
         Slider* slider_repulsiondistance;
         GraphicText* label_attractiondistance;
         Slider* slider_attractiondistance;
+        GraphicText* label_particleradius;
+        Slider* slider_particleradius;
 
         GraphicText* label_useVelocity;
         Checkbox* checkbox_velocityActivation;

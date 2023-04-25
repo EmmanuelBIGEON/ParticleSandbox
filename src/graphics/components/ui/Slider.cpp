@@ -132,6 +132,9 @@ void Slider::OnMouseMoved(float x, float y)
         isHovered = true; 
         m_IsUpdated = false;
 
+        // Trigger any callbacks added to the slider. 
+        OnValueChanged.Emit();
+
     }else 
     {
         if (x > m_boundingBoxCursor[0] && x < m_boundingBoxCursor[2] &&
