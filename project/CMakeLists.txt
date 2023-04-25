@@ -49,6 +49,7 @@ set(SOURCES
     ../src/graphics/components/ui/Slider.cpp
     ../src/graphics/components/ui/Button.cpp
     ../src/graphics/components/ui/Input.cpp
+    ../src/graphics/components/ui/Checkbox.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES} favicon.rc)
