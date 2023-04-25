@@ -70,16 +70,22 @@ GraphicContext::GraphicContext()
     m_PA1_posX = nullptr;
     m_PA1_posY = nullptr;
     m_PA1_mass = nullptr;
+    m_PA1_velocityX = nullptr;
+    m_PA1_velocityY = nullptr;
     m_nb_PA1 = 0;
 
     m_PA2_posX = nullptr;
     m_PA2_posY = nullptr;
     m_PA2_mass = nullptr;
+    m_PA2_velocityX = nullptr;
+    m_PA2_velocityY = nullptr;
     m_nb_PA2 = 0;
 
     m_PA3_posX = nullptr;
     m_PA3_posY = nullptr;
     m_PA3_mass = nullptr;
+    m_PA3_velocityX = nullptr;
+    m_PA3_velocityY = nullptr;
     m_nb_PA3 = 0;
 
     m_ParticleClasses.push_back(PART_CLASS_1);
@@ -256,6 +262,8 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
     float* PA_PosX = nullptr;
     float* PA_PosY = nullptr;
     float* PA_Mass = nullptr;
+    float* PA_VelX = nullptr;
+    float* PA_VelY = nullptr;
     int PA_CurrentNB = 0;
         
     switch(particleClass)
@@ -263,18 +271,21 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
         case PART_CLASS_1:
         {
             PA_PosX = m_PA1_posX; PA_PosY = m_PA1_posY; PA_Mass = m_PA1_mass;
+            PA_VelX = m_PA1_velocityX; PA_VelY = m_PA1_velocityY;
             PA_CurrentNB = m_nb_PA1;
             break;
         }
         case PART_CLASS_2:
         {
             PA_PosX = m_PA2_posX; PA_PosY = m_PA2_posY; PA_Mass = m_PA2_mass;
+            PA_VelX = m_PA2_velocityX; PA_VelY = m_PA2_velocityY;
             PA_CurrentNB = m_nb_PA2;
             break;
         }
         case PART_CLASS_3:
         {
             PA_PosX = m_PA3_posX; PA_PosY = m_PA3_posY; PA_Mass = m_PA3_mass;
+            PA_VelX = m_PA3_velocityX; PA_VelY = m_PA3_velocityY;
             PA_CurrentNB = m_nb_PA3;
             break;
         }
@@ -287,19 +298,26 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
         float* old_pos_x = PA_PosX;
         float* old_pos_y = PA_PosY;
         float* old_mass = PA_Mass;
+        float* old_vel_x = PA_VelX;
+        float* old_vel_y = PA_VelY;
 
         PA_PosX = new float[(PA_CurrentNB) + nbParticles];
         PA_PosY = new float[(PA_CurrentNB) + nbParticles];
         PA_Mass = new float[(PA_CurrentNB) + nbParticles];
+        PA_VelX = new float[(PA_CurrentNB) + nbParticles];
+        PA_VelY = new float[(PA_CurrentNB) + nbParticles];
 
         memcpy(PA_PosX, old_pos_x, (PA_CurrentNB) * sizeof(float));
         memcpy(PA_PosY, old_pos_y, (PA_CurrentNB) * sizeof(float));
         memcpy(PA_Mass, old_mass, PA_CurrentNB * sizeof(float));
+        memcpy(PA_VelX, old_vel_x, PA_CurrentNB * sizeof(float));
+        memcpy(PA_VelY, old_vel_y, PA_CurrentNB * sizeof(float));
 
         delete[] old_pos_x;
         delete[] old_pos_y;
         delete[] old_mass;
-
+        delete[] old_vel_x;
+        delete[] old_vel_y;
 
         float modulox = rangex_max - rangex_min;
         float moduloy = rangey_max - rangey_min;
@@ -313,6 +331,8 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
             PA_PosY[i] += rangey_min;
             
             m_PA1_mass[i] = 1.0f;
+            m_PA1_velocityX[i] = 0.0f;
+            m_PA1_velocityY[i] = 0.0f;
         }
 
        PA_CurrentNB += nbParticles;
@@ -322,6 +342,8 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
         PA_PosX = new float[nbParticles];
         PA_PosY = new float[nbParticles];
         PA_Mass = new float[nbParticles];
+        PA_VelX = new float[nbParticles];
+        PA_VelY = new float[nbParticles];
 
         float modulox = rangex_max - rangex_min;
         float moduloy = rangey_max - rangey_min;
@@ -334,6 +356,9 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
             PA_PosY[i] = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(moduloy)));
             PA_PosY[i] += rangey_min;
             PA_Mass[i] = 1.0f;
+            PA_VelX[i] = 0.0f;
+            PA_VelY[i] = 0.0f;
+
         }
 
        PA_CurrentNB = nbParticles;
@@ -349,6 +374,8 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
             m_PA1_posX = PA_PosX;
             m_PA1_posY = PA_PosY;
             m_PA1_mass = PA_Mass;
+            m_PA1_velocityX = PA_VelX;
+            m_PA1_velocityY = PA_VelY;
             break;
         }
         case PART_CLASS_2:
@@ -357,6 +384,8 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
             m_PA2_posX = PA_PosX;
             m_PA2_posY = PA_PosY;
             m_PA2_mass = PA_Mass;
+            m_PA2_velocityX = PA_VelX;
+            m_PA2_velocityY = PA_VelY;
             break;
         }
         case PART_CLASS_3:
@@ -365,6 +394,8 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
             m_PA3_posX = PA_PosX;
             m_PA3_posY = PA_PosY;
             m_PA3_mass = PA_Mass;
+            m_PA3_velocityX = PA_VelX;
+            m_PA3_velocityY = PA_VelY;
             break;
         }
     }
@@ -382,19 +413,27 @@ void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, 
     float* PA_PosX = nullptr;
     float* PA_PosY = nullptr;
     float* PA_Mass = nullptr;
+    float* PA_VelX = nullptr;
+    float* PA_VelY = nullptr;
     int PA_CurrentNB = 0;
     int size = particles.size();
         
     switch(particleClass)
     {
         case PART_CLASS_1:{
-            PA_PosX = m_PA1_posX; PA_PosY = m_PA1_posY; PA_Mass = m_PA1_mass; PA_CurrentNB = m_nb_PA1; break;
+            PA_PosX = m_PA1_posX; PA_PosY = m_PA1_posY; PA_Mass = m_PA1_mass; PA_CurrentNB = m_nb_PA1; 
+            PA_VelX = m_PA1_velocityX; PA_VelY = m_PA1_velocityY;
+            break;
         }
         case PART_CLASS_2:{
-            PA_PosX = m_PA2_posX; PA_PosY = m_PA2_posY; PA_Mass = m_PA2_mass; PA_CurrentNB = m_nb_PA2; break;
+            PA_PosX = m_PA2_posX; PA_PosY = m_PA2_posY; PA_Mass = m_PA2_mass; PA_CurrentNB = m_nb_PA2; 
+            PA_VelX = m_PA2_velocityX; PA_VelY = m_PA2_velocityY;
+            break;
         }
         case PART_CLASS_3:{
-            PA_PosX = m_PA3_posX; PA_PosY = m_PA3_posY; PA_Mass = m_PA3_mass; PA_CurrentNB = m_nb_PA3; break;
+            PA_PosX = m_PA3_posX; PA_PosY = m_PA3_posY; PA_Mass = m_PA3_mass; PA_CurrentNB = m_nb_PA3; 
+            PA_VelX = m_PA3_velocityX; PA_VelY = m_PA3_velocityY;
+            break;
         }
     }
 
@@ -404,18 +443,26 @@ void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, 
         float* old_pos_x = PA_PosX;
         float* old_pos_y = PA_PosY;
         float* old_mass = PA_Mass;
+        float* old_vel_x = PA_VelX;
+        float* old_vel_y = PA_VelY;
 
         PA_PosX = new float[(PA_CurrentNB) + size];
         PA_PosY = new float[(PA_CurrentNB) + size];
         PA_Mass = new float[(PA_CurrentNB) + size];
+        PA_VelX = new float[(PA_CurrentNB) + size];
+        PA_VelY = new float[(PA_CurrentNB) + size];
 
         memcpy(PA_PosX, old_pos_x, (PA_CurrentNB) * sizeof(float));
         memcpy(PA_PosY, old_pos_y, (PA_CurrentNB) * sizeof(float));
         memcpy(PA_Mass, old_mass, PA_CurrentNB * sizeof(float));
+        memcpy(PA_VelX, old_vel_x, PA_CurrentNB * sizeof(float));
+        memcpy(PA_VelY, old_vel_y, PA_CurrentNB * sizeof(float));
 
         delete[] old_pos_x;
         delete[] old_pos_y;
         delete[] old_mass;
+        delete[] old_vel_x;
+        delete[] old_vel_y;
 
         // fill with random values between world bounds
         for(int i = 0; i < size; i++)
@@ -423,6 +470,8 @@ void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, 
             PA_PosX[i+PA_CurrentNB] = particles[i].pos_x;
             PA_PosY[i+PA_CurrentNB] = particles[i].pos_y;
             PA_Mass[i+PA_CurrentNB] = particles[i].mass;
+            PA_VelX[i+PA_CurrentNB] = 0.0f;
+            PA_VelY[i+PA_CurrentNB] = 0.0f;
         }
 
        PA_CurrentNB += size;
@@ -432,13 +481,16 @@ void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, 
         PA_PosX = new float[size];
         PA_PosY = new float[size];
         PA_Mass = new float[size];
+        PA_VelX = new float[size];
+        PA_VelY = new float[size];
         
-        // fill with random values between world bounds
         for(int i = 0; i < size; i++)
         {
             PA_PosX[i] = particles[i].pos_x;
             PA_PosY[i] = particles[i].pos_y;
             PA_Mass[i] = particles[i].mass;
+            PA_VelX[i] = 0.0f;
+            PA_VelY[i] = 0.0f;
         }
        PA_CurrentNB = size;
     }
@@ -446,13 +498,19 @@ void GraphicContext::AddParticles(const std::vector<ParticleStruct>& particles, 
     switch(particleClass)
     {
         case PART_CLASS_1:{
-            m_nb_PA1 = PA_CurrentNB; m_PA1_posX = PA_PosX; m_PA1_posY = PA_PosY; m_PA1_mass = PA_Mass; break;
+            m_nb_PA1 = PA_CurrentNB; m_PA1_posX = PA_PosX; m_PA1_posY = PA_PosY; m_PA1_mass = PA_Mass; 
+            m_PA1_velocityX = PA_VelX; m_PA1_velocityY = PA_VelY;
+            break;
         }
         case PART_CLASS_2:{
-            m_nb_PA2 = PA_CurrentNB; m_PA2_posX = PA_PosX; m_PA2_posY = PA_PosY; m_PA2_mass = PA_Mass;break;
+            m_nb_PA2 = PA_CurrentNB; m_PA2_posX = PA_PosX; m_PA2_posY = PA_PosY; m_PA2_mass = PA_Mass;
+            m_PA2_velocityX = PA_VelX; m_PA2_velocityY = PA_VelY;
+            break;
         }
         case PART_CLASS_3:{
-            m_nb_PA3 = PA_CurrentNB; m_PA3_posX = PA_PosX; m_PA3_posY = PA_PosY; m_PA3_mass = PA_Mass;break;
+            m_nb_PA3 = PA_CurrentNB; m_PA3_posX = PA_PosX; m_PA3_posY = PA_PosY; m_PA3_mass = PA_Mass;
+            m_PA3_velocityX = PA_VelX; m_PA3_velocityY = PA_VelY;
+            break;
         }
     }
 
@@ -540,6 +598,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
     float* currentPA_mass = nullptr;
+    float* currentPA_velX = nullptr;
+    float* currentPA_velY = nullptr;
     int currentPA_nb = 0;
     
     // Reduce time to access memory by advancing the cursor instead of always accessing the element of array.
@@ -609,6 +669,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
     while(currentPA_x < currentend_cursor)
     {
+
         
         // -- initialize configuration -- 
         // load scalar (current x and y)
@@ -665,8 +726,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         } 
         int sizeConfig = vec_scalarXY_config.size();
 
-        mvt_x = 0.0f;
-        mvt_y = 0.0f;
         // -- Prepare targeted data --
         for(auto particle_class : m_ParticleClasses)
         {
@@ -684,6 +743,10 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 targetPA_x = m_PA3_posX; targetPA_y = m_PA3_posY; targetPA_mass = m_PA3_mass; targetPA_nb = m_nb_PA3;
                 targetend_cursor = m_PA3_posX + m_nb_PA3;
             }
+
+            // Apply current velocity to current particle.
+            mvt_x = *currentPA_velX;
+            mvt_y = *currentPA_velY;
 
             // -- begin calculations --
 
@@ -814,6 +877,10 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         *currentPA_x += mvt_x;
         *currentPA_y += mvt_y;
 
+        // Update current particle velocity
+        *currentPA_velX = mvt_x;
+        *currentPA_velY = mvt_y;
+
         // // Check if the particle is out of the screen
         if(*currentPA_x < 0.0f)
             *currentPA_x = *currentPA_x + worldWidth;
@@ -829,6 +896,8 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
         currentPA_x++;
         currentPA_y++;
+        currentPA_velX++;
+        currentPA_velY++;
     }
 
     m_ParticleAdaptersMutex.unlock();
@@ -920,6 +989,8 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
     float* currentPA_mass = nullptr;
+    float* currentPA_velX = nullptr;
+    float* currentPA_velY = nullptr;
     int currentPA_nb = 0;
     switch (particleClass)
     {
@@ -927,18 +998,24 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             currentPA_x = m_PA1_posX;
             currentPA_y = m_PA1_posY;
             currentPA_mass = m_PA1_mass;
+            currentPA_velX = m_PA1_velocityX;
+            currentPA_velY = m_PA1_velocityY;
             currentPA_nb = m_nb_PA1;
             break;
         case ParticleClass::PART_CLASS_2:
             currentPA_x = m_PA2_posX;
             currentPA_y = m_PA2_posY;
             currentPA_mass = m_PA2_mass;
+            currentPA_velX = m_PA2_velocityX;
+            currentPA_velY = m_PA2_velocityY;
             currentPA_nb = m_nb_PA2;
             break;
         case ParticleClass::PART_CLASS_3:
             currentPA_x = m_PA3_posX;
             currentPA_y = m_PA3_posY;
             currentPA_mass = m_PA3_mass;
+            currentPA_velX = m_PA3_velocityX;
+            currentPA_velY = m_PA3_velocityY;
             currentPA_nb = m_nb_PA3;
             break;
     }
@@ -988,8 +1065,8 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
         } 
         int sizeConfig = XY_config.size();
 
-        float mvt_x = 0.0f;
-        float mvt_y = 0.0f;
+        float mvt_x = currentPA_velX[i]; // velocity x
+        float mvt_y = currentPA_velY[i]; // velocity y
         float attraction_x = 0.0f; 
         float attraction_y = 0.0f; 
         float repulsion_x = 0.0f;
@@ -1072,6 +1149,10 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
         
         currentPA_x[i] += mvt_x;
         currentPA_y[i] += mvt_y;
+
+        // Update velocity
+        currentPA_velX[i] = mvt_x;
+        currentPA_velY[i] = mvt_y;
 
         // // Check if the particle is out of the screen
         if(currentPA_x[i] < 0.0f)

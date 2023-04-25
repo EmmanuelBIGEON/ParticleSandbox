@@ -157,16 +157,22 @@ class GraphicContext
         float* m_PA1_posX;
         float* m_PA1_posY;
         float* m_PA1_mass; // not used, maybe later
+        float* m_PA1_velocityX;
+        float* m_PA1_velocityY;
         int m_nb_PA1;
 
         float* m_PA2_posX;
         float* m_PA2_posY;
         float* m_PA2_mass; // not used, maybe later
+        float* m_PA2_velocityX;
+        float* m_PA2_velocityY;
         int m_nb_PA2;
 
         float* m_PA3_posX;
         float* m_PA3_posY;
         float* m_PA3_mass; // not used, maybe later
+        float* m_PA3_velocityX;
+        float* m_PA3_velocityY;
         int m_nb_PA3;
 
         std::vector<ParticleClass> m_ParticleClasses;
