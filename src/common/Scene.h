@@ -32,6 +32,7 @@ class Scene
         static Scene* CreateScene_3(GraphicContext* graphicContext);
 
         static Scene* CreateScene_Main(GraphicContext* graphicContext); // first scene the users sees.
+        static Scene* CreateScene_Behavior(GraphicContext* graphicContext); // scene used for behavior introduction
         static Scene* CreateScene_Text(GraphicContext* graphicContext); // scene used for Text testing.
         static Scene* CreateScene_Testing(GraphicContext* graphicContext); // scene used for testing.
 

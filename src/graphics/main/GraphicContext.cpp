@@ -37,13 +37,14 @@ float GraphicContext::repulsion_factor = 1.21f;
 float GraphicContext::attraction_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
 float GraphicContext::attraction_threshold_distance = 700.0f;
+float GraphicContext::movement_intensity = 0.05f;
 glm::vec3 GraphicContext::PA1_color = glm::vec3(0.21, 0.41, 0.91);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(0.91, 0.41, 0.21);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.21, 0.91, 0.41);
 bool GraphicContext::useVelocity = false;
 bool GraphicContext::behaviorDriven = false;
 
-#define LOSE_ACCELERATION_FACTOR 0.60f
+#define LOSE_ACCELERATION_FACTOR 0.45f
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
@@ -897,6 +898,9 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             }
         }
         
+        mvt_x *= movement_intensity;
+        mvt_y *= movement_intensity;
+
         *currentPA_x += mvt_x;
         *currentPA_y += mvt_y;
 
@@ -1196,6 +1200,10 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             } // end calculations with targeted buffer
         }
         
+        // Speed factor.
+        mvt_x *= movement_intensity;
+        mvt_y *= movement_intensity;
+
         currentPA_x[i] += mvt_x;
         currentPA_y[i] += mvt_y;
 
@@ -1262,66 +1270,66 @@ void GraphicContext::InitBehaviors()
     // How Class1 affect itself
     ParticleBehaviour pb1_1;
     pb1_1.attraction = 0.381f;
-    pb1_1.repulsion = 1.21f;
-    pb1_1.repulsion_distance = 19.23f;
+    pb1_1.repulsion = 100.21f;
+    pb1_1.repulsion_distance = 10.23f;
     pb1_1.attraction_distance = 700.0f;
 
     // How Class 1 react to Class2
     ParticleBehaviour pb1_2;
     pb1_2.attraction = 0.0f;
     pb1_2.repulsion = 2.0f;
-    pb1_2.repulsion_distance = 500.0f;
+    pb1_2.repulsion_distance = 20.0f;
     pb1_2.attraction_distance = 0.0f;
 
     // How Class 1 react to Class3
     ParticleBehaviour pb1_3;
     pb1_3.attraction = 5.381f;
-    pb1_3.repulsion = 1.21f;
-    pb1_3.repulsion_distance = 19.23f;
+    pb1_3.repulsion = 100.21f;
+    pb1_3.repulsion_distance = 10.23f;
     pb1_3.attraction_distance = 200.0f;
 
     // --------------------- Class 2 ---------------------
     // How Class2 affect itselfperf_attraction_factor
     ParticleBehaviour pb2_2;
     pb2_2.attraction = 0.381f;
-    pb2_2.repulsion = 15.21f;
-    pb2_2.repulsion_distance = 200.23f;
+    pb2_2.repulsion = 100.0f;
+    pb2_2.repulsion_distance = 10.0f;
     pb2_2.attraction_distance = 700.0f;
 
     // How Class 2 react to Class1
     ParticleBehaviour pb2_1;
     pb2_1.attraction = 0.0f;
-    pb2_1.repulsion = 2.0f;
-    pb2_1.repulsion_distance = 40.0f;
+    pb2_1.repulsion = 100.21f;
+    pb2_1.repulsion_distance = 20.0f;
     pb2_1.attraction_distance = 0.0f;
 
     // How Class 2 react to Class3
     ParticleBehaviour pb2_3;
     pb2_3.attraction = 0.381f;
-    pb2_3.repulsion = 1.21f;
-    pb2_3.repulsion_distance = 19.23f;
+    pb2_3.repulsion = 100.21f;
+    pb2_3.repulsion_distance = 10.0f;
     pb2_3.attraction_distance = 0.0f;
 
     // --------------------- Class 3 ---------------------
     // How Class3 affect itself
     ParticleBehaviour pb3_3;
     pb3_3.attraction = 10.381f;
-    pb3_3.repulsion = 1.21f;
-    pb3_3.repulsion_distance = 0.0f;
+    pb3_3.repulsion = 100.21f;
+    pb3_3.repulsion_distance = 10.0f;
     pb3_3.attraction_distance = 0.0f;
 
     // How Class 3 react to Class1
     ParticleBehaviour pb3_1;
     pb3_1.attraction = 0.381f;
-    pb3_1.repulsion = 1.21f;
-    pb3_1.repulsion_distance = 0.0f;
+    pb3_1.repulsion = 100.21f;
+    pb3_1.repulsion_distance = 10.0f;
     pb3_1.attraction_distance = 0.0f;
 
     // How Class 3 react to Class2
     ParticleBehaviour pb3_2;
     pb3_2.attraction = 0.381f;
-    pb3_2.repulsion = 1.21f;
-    pb3_2.repulsion_distance = 19.0f;
+    pb3_2.repulsion = 100.21f;
+    pb3_2.repulsion_distance = 20.0f;
     pb3_2.attraction_distance = 700.0f;
 
     m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_1)] =  pb1_1;

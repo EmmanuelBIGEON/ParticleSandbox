@@ -36,7 +36,7 @@ Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(gra
 {
     if (withUI)
     {
-        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 550.0f, 170.0f, 550.0f);
+        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 600.0f, 170.0f, 600.0f);
         m_BasicUI->Init(graphicContext);
     }
 }
@@ -71,6 +71,21 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 }
 
 Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
+{
+    Scene* scene = new Scene(graphicContext);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+
+    float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
+    float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
+    float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
+    float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
+
+    graphicContext->AddParticles(1500, PART_CLASS_1, xmin, xmax, ymin, ymax);
+
+    return scene;
+}
+
+Scene* Scene::CreateScene_Behavior(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
