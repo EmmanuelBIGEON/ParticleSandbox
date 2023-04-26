@@ -55,7 +55,7 @@ void BasicUI::Init(GraphicContext* context)
     slider_particleradius = new Slider(context, 0.0f, 10.0f, &particleRadius, m_startingX+ 85.0f, cursorY -10.0f);
     cursorY -= 65.0f;
     label_movementintensity = new GraphicText(context, "Movement intensity", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_movementintensity = new Slider(context, 0.0f, 0.5f, &GraphicContext::movement_intensity, m_startingX+ 85.0f, cursorY -20.0f);
+    slider_movementintensity = new Slider(context, 0.0f, 0.25f, &GraphicContext::movement_intensity, m_startingX+ 85.0f, cursorY -20.0f);
     cursorY -= 75.0f;
     label_useVelocity = new GraphicText(context, "Use Velocity:", glm::vec2(m_startingX+ 6.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 35.0f));
     checkbox_velocityActivation = new Checkbox(context, &GraphicContext::useVelocity,glm::vec2(m_startingX + m_width - 25.0f, cursorY));
