@@ -15,7 +15,7 @@
 #define FIXED_PADDING 5
 
 GraphicText::GraphicText(GraphicContext* context, const char* text, glm::vec2 topLeft, glm::vec2 bottomRight)
-    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_scale(1.0f), m_VAO(0), m_VBO(0), m_vertices(nullptr), m_nbCharacters(0)
+    : GraphicObject(context,SHADER_TEXT), m_Text(text), m_scale(1.0f), m_VAO(0), m_VBO(0), m_vertices(nullptr), m_nbCharacters(0), m_Alignment(TextAlign::ALIGN_CENTER) 
 {
     m_Font = context->font_main;
     m_Color = glm::vec3(1.0f, 1.0f, 1.0f);
