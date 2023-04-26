@@ -37,11 +37,11 @@ void BasicUI::Init(GraphicContext* context)
     m_particlesCountText = new GraphicText(context, text.c_str(), glm::vec2(m_startingX, cursorY), glm::vec2(m_startingX + m_width, cursorY - 25));
     cursorY -= context->font_main->GetSize();
     m_fpsText = new GraphicText(context, text2.c_str(), glm::vec2(m_startingX, cursorY), glm::vec2(m_startingX + m_width,cursorY - 25));
-    cursorY -= context->font_main->GetSize()*3.2;
+    cursorY -= context->font_main->GetSize()*3.0;
     
     label_repulsion = new GraphicText(context, "Repulsion", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_repulsion = new Slider(context, 0.0f, 1.4f, &GraphicContext::repulsion_factor, m_startingX+ 85.0f, cursorY- 20.0f);
-    cursorY -= 80.0f;
+    cursorY -= 75.0f;
     label_attraction = new GraphicText(context, "Attraction", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_attraction = new Slider(context, 0.0f, 0.7f, &GraphicContext::attraction_factor, m_startingX+ 85.0f, cursorY -20.0f);
     cursorY -= 80.0f;
@@ -50,10 +50,13 @@ void BasicUI::Init(GraphicContext* context)
     cursorY -= 100.0f;
     label_attractiondistance = new GraphicText(context, "Attraction Distance", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 85.0f, cursorY -40.0f);
-    cursorY -= 95.0f;
-    label_particleradius = new GraphicText(context, "Particle Radius", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_particleradius = new Slider(context, 0.0f, 10.0f, &particleRadius, m_startingX+ 85.0f, cursorY -20.0f);
     cursorY -= 90.0f;
+    label_particleradius = new GraphicText(context, "Particle Radius", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
+    slider_particleradius = new Slider(context, 0.0f, 10.0f, &particleRadius, m_startingX+ 85.0f, cursorY -10.0f);
+    cursorY -= 65.0f;
+    label_movementintensity = new GraphicText(context, "Movement intensity", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
+    slider_movementintensity = new Slider(context, 0.0f, 0.5f, &GraphicContext::movement_intensity, m_startingX+ 85.0f, cursorY -20.0f);
+    cursorY -= 75.0f;
     label_useVelocity = new GraphicText(context, "Use Velocity:", glm::vec2(m_startingX+ 6.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 35.0f));
     checkbox_velocityActivation = new Checkbox(context, &GraphicContext::useVelocity,glm::vec2(m_startingX + m_width - 25.0f, cursorY));
     cursorY -= 100.0f;
