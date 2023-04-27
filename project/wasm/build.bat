@@ -5,6 +5,9 @@ set CURRENT_DIR=%~dp0
 @REM Compile in Release only for the moment.
 set CONFIGURATION=Debug
 
+
+set EMCC_DEBUG=0
+
 cmake^
   -G "MinGW Makefiles"^
   -DCMAKE_BUILD_TYPE=%CONFIGURATION%^

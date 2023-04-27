@@ -7,7 +7,15 @@
 #include <filesystem>
 #include <fstream>
 
+#include "arch_support.h"
+
 namespace fs = std::filesystem;
+
+bool g_bIsAVXSupported = false;
+bool g_bIsAVX2Supported = false;
+bool g_bIsAVX512Supported = false;
+bool g_bIsSSSE3Supported = false;
+bool g_bIsSSSE4Supported = false;
 
 int main()
 {
@@ -26,7 +34,7 @@ int main()
         // Not optimal, but it works.
         // Optimization todo
         Application::GetInstance()->Render();
-    }, 0, 1);
+    }, 60, 1);
 
 
     return 0;

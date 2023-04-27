@@ -23,11 +23,47 @@
 #include "../../common/Window.h"
 #include "../../common/Chrono.h"
 
-#ifndef __EMSCRIPTEN__
 #include <thread>
+#include <immintrin.h>
+
+#ifdef __EMSCRIPTEN__
+// Weird Emscripten problem... 
+// Undefined values so i redefine it here. Need fix *
+// i took the values from <avxintrin.h>
+#define _CMP_EQ_OQ 0
+#define _CMP_LT_OS 1
+#define _CMP_LE_OS 2
+#define _CMP_UNORD_Q 3
+#define _CMP_NEQ_UQ 4
+#define _CMP_NLT_US 5
+#define _CMP_NLE_US 6
+#define _CMP_ORD_Q 7
+#define _CMP_EQ_UQ 8
+#define _CMP_NGE_US 9
+#define _CMP_NGT_US 10
+#define _CMP_FALSE_OQ 11
+#define _CMP_NEQ_OQ 12
+#define _CMP_GE_OS 13
+#define _CMP_GT_OS 14
+#define _CMP_TRUE_UQ 15
+#define _CMP_EQ_OS 16
+#define _CMP_LT_OQ 17
+#define _CMP_LE_OQ 18
+#define _CMP_UNORD_S 19
+#define _CMP_NEQ_US 20
+#define _CMP_NLT_UQ 21
+#define _CMP_NLE_UQ 22
+#define _CMP_ORD_S 23
+#define _CMP_EQ_US 24
+#define _CMP_NGE_UQ  25
+#define _CMP_NGT_UQ  26
+#define _CMP_FALSE_OS  27
+#define _CMP_NEQ_OS  28
+#define _CMP_GE_OQ 29
+#define _CMP_GT_OQ 30
+#define _CMP_TRUE_US 31
 #endif
 
-#include <immintrin.h>
 
 #include "../../arch_support.h"
 
@@ -37,7 +73,7 @@ float GraphicContext::repulsion_factor = 1.21f;
 float GraphicContext::attraction_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
 float GraphicContext::attraction_threshold_distance = 700.0f;
-float GraphicContext::movement_intensity = 0.05f;
+float GraphicContext::movement_intensity = 0.2f;
 glm::vec3 GraphicContext::PA1_color = glm::vec3(0.31, 0.51, 1.00);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(1.00, 0.51, 0.31);
 glm::vec3 GraphicContext::PA3_color = glm::vec3(0.31, 1.00, 0.51);
@@ -602,6 +638,7 @@ Shader* GraphicContext::GetShader(AvailableShader shader)
 
 void GraphicContext::RenderParticles(ParticleClass particleClass)
 {
+#ifdef _MSC_VER
     m_ParticleAdaptersMutex.lock();
     
     shader_particle->Use();
@@ -631,7 +668,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     float perf_repulsion_maximum_distance = repulsion_maximum_distance;
     float perf_attraction_threshold_distance = attraction_threshold_distance;
 
-
     switch(particleClass)
     {
         case PART_CLASS_1:
@@ -641,6 +677,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             currentPA_mass = m_PA1_mass;
             currentPA_nb = m_nb_PA1;
             currentend_cursor = m_PA1_posX + m_nb_PA1;
+            currentPA_velX = m_PA1_velocityX; currentPA_velY = m_PA1_velocityY;
             break;
         }
         case PART_CLASS_2:
@@ -651,6 +688,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             currentPA_mass = m_PA2_mass;
             currentPA_nb = m_nb_PA2;
             currentend_cursor = m_PA2_posX + m_nb_PA2;
+            currentPA_velX = m_PA2_velocityX; currentPA_velY = m_PA2_velocityY;
             break;
         }
         case PART_CLASS_3:
@@ -661,6 +699,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             currentPA_mass = m_PA3_mass;
             currentPA_nb = m_nb_PA3;
             currentend_cursor = m_PA3_posX + m_nb_PA3;
+            currentPA_velX = m_PA3_velocityX; currentPA_velY = m_PA3_velocityY;
             break;
         }
     }
@@ -737,6 +776,17 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         } 
         int sizeConfig = vec_scalarXY_config.size();
 
+        // Apply current velocity to current particle.
+        if(useVelocity)
+        {
+            mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
+            mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR; 
+        }else
+        {
+            mvt_x = 0.0f;
+            mvt_y = 0.0f;
+        }
+
         // -- Prepare targeted data --
         for(auto particle_class : m_ParticleClasses)
         {
@@ -766,16 +816,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 perf_repulsion_maximum_distance = behavior.repulsion_distance;
             }
 
-            // Apply current velocity to current particle.
-            if(useVelocity)
-            {
-                mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
-                mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR; 
-            }else
-            {
-                mvt_x = 0.0f;
-                mvt_y = 0.0f;
-            }
 
             // -- begin calculations --
 
@@ -844,7 +884,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 targetPA_x += 8;
                 targetPA_y += 8;
             } // end calculations with targeted buffer
-
+            
             float direction_x = 0.0f;
             float direction_y = 0.0f;
 
@@ -902,7 +942,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 targetPA_y++;
             }
         }
-        
+    
         mvt_x *= movement_intensity;
         mvt_y *= movement_intensity;
 
@@ -936,7 +976,9 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     }
 
     m_ParticleAdaptersMutex.unlock();
-    
+
+
+#endif    
 }
    
 void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
@@ -1135,14 +1177,31 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
                     __m128 tempsub_x = _mm_sub_ps(vecX, vec_scalarXY_config[k].first);
                     __m128 tempsub_y = _mm_sub_ps(vecY, vec_scalarXY_config[k].second);
                     __m128 distance_temp = _mm_add_ps(_mm_mul_ps(tempsub_x, tempsub_x), _mm_mul_ps(tempsub_y, tempsub_y));
+#ifdef __EMSCRIPTEN__
+                    __m128 mask;
+                    __m128 temp1 = _mm_and_ps(distance_temp, distance);
+                    __m128 temp2 = _mm_cmplt_ps(distance_temp, distance);
+                    mask = _mm_and_ps(temp1, temp2);
+#else
                     __m128 mask = _mm_cmp_ps(distance_temp, distance, _CMP_LT_OQ);
+#endif
                     distance = _mm_blendv_ps(distance, distance_temp, mask);
                     sub_x = _mm_blendv_ps(sub_x, tempsub_x, mask);
                     sub_y = _mm_blendv_ps(sub_y, tempsub_y, mask);
                 }
 
                 // sqrt
+#ifdef __EMSCRIPTEN__
+                    __m128 mask_sqrt;
+                    { 
+                        
+                        __m128 temp1 = _mm_andnot_ps(distance, mm_zeros);  
+                        __m128 temp2 = _mm_cmplt_ps(distance, mm_zeros);
+                        mask_sqrt = _mm_and_ps(temp1, temp2);
+                    }
+#else
                 __m128 mask_sqrt = _mm_cmp_ps(distance, mm_zeros, _CMP_GT_OQ); // prevent division by 0
+#endif
                 distance = _mm_blendv_ps(mm_zeros, _mm_sqrt_ps(distance), mask_sqrt);
 
                 // // Calculate the direction between the current particle and all the others
@@ -1165,8 +1224,29 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
                 __m128 repulsion_y = _mm_mul_ps(direction_y, mm_repulsion_factor);
 
                 // resulting movement mask
+#ifdef __EMSCRIPTEN__
+                __m128 mask_attraction;
+                { 
+                    
+                    __m128 temp1 = _mm_and_ps(distance, mm_attraction_threshold_distance);  
+                    __m128 temp2 = _mm_cmplt_ps(distance, mm_attraction_threshold_distance);
+                    mask_attraction = _mm_and_ps(temp1, temp2);
+                }
+#else
                 __m128 mask_attraction = _mm_cmp_ps(distance, mm_attraction_threshold_distance, _CMP_LT_OQ);
+#endif
+
+#ifdef __EMSCRIPTEN__
+                __m128 mask_repulsion;
+                { 
+                    
+                    __m128 temp1 = _mm_and_ps(distance, mm_repulsion_maximum_distance);  
+                    __m128 temp2 = _mm_cmplt_ps(distance, mm_repulsion_maximum_distance);
+                    mask_repulsion = _mm_and_ps(temp1, temp2);
+                }
+#else
                 __m128 mask_repulsion = _mm_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
+#endif
                 __m128 mvt_x_tmp = _mm_add_ps(_mm_and_ps(mask_attraction, attraction_x), _mm_and_ps(mask_repulsion, repulsion_x));
                 __m128 mvt_y_tmp = _mm_add_ps(_mm_and_ps(mask_attraction, attraction_y), _mm_and_ps(mask_repulsion, repulsion_y));
 
@@ -1298,6 +1378,24 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
             break;
     }
 
+
+#ifdef __EMSCRIPTEN__
+    int start_thread1 = 0;
+    int end_thread1 = nb_particles/3;
+    int start_thread2 = end_thread1;
+    int end_thread2 = 2*nb_particles/3;
+    int start_thread3 = end_thread2;
+    int end_thread3 = nb_particles;
+
+    std::thread thread1(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread1, end_thread1);
+    std::thread thread2(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread2, end_thread2);
+    std::thread thread3(&GraphicContext::ComputeParticles_thread, this, particleClass, start_thread3, end_thread3);
+
+    thread1.join();
+    thread2.join();
+    thread3.join();
+    
+#else
     int start_thread1 = 0;
     int end_thread1 = nb_particles/4;
     int start_thread2 = end_thread1;
@@ -1316,9 +1414,9 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
     thread2.join();
     thread3.join();
     thread4.join();
-
-    // draw
+#endif
     shader_particle->Use();
+    glBindVertexArray(Particle_OPENGL::VAO);
 
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
@@ -1355,8 +1453,6 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
 
 void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int start, int end)
 {
-    shader_particle->Use();
-    glBindVertexArray(Particle_OPENGL::VAO);
     
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
