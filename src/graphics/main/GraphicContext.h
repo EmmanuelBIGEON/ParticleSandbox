@@ -137,6 +137,11 @@ class GraphicContext
         // For now, act the same way for all the particles, but later, each class will have a behavior depending on the targeted class.
         void RenderParticles(ParticleClass particleClass);
 
+        // In case AVX2 is not available and AVX available.
+        // This method will be use for WASM implementation as AVX2 is not available on WASM.
+        // https://emscripten.org/docs/porting/simd.html
+        void RenderParticles_without_avx2(ParticleClass particleClass);
+
         // incredibly slow method but, allow the program to run on all machines (using multithreading)
         void RenderParticles_without_avx(ParticleClass particleClass);
 

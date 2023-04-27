@@ -188,7 +188,7 @@ void GraphicContext::Render()
 
     // No depth testing to relieve the GPU, UI objects will be drawn after particles to appear on top.
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    
     if(!m_Pause)
     {
         if(IsAVX2Supported())
@@ -196,7 +196,12 @@ void GraphicContext::Render()
             RenderParticles(PART_CLASS_1);
             RenderParticles(PART_CLASS_2);
             RenderParticles(PART_CLASS_3);
-        }else 
+        }else if(IsAVXSupported()) 
+        {
+            RenderParticles_without_avx2(PART_CLASS_1);
+            RenderParticles_without_avx2(PART_CLASS_2);
+            RenderParticles_without_avx2(PART_CLASS_3);
+        }else
         {
             RenderParticles_without_avx(PART_CLASS_1);
             RenderParticles_without_avx(PART_CLASS_2);
@@ -325,6 +330,7 @@ void GraphicContext::AddParticles(int nbParticles, ParticleClass particleClass,
         delete[] old_vel_x;
         delete[] old_vel_y;
 
+        
         float modulox = rangex_max - rangex_min;
         float moduloy = rangey_max - rangey_min;
         // fill with random values between world bounds
@@ -631,7 +637,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         case PART_CLASS_1:
         {
             shader_particle->SetVec3("particleColor", PA1_color);
-            // Would normally look for behavior here, for now, behavior is static.
             currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY;
             currentPA_mass = m_PA1_mass;
             currentPA_nb = m_nb_PA1;
@@ -934,6 +939,344 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     
 }
    
+void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
+{
+    m_ParticleAdaptersMutex.lock();
+    
+    shader_particle->Use();
+    glBindVertexArray(Particle_OPENGL::VAO);
+    
+    float* currentPA_x = nullptr;
+    float* currentPA_y = nullptr;
+    float* currentPA_mass = nullptr;
+    float* currentPA_velX = nullptr;
+    float* currentPA_velY = nullptr;
+    int currentPA_nb = 0;
+    
+    // Reduce time to access memory by advancing the cursor instead of always accessing the element of array.
+    // Since the size of x and y are the same, we can use the same cursor for both.
+    float* targetend_cursor = nullptr; 
+    float* currentend_cursor = nullptr;
+
+    // resulting movement to apply to the particle
+    float mvt_x = 0.0f;
+    float mvt_y = 0.0f;
+
+    // performance variables to reduce time acess and repetition of the same operation
+    float worldWidthDividedBy2 = worldWidth / 2.0f;
+    float worldHeightDividedBy2 = worldHeight / 2.0f;
+    float perf_repulsion_factor = repulsion_factor;
+    float perf_attraction_factor = attraction_factor;
+    float perf_repulsion_maximum_distance = repulsion_maximum_distance;
+    float perf_attraction_threshold_distance = attraction_threshold_distance;
+
+
+    switch(particleClass)
+    {
+        case PART_CLASS_1:
+        {
+            shader_particle->SetVec3("particleColor", PA1_color);
+            currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY;
+            currentPA_mass = m_PA1_mass;
+            currentPA_nb = m_nb_PA1;
+            currentend_cursor = m_PA1_posX + m_nb_PA1;
+            break;
+        }
+        case PART_CLASS_2:
+        {
+            shader_particle->SetVec3("particleColor", PA2_color);
+            
+            currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY;
+            currentPA_mass = m_PA2_mass;
+            currentPA_nb = m_nb_PA2;
+            currentend_cursor = m_PA2_posX + m_nb_PA2;
+            break;
+        }
+        case PART_CLASS_3:
+        {
+            shader_particle->SetVec3("particleColor", PA3_color);
+            
+            currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY;
+            currentPA_mass = m_PA3_mass;
+            currentPA_nb = m_nb_PA3;
+            currentend_cursor = m_PA3_posX + m_nb_PA3;
+            break;
+        }
+    }
+
+    float* targetPA_x = nullptr;
+    float* targetPA_y = nullptr;
+    float* targetPA_mass = nullptr;
+    int targetPA_nb = 0;
+
+    // prepare main variables
+    __m128 mm_attraction_factor = _mm_set1_ps(perf_attraction_factor);
+    __m128 mm_repulsion_factor = _mm_set1_ps(perf_repulsion_factor);
+    __m128 mm_repulsion_maximum_distance = _mm_set1_ps(perf_repulsion_maximum_distance);
+    __m128 mm_attraction_threshold_distance = _mm_set1_ps(perf_attraction_threshold_distance);
+    __m128 mm_zeros = _mm_set1_ps(0.0f);
+    __m128 mm_minus = _mm_set1_ps(-1.0f);
+
+    while(currentPA_x < currentend_cursor)
+    {
+
+        
+        // -- initialize configuration -- 
+        // load scalar (current x and y)
+        __m128 scalar_x = _mm_set1_ps(*currentPA_x);
+        __m128 scalar_y = _mm_set1_ps(*currentPA_y);
+
+        // Do each configuration considering the repetition of the world
+        // Careful, for each configuration, sometimes the configuration is within worldbounds, you can't apply it.
+        // find other configurations that are outside worldbounds to simulate the repetition of the world.
+        // Ignoring first configuration (scalar_x, scalar_y), it will be the first calculation.
+        std::vector<std::pair<__m128, __m128>> vec_scalarXY_config;
+        vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalar_y));
+        std::vector<std::pair<float, float>> vec_x_y_config; // used for remaining particles unable to fit into the 8 float buffer
+        vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y));
+
+
+        if(*currentPA_x < worldWidthDividedBy2)
+        {
+            if(*currentPA_y < worldHeightDividedBy2){
+                // Bottom left corner.
+                __m128 scalarX_left_to_right = _mm_add_ps(scalar_x, _mm_set1_ps(worldWidth));
+                __m128 scalarY_bottom_to_top = _mm_add_ps(scalar_y, _mm_set1_ps(worldHeight));
+                vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
+            }else{
+                // Top left corner.
+                __m128 scalarX_left_to_right = _mm_add_ps(scalar_x, _mm_set1_ps(worldWidth));
+                __m128 scalarY_top_to_bottom = _mm_sub_ps(scalar_y, _mm_set1_ps(worldHeight));
+                vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
+            }
+        }else{
+            if(*currentPA_y < (worldHeight / 2)){
+                // Bottom right corner.
+                __m128 scalarX_right_to_left = _mm_sub_ps(scalar_x, _mm_set1_ps(worldWidth));
+                __m128 scalarY_bottom_to_top = _mm_add_ps(scalar_y, _mm_set1_ps(worldHeight));
+                vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
+            }else{
+                // Top right corner.
+                __m128 scalarX_right_to_left = _mm_sub_ps(scalar_x, _mm_set1_ps(worldWidth));
+                __m128 scalarY_top_to_bottom = _mm_sub_ps(scalar_y, _mm_set1_ps(worldHeight));
+                vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
+            }
+        } 
+        int sizeConfig = vec_scalarXY_config.size();
+
+        // -- Prepare targeted data --
+        for(auto particle_class : m_ParticleClasses)
+        {
+
+            if(particle_class == PART_CLASS_1)
+            {
+                targetPA_x = m_PA1_posX; targetPA_y = m_PA1_posY; targetPA_mass = m_PA1_mass; targetPA_nb = m_nb_PA1;
+                targetend_cursor = m_PA1_posX + m_nb_PA1;
+            }else if(particle_class == PART_CLASS_2)
+            {
+                targetPA_x = m_PA2_posX; targetPA_y = m_PA2_posY; targetPA_mass = m_PA2_mass; targetPA_nb = m_nb_PA2;
+                targetend_cursor = m_PA2_posX + m_nb_PA2;
+            }else if(particle_class == PART_CLASS_3)
+            {
+                targetPA_x = m_PA3_posX; targetPA_y = m_PA3_posY; targetPA_mass = m_PA3_mass; targetPA_nb = m_nb_PA3;
+                targetend_cursor = m_PA3_posX + m_nb_PA3;
+            }
+
+            // Initiate behaviors
+            if(behaviorDriven)
+            {
+                // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
+                const ParticleBehaviour& behavior = m_ParticleBehaviours[std::make_pair(particleClass, particle_class)];
+                perf_attraction_factor = behavior.attraction;
+                perf_repulsion_factor = behavior.repulsion;
+                perf_attraction_threshold_distance = behavior.attraction_distance;
+                perf_repulsion_maximum_distance = behavior.repulsion_distance;
+            }
+
+            // Apply current velocity to current particle.
+            if(useVelocity)
+            {
+                mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
+                mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR; 
+            }else
+            {
+                mvt_x = 0.0f;
+                mvt_y = 0.0f;
+            }
+
+            // -- begin calculations --
+
+            while(targetPA_x < targetend_cursor)
+            {
+                // load vector (other x and y)
+                __m128 vecX = _mm_load_ps(targetPA_x);
+                __m128 vecY = _mm_load_ps(targetPA_y);
+                // Calculate the minimal distance considering the available configurations
+                // init distance, sub_x, sub_y
+                __m128 sub_x = _mm_sub_ps(vecX, scalar_x);
+                __m128 sub_y = _mm_sub_ps(vecY, scalar_y);
+                
+                __m128 distance = _mm_add_ps(_mm_mul_ps(sub_x, sub_x), _mm_mul_ps(sub_y, sub_y));
+
+                for(int k= 0; k < sizeConfig; k++)
+                {
+                    __m128 tempsub_x = _mm_sub_ps(vecX, vec_scalarXY_config[k].first);
+                    __m128 tempsub_y = _mm_sub_ps(vecY, vec_scalarXY_config[k].second);
+                    __m128 distance_temp = _mm_add_ps(_mm_mul_ps(tempsub_x, tempsub_x), _mm_mul_ps(tempsub_y, tempsub_y));
+                    __m128 mask = _mm_cmp_ps(distance_temp, distance, _CMP_LT_OQ);
+                    distance = _mm_blendv_ps(distance, distance_temp, mask);
+                    sub_x = _mm_blendv_ps(sub_x, tempsub_x, mask);
+                    sub_y = _mm_blendv_ps(sub_y, tempsub_y, mask);
+                }
+
+                // sqrt
+                __m128 mask_sqrt = _mm_cmp_ps(distance, mm_zeros, _CMP_GT_OQ); // prevent division by 0
+                distance = _mm_blendv_ps(mm_zeros, _mm_sqrt_ps(distance), mask_sqrt);
+
+                // // Calculate the direction between the current particle and all the others
+                // Calculate the direction between the current particle and all the others normalisation of the vector
+                // use mask to avoid division by 0
+                __m128 direction_x = _mm_blendv_ps(mm_zeros, _mm_div_ps(sub_x, distance), mask_sqrt);
+                __m128 direction_y = _mm_blendv_ps(mm_zeros, _mm_div_ps(sub_y, distance), mask_sqrt);
+
+                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // on the distance between the current particle and the others
+                // apply minimum distance
+                __m128 attraction_x = _mm_mul_ps(direction_x, mm_attraction_factor);
+                __m128 attraction_y = _mm_mul_ps(direction_y, mm_attraction_factor);
+
+                // calculate repulsion 
+                // invert direction
+                direction_x = _mm_mul_ps(direction_x, mm_minus);
+                direction_y = _mm_mul_ps(direction_y, mm_minus);
+                __m128 repulsion_x = _mm_mul_ps(direction_x, mm_repulsion_factor);
+                __m128 repulsion_y = _mm_mul_ps(direction_y, mm_repulsion_factor);
+
+                // resulting movement mask
+                __m128 mask_attraction = _mm_cmp_ps(distance, mm_attraction_threshold_distance, _CMP_LT_OQ);
+                __m128 mask_repulsion = _mm_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
+                __m128 mvt_x_tmp = _mm_add_ps(_mm_and_ps(mask_attraction, attraction_x), _mm_and_ps(mask_repulsion, repulsion_x));
+                __m128 mvt_y_tmp = _mm_add_ps(_mm_and_ps(mask_attraction, attraction_y), _mm_and_ps(mask_repulsion, repulsion_y));
+
+                float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
+                float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
+                for(int k = 0; k < 8; k++)
+                {
+                    mvt_x += *mvt_x_tmp_ptr;
+                    mvt_y += *mvt_y_tmp_ptr;
+                    mvt_x_tmp_ptr++;
+                    mvt_y_tmp_ptr++;
+                }
+
+                targetPA_x += 8;
+                targetPA_y += 8;
+            } // end calculations with targeted buffer
+
+            float direction_x = 0.0f;
+            float direction_y = 0.0f;
+
+            for(int j = 8*(targetPA_nb/8); j < targetPA_nb; j++)
+            {
+                // do the same thing than above
+                // Calculate the minimal distance considering the available configurations
+                // init distance, sub_x, sub_y
+                float sub_x = *targetPA_x - *currentPA_x;
+                float sub_y = *targetPA_y - *currentPA_y;
+                float distance = sub_x*sub_x + sub_y*sub_y;
+
+                for(int k= 0; k < sizeConfig; k++)
+                {
+                    float temp_sub_x = *targetPA_x - vec_x_y_config[k].first;
+                    float temp_sub_y = *targetPA_y - vec_x_y_config[k].second;
+                    float temp_distance = temp_sub_x*temp_sub_x + temp_sub_y*temp_sub_y;
+                    if(temp_distance < distance)
+                    {
+                        distance = temp_distance;
+                        sub_x = temp_sub_x;
+                        sub_y = temp_sub_y;
+                    }
+                }
+
+                distance = sqrt(distance);
+
+                // Calculate the direction between the current particle and all the others
+                // Calculate the direction between the current particle and all the others normalisation of the vector
+                // use mask to avoid division by 0
+                direction_x = 0.0f;
+                direction_y = 0.0f;
+                if(distance > 0.0f)
+                {
+                    direction_x = sub_x/distance;
+                    direction_y = sub_y/distance;
+                }
+                if(distance < perf_attraction_threshold_distance)
+                {
+                    mvt_x += direction_x* perf_attraction_factor;
+                    mvt_y += direction_y* perf_attraction_factor;
+                }
+                
+                if(distance < perf_repulsion_maximum_distance)
+                {
+                    // invert direction
+                    direction_x = -direction_x;
+                    direction_y = -direction_y;
+                    mvt_x += direction_x* perf_repulsion_factor;
+                    mvt_y += direction_y* perf_repulsion_factor;
+                }
+                // Calculate the movement of the current particle, if attraction or repulsion depending
+                
+                targetPA_x++;
+                targetPA_y++;
+            }
+        }
+        
+        mvt_x *= movement_intensity;
+        mvt_y *= movement_intensity;
+
+        *currentPA_x += mvt_x;
+        *currentPA_y += mvt_y;
+
+        // Update current particle velocity
+        if(useVelocity)
+        {
+            *currentPA_velX = mvt_x * LOSE_ACCELERATION_FACTOR;
+            *currentPA_velY = mvt_y * LOSE_ACCELERATION_FACTOR;
+        }
+
+        // // Check if the particle is out of the screen
+        if(*currentPA_x < 0.0f)
+            *currentPA_x = *currentPA_x + worldWidth;
+        else if(*currentPA_x >= worldWidth)
+            *currentPA_x = *currentPA_x - worldWidth;
+        if(*currentPA_y < 0.0f)
+            *currentPA_y = *currentPA_y + worldHeight;
+        else if(*currentPA_y >= worldHeight)
+            *currentPA_y = *currentPA_y - worldHeight;
+
+        shader_particle->SetVec2("shiftPos", glm::vec2(*currentPA_x, *currentPA_y));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+
+        currentPA_x++;
+        currentPA_y++;
+        currentPA_velX++;
+        currentPA_velY++;
+    }
+
+    m_ParticleAdaptersMutex.unlock();
+    
+}
    
 void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
 {
@@ -1009,7 +1352,6 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
 
     m_ParticleAdaptersMutex.unlock();
 }
-
 
 void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int start, int end)
 {
@@ -1225,7 +1567,6 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             currentPA_y[i] = currentPA_y[i] - 1200.0f;
     }
 }
-
 
 void GraphicContext::DrawParticles(ParticleClass particleClass)
 {
