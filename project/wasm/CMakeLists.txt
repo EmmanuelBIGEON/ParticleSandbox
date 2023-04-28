@@ -80,6 +80,8 @@ set(SOURCES
     ../../src/graphics/components/ui/Input.cpp
     ../../src/graphics/components/ui/Slider.cpp
     ../../src/graphics/components/ui/Checkbox.cpp
+    ../../src/graphics/components/ui/Statebox.cpp
+    ../../src/graphics/components/ui/MatrixStatebox.cpp
 )
 
 add_executable(ParticleSandboxWasm ${SOURCES})

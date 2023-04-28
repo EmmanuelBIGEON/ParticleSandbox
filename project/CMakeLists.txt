@@ -51,6 +51,7 @@ set(SOURCES
     ../src/graphics/components/ui/Input.cpp
     ../src/graphics/components/ui/Checkbox.cpp
     ../src/graphics/components/ui/Statebox.cpp
+    ../src/graphics/components/ui/MatrixStatebox.cpp
     ../src/graphics/components/ui/layout/BasicUI.cpp
     ../src/graphics/components/ui/layout/BehaviorUI.cpp
 )

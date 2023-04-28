@@ -17,6 +17,7 @@
 #include "../graphics/components/ui/Input.h"
 #include "../graphics/components/ui/Checkbox.h"
 #include "../graphics/components/ui/Statebox.h"
+#include "../graphics/components/ui/MatrixStatebox.h"
 
 #include "../graphics/main/ParticleImpl.h"
 
@@ -159,14 +160,27 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
     // Checkbox* checkbox = new Checkbox(graphicContext, &GraphicContext::useVelocity,glm::vec2(700.0f, 700.0f));
 
     // ParticleAdapter* adapter = new ParticleAdapter(graphicContext, glm::vec2(400.0f, 400.0f), glm::vec3(0.2f, 0.8f, 0.2f));
-    Statebox* statebox = new Statebox(graphicContext, glm::vec2(400.0f, 400.0f));
-    int id_state = statebox->AddState(glm::vec3(0.2f, 0.8f, 0.2f));
-    statebox->AddStateAction(id_state, [](){std::cout << "State 1" << std::endl;});
-    id_state = statebox->AddState(glm::vec3(0.8f, 0.2f, 0.2f));
-    statebox->AddStateAction(id_state, [](){std::cout << "State 2" << std::endl;});
-    id_state = statebox->AddState(glm::vec3(0.2f, 0.2f, 0.8f));
-    statebox->AddStateAction(id_state, [](){std::cout << "State 3" << std::endl;});
+    // Statebox* statebox = new Statebox(graphicContext, glm::vec2(400.0f, 400.0f));
+    // int id_state = statebox->AddState(glm::vec3(0.2f, 0.8f, 0.2f));
+    // statebox->AddStateAction(id_state, [](){std::cout << "State 1" << std::endl;});
+    // id_state = statebox->AddState(glm::vec3(0.8f, 0.2f, 0.2f));
+    // statebox->AddStateAction(id_state, [](){std::cout << "State 2" << std::endl;});
+    // id_state = statebox->AddState(glm::vec3(0.2f, 0.2f, 0.8f));
+    // statebox->AddStateAction(id_state, [](){std::cout << "State 3" << std::endl;});
 
+    MatrixStatebox* matrixStatebox = new MatrixStatebox(3);
+    matrixStatebox->Init(graphicContext);
+
+    matrixStatebox->GetStatebox(0,0)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
+    matrixStatebox->GetStatebox(0,0)->AddStateAction(0, [](){std::cout << "State 1" << std::endl;});
+    matrixStatebox->GetStatebox(1,1)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
+    matrixStatebox->GetStatebox(1,1)->AddStateAction(0, [](){std::cout << "State 2" << std::endl;});
+    matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 0.0f, 1.0f));
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [](){std::cout << "State 3" << std::endl;});
+    matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [](){std::cout << "State 3" << std::endl;});
+    matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [](){std::cout << "State 3" << std::endl;});
 
     return scene;
 }

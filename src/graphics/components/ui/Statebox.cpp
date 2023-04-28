@@ -8,7 +8,7 @@
 
 #include "../../main/Shader.h"
 
-float Statebox::sizeStatebox = 180.0f;
+float Statebox::sizeStatebox = 25.0f;
 
 Statebox::Statebox(GraphicContext* context, const glm::vec2& position) : GraphicObject(context, SHADER_BUTTON), m_Pos(position), 
     beingClicked(false), m_Color(0.0f, 0.0f, 0.0f), current_state(-1), VAO(0), VBO(0), EBO(0)
