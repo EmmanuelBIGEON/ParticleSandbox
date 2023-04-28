@@ -16,6 +16,7 @@
 #include "../graphics/components/ui/Button.h"
 #include "../graphics/components/ui/Input.h"
 #include "../graphics/components/ui/Checkbox.h"
+#include "../graphics/components/ui/Statebox.h"
 
 #include "../graphics/main/ParticleImpl.h"
 
@@ -33,12 +34,22 @@
 // use lowp vector2
 typedef glm::tvec2<GLbyte, glm::lowp> lowp_vec2;
 
-Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(graphicContext), m_BasicUI(nullptr)
+Scene::Scene(GraphicContext* graphicContext, LayoutType layout) : m_GraphicContext(graphicContext), m_UI(nullptr)
 {
-    if (withUI)
+    switch(layout)
     {
-        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 600.0f, 170.0f, 600.0f);
-        m_BasicUI->Init(graphicContext);
+        case LayoutType::BASIC:
+        {
+            m_UI = new BasicUI(0.0f, GraphicContext::worldHeight - 600.0f, 170.0f, 600.0f);
+            m_UI->Init(graphicContext);
+            break;
+        }
+        case LayoutType::BEHAVIOR:
+        {
+            m_UI = new BehaviorUI();
+            m_UI->Init(graphicContext);
+            break;
+        }
     }
 }
 
@@ -56,8 +67,8 @@ void Scene::Init()
 
 void Scene::Update()
 {
-    if(m_BasicUI)
-        m_BasicUI->Update();
+    if(m_UI)
+        m_UI->Update();
         
     m_GraphicContext->Render();
 }
@@ -88,7 +99,7 @@ Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_Behavior(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext);
+    Scene* scene = new Scene(graphicContext, LayoutType::BEHAVIOR);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
 
     float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
@@ -107,7 +118,7 @@ Scene* Scene::CreateScene_Behavior(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_Wasm(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext,false);
+    Scene* scene = new Scene(graphicContext,LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
 
     float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
@@ -126,7 +137,7 @@ Scene* Scene::CreateScene_Wasm(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, false);
+    Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
     Button* button3 = new Button(graphicContext, glm::vec2(400.0f, 300.0f), glm::vec2(200.0f, 50.0f), glm::vec3(0.2f, 0.2f, 0.2f), "");
     button3->SetPathIcon("data/img/play.png");
@@ -138,24 +149,31 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 
 Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, true);
+    Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
     // Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
     // input->SetNumberOnly(true);
     // input->SetMaxSize(5);
 
-    Checkbox* checkbox = new Checkbox(graphicContext, &GraphicContext::useVelocity,glm::vec2(700.0f, 700.0f));
+    // Checkbox* checkbox = new Checkbox(graphicContext, &GraphicContext::useVelocity,glm::vec2(700.0f, 700.0f));
 
-    ParticleAdapter* adapter = new ParticleAdapter(graphicContext, glm::vec2(400.0f, 400.0f), glm::vec3(0.2f, 0.8f, 0.2f));
-    
+    // ParticleAdapter* adapter = new ParticleAdapter(graphicContext, glm::vec2(400.0f, 400.0f), glm::vec3(0.2f, 0.8f, 0.2f));
+    Statebox* statebox = new Statebox(graphicContext, glm::vec2(400.0f, 400.0f));
+    int id_state = statebox->AddState(glm::vec3(0.2f, 0.8f, 0.2f));
+    statebox->AddStateAction(id_state, [](){std::cout << "State 1" << std::endl;});
+    id_state = statebox->AddState(glm::vec3(0.8f, 0.2f, 0.2f));
+    statebox->AddStateAction(id_state, [](){std::cout << "State 2" << std::endl;});
+    id_state = statebox->AddState(glm::vec3(0.2f, 0.2f, 0.8f));
+    statebox->AddStateAction(id_state, [](){std::cout << "State 3" << std::endl;});
+
 
     return scene;
 }
 
 Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, false);
+    Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
     glm::vec3 color = glm::vec3(0.2f, 0.2f, 0.2f);

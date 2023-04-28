@@ -34,7 +34,6 @@ set(SOURCES
     ../src/graphics/main/Font.cpp
     ../src/graphics/main/ParticleImpl.cpp
 
-    ../src/graphics/util/BasicUI.cpp
 
     ../src/graphics/components/adapters/TriangleAdapter.cpp
     ../src/graphics/components/adapters/AdvancedRectangle.cpp
@@ -51,6 +50,9 @@ set(SOURCES
     ../src/graphics/components/ui/Button.cpp
     ../src/graphics/components/ui/Input.cpp
     ../src/graphics/components/ui/Checkbox.cpp
+    ../src/graphics/components/ui/Statebox.cpp
+    ../src/graphics/components/ui/layout/BasicUI.cpp
+    ../src/graphics/components/ui/layout/BehaviorUI.cpp
 )
 
 add_executable(ParticleSandbox ${SOURCES} favicon.rc)
@@ -68,5 +70,4 @@ endif()
 # install shaders
 install(DIRECTORY ${MAIN_DIR}/src/graphics/shaders DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${MAIN_DIR}/fonts DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(DIRECTORY ${MAIN_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${MAIN_DIR}/data DESTINATION ${CMAKE_INSTALL_PREFIX})

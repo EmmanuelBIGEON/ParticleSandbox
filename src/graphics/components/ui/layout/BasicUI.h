@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../main/GraphicContext.h"
-#include "../main/GraphicObject.h"
-#include "../../common/Application.h"
+#include "../../../main/GraphicContext.h"
+#include "../../../main/GraphicObject.h"
+#include "../../../../common/Application.h"
+#include "LayoutUI.h"
 
 class Button;
 class Slider;
@@ -12,14 +13,14 @@ class RectangleAdapter;
 
 //! \class BasicUI
 //! \brief Display the FPS and the number of particules in the context.
-class BasicUI
+class BasicUI : public LayoutUI
 {
     public:
         BasicUI(int startingX, int startingY, int width, int height);
         virtual ~BasicUI();
 
-        void Init(GraphicContext* context);
-        void Update();
+        virtual void Init(GraphicContext* context) override;
+        virtual void Update() override;
 
     private:
         int m_startingX;

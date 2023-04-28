@@ -63,7 +63,8 @@ set(SOURCES
     ../../src/graphics/main/Font.cpp
     ../../src/graphics/main/ParticleImpl.cpp
 
-    ../../src/graphics/util/BasicUI.cpp
+    ../../src/graphics/components/ui/layout/BasicUI.cpp
+    ../../src/graphics/components/ui/layout/BehaviorUI.cpp
 
     ../../src/graphics/components/adapters/TriangleAdapter.cpp
     ../../src/graphics/components/adapters/AdvancedRectangle.cpp

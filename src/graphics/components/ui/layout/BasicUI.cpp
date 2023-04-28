@@ -1,10 +1,10 @@
 #include "BasicUI.h"
 
-#include "../components/adapters/RectangleAdapter.h"
-#include "../components/common/GraphicText.h"
-#include "../components/ui/Button.h"
-#include "../components/ui/Slider.h"
-#include "../components/ui/Checkbox.h"
+#include "../../adapters/RectangleAdapter.h"
+#include "../../common/GraphicText.h"
+#include "../Button.h"
+#include "../Slider.h"
+#include "../Checkbox.h"
 
 BasicUI::BasicUI(int startingX, int startingY, int width, int height)
     : m_startingX(startingX), m_startingY(startingY), m_width(width), m_height(height), m_particlesCount(0), m_fps(0)
