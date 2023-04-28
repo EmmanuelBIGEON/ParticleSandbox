@@ -147,7 +147,6 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
     return scene;
 }
 
-
 Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, LayoutType::NONE);
