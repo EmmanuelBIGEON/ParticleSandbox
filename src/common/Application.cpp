@@ -63,7 +63,9 @@ void Application::CreateWasmView()
     Particle_OPENGL::LoadParticleVAO();
 
     // Load the scene.
-    LoadScene_2();
+    // LoadScene_Main();
+    // LoadScene_Behavior();
+    LoadScene_Wasm();
 }
 
 
@@ -81,8 +83,8 @@ void Application::CreateWindow()
         Particle_OPENGL::LoadParticleVAO();
 
         // Load the scene.
-        // LoadScene_Main();
-        LoadScene_Behavior();
+        LoadScene_Main();
+        // LoadScene_Behavior();
         // LoadScene_Testing();
         
     });
@@ -150,4 +152,12 @@ void Application::LoadScene_Text()
         delete(m_currentScene);
 
     m_currentScene = Scene::CreateScene_Text(m_GraphicContext);
+}
+
+void Application::LoadScene_Wasm()
+{
+    if(m_currentScene)
+        delete(m_currentScene);
+
+    m_currentScene = Scene::CreateScene_Wasm(m_GraphicContext);
 }

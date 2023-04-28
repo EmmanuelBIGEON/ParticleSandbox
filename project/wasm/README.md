@@ -18,6 +18,7 @@ Note : If you are using WASM you can't display the UUID of Objects into string. 
 ## Build
 
 You need to have Emscripten 3.1.9 or another version compatible and MingW64 from MSYS2.
+To get MingW64, grab it with MSYS2 (mingw-w64-x86_64-gcc) (mingw-w64-x86_64-make)
 You can try other compiler who can work with Emscripten ToolChain but you'll have to recompile FreeType too using the same toolchain and compiler.
 ```
 $ build.bat
