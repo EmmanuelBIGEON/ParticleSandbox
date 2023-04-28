@@ -83,9 +83,9 @@ void Application::CreateWindow()
         Particle_OPENGL::LoadParticleVAO();
 
         // Load the scene.
-        LoadScene_Main();
+        // LoadScene_Main();
         // LoadScene_Behavior();
-        // LoadScene_Testing();
+        LoadScene_Testing();
         
     });
 

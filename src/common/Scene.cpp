@@ -6,6 +6,7 @@
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
 #include "../graphics/components/adapters/WigglingCircle.h"
+#include "../graphics/components/adapters/ParticleAdapter.h"
 #include "../graphics/components/common/GraphicText.h"
 #include "../graphics/components/common/GraphicImage.h"
 #include "../graphics/components/common/GraphicLine.h"
@@ -140,11 +141,14 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
     Scene* scene = new Scene(graphicContext, true);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
-    Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
-    input->SetNumberOnly(true);
-    input->SetMaxSize(5);
+    // Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
+    // input->SetNumberOnly(true);
+    // input->SetMaxSize(5);
 
     Checkbox* checkbox = new Checkbox(graphicContext, &GraphicContext::useVelocity,glm::vec2(700.0f, 700.0f));
+
+    ParticleAdapter* adapter = new ParticleAdapter(graphicContext, glm::vec2(400.0f, 400.0f), glm::vec3(0.2f, 0.8f, 0.2f));
+    
 
     return scene;
 }

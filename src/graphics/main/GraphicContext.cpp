@@ -294,6 +294,11 @@ void GraphicContext::Render()
                 shader_ui->Use();
                 if(!object->IsUpdated()) object->Update();   
                 break;
+            }case SHADER_PARTICLE:
+            {
+                shader_particle->Use();
+                if(!object->IsUpdated()) object->Update();   
+                break;
             }
         }
         object->Draw();
@@ -642,7 +647,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     m_ParticleAdaptersMutex.lock();
     
     shader_particle->Use();
-    glBindVertexArray(Particle_OPENGL::VAO);
+    glBindVertexArray(Particle_OPENGL::pVAO);
     
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
@@ -967,7 +972,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             *currentPA_y = *currentPA_y - worldHeight;
 
         shader_particle->SetVec2("shiftPos", glm::vec2(*currentPA_x, *currentPA_y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
 
         currentPA_x++;
         currentPA_y++;
@@ -986,7 +991,7 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
     m_ParticleAdaptersMutex.lock();
     
     shader_particle->Use();
-    glBindVertexArray(Particle_OPENGL::VAO);
+    glBindVertexArray(Particle_OPENGL::pVAO);
     
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
@@ -1346,7 +1351,7 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             *currentPA_y = *currentPA_y - worldHeight;
 
         shader_particle->SetVec2("shiftPos", glm::vec2(*currentPA_x, *currentPA_y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
 
         currentPA_x++;
         currentPA_y++;
@@ -1416,7 +1421,7 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
     thread4.join();
 #endif
     shader_particle->Use();
-    glBindVertexArray(Particle_OPENGL::VAO);
+    glBindVertexArray(Particle_OPENGL::pVAO);
 
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
@@ -1440,11 +1445,11 @@ void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
     }
 
     // draw
-    glBindVertexArray(Particle_OPENGL::VAO);
+    glBindVertexArray(Particle_OPENGL::pVAO);
     for(int i = 0; i < nb_particles; i++)
     {
         shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
     }
 
 
@@ -1667,7 +1672,7 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
 void GraphicContext::DrawParticles(ParticleClass particleClass)
 {
     shader_particle->Use();
-    glBindVertexArray(Particle_OPENGL::VAO);
+    glBindVertexArray(Particle_OPENGL::pVAO);
 
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
@@ -1690,7 +1695,7 @@ void GraphicContext::DrawParticles(ParticleClass particleClass)
     for(int i = 0; i < nb_particles; i++)
     {
         shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::nbVertices);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
     }
 }
 

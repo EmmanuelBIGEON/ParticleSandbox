@@ -13,12 +13,12 @@ float particleRadius = 5.0f;
 
 namespace Particle_OPENGL
 {
-    unsigned int VAO = 0;
-    unsigned int VBO = 0;
-    float* vertices = nullptr;
-    int nbVertices = 0;
+    unsigned int pVAO = 0;
+    unsigned int pVBO = 0;
+    float* pvertices = nullptr;
+    int pnbVertices = 0;
 
-    void LoadParticleVAO()
+    void LoadParticleVAO(unsigned int& VAO, unsigned int& VBO, float*& vertices, int& nbVertices, float radius)
     {
         if(vertices != nullptr)
         {
@@ -29,7 +29,6 @@ namespace Particle_OPENGL
         }
 
         // Create the VAO and VBO for the particle.
-        float radius = particleRadius;
 
         // Calculate the number of vertices depending on the radius (for a better circle)
         // More vertices as the circle is bigger.

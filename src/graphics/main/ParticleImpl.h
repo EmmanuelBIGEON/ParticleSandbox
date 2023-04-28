@@ -15,14 +15,16 @@ extern float particleRadius;
 // It replaced the previous (ParticleAdapter.cpp)
 namespace Particle_OPENGL
 {
+    extern unsigned int pVAO;
+    extern unsigned int pVBO;
+    extern float* pvertices;
+    extern int pnbVertices;
+
     //! \brief Initialize the VAO and VBO for the particle.
     //! The purpose is to reduce as much as possible the computation needed to draw the particle.
-    void LoadParticleVAO();
+    void LoadParticleVAO(unsigned int& VAO = Particle_OPENGL::pVAO, unsigned int& VBO = Particle_OPENGL::pVBO,
+                         float*& vertices = Particle_OPENGL::pvertices, int& nbVertices = Particle_OPENGL::pnbVertices, float radius = particleRadius);
 
-    extern unsigned int VAO;
-    extern unsigned int VBO;
-    extern float* vertices;
-    extern int nbVertices;
     
 };
 

@@ -42,6 +42,7 @@ set(SOURCES
     ../src/graphics/components/adapters/CircleAdapter.cpp
     ../src/graphics/components/adapters/PanickedCircle.cpp
     ../src/graphics/components/adapters/WigglingCircle.cpp
+    ../src/graphics/components/adapters/ParticleAdapter.cpp
     ../src/graphics/components/common/GraphicText.cpp
     ../src/graphics/components/common/GraphicImage.cpp
     ../src/graphics/components/common/GraphicLine.cpp
