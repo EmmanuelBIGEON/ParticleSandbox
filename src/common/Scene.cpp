@@ -170,16 +170,44 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
     MatrixStatebox* matrixStatebox = new MatrixStatebox(3);
     matrixStatebox->Init(graphicContext);
 
+    ParticleBehavior* behavior = graphicContext->GetParticleBehavior(ParticleClass::PART_CLASS_1, ParticleClass::PART_CLASS_3);
+
     matrixStatebox->GetStatebox(0,0)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
     matrixStatebox->GetStatebox(0,0)->AddStateAction(0, [](){std::cout << "State 1" << std::endl;});
     matrixStatebox->GetStatebox(1,1)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
     matrixStatebox->GetStatebox(1,1)->AddStateAction(0, [](){std::cout << "State 2" << std::endl;});
     matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 0.0f, 1.0f));
-    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [](){std::cout << "State 3" << std::endl;});
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [behavior](){
+        behavior->attraction = 0.0f;
+        behavior->repulsion = 0.0f;
+        behavior->attraction_distance = 0.0f;
+        behavior->repulsion_distance = 0.0f;
+    });
     matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
-    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [](){std::cout << "State 3" << std::endl;});
-    matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
-    matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [](){std::cout << "State 3" << std::endl;});
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(1, [behavior](){
+        behavior->attraction = 5.381f;
+        behavior->repulsion = 100.21f;
+        behavior->repulsion_distance = 10.23f;
+        behavior->attraction_distance = 200.0f;
+    });
+    matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [behavior](){
+        behavior->attraction = 5.381f;
+        behavior->repulsion = 1.21f;
+        behavior->repulsion_distance = 700.23f;
+        behavior->attraction_distance = 0.0f;
+    });
+
+    // matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
+    // matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [](){std::cout << "State 3" << std::endl;});
+
+    float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
+    float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
+    float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
+    float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
+    graphicContext->AddParticles(300, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(300, PART_CLASS_3, xmin, xmax, ymin, ymax);
+    GraphicContext::behaviorDriven = true;
 
     return scene;
 }

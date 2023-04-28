@@ -673,6 +673,9 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     float perf_repulsion_maximum_distance = repulsion_maximum_distance;
     float perf_attraction_threshold_distance = attraction_threshold_distance;
 
+    __m256 mm_zeros = _mm256_set1_ps(0.0f);
+    __m256 mm_minus = _mm256_set1_ps(-1.0f);
+
     switch(particleClass)
     {
         case PART_CLASS_1:
@@ -714,18 +717,9 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     float* targetPA_mass = nullptr;
     int targetPA_nb = 0;
 
-    // prepare main variables
-    __m256 mm_attraction_factor = _mm256_set1_ps(perf_attraction_factor);
-    __m256 mm_repulsion_factor = _mm256_set1_ps(perf_repulsion_factor);
-    __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(perf_repulsion_maximum_distance);
-    __m256 mm_attraction_threshold_distance = _mm256_set1_ps(perf_attraction_threshold_distance);
-    __m256 mm_zeros = _mm256_set1_ps(0.0f);
-    __m256 mm_minus = _mm256_set1_ps(-1.0f);
 
     while(currentPA_x < currentend_cursor)
     {
-
-        
         // -- initialize configuration -- 
         // load scalar (current x and y)
         __m256 scalar_x = _mm256_set1_ps(*currentPA_x);
@@ -814,16 +808,20 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
             if(behaviorDriven)
             {
                 // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
-                const ParticleBehaviour& behavior = m_ParticleBehaviours[std::make_pair(particleClass, particle_class)];
-                perf_attraction_factor = behavior.attraction;
-                perf_repulsion_factor = behavior.repulsion;
-                perf_attraction_threshold_distance = behavior.attraction_distance;
-                perf_repulsion_maximum_distance = behavior.repulsion_distance;
+                ParticleBehavior* behavior = m_ParticleBehaviors[std::make_pair(particleClass, particle_class)];
+                perf_attraction_factor = behavior->attraction;
+                perf_repulsion_factor = behavior->repulsion;
+                perf_attraction_threshold_distance = behavior->attraction_distance;
+                perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
+            // prepare main variables
+            __m256 mm_attraction_factor = _mm256_set1_ps(perf_attraction_factor);
+            __m256 mm_repulsion_factor = _mm256_set1_ps(perf_repulsion_factor);
+            __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(perf_repulsion_maximum_distance);
+            __m256 mm_attraction_threshold_distance = _mm256_set1_ps(perf_attraction_threshold_distance);
 
             // -- begin calculations --
-
             while(targetPA_x < targetend_cursor)
             {
                 // load vector (other x and y)
@@ -981,9 +979,12 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     }
 
     m_ParticleAdaptersMutex.unlock();
-
-
 #endif    
+}
+
+ParticleBehavior* GraphicContext::GetParticleBehavior(ParticleClass c1, ParticleClass c2)
+{
+    return m_ParticleBehaviors.at(std::pair<ParticleClass, ParticleClass>(c1, c2));
 }
    
 void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
@@ -1145,11 +1146,11 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             if(behaviorDriven)
             {
                 // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
-                const ParticleBehaviour& behavior = m_ParticleBehaviours[std::make_pair(particleClass, particle_class)];
-                perf_attraction_factor = behavior.attraction;
-                perf_repulsion_factor = behavior.repulsion;
-                perf_attraction_threshold_distance = behavior.attraction_distance;
-                perf_repulsion_maximum_distance = behavior.repulsion_distance;
+                ParticleBehavior* behavior = m_ParticleBehaviors[std::make_pair(particleClass, particle_class)];
+                perf_attraction_factor = behavior->attraction;
+                perf_repulsion_factor = behavior->repulsion;
+                perf_attraction_threshold_distance = behavior->attraction_distance;
+                perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
             // Apply current velocity to current particle.
@@ -1576,11 +1577,11 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             if(behaviorDriven)
             {
                 // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
-                const ParticleBehaviour& behavior = m_ParticleBehaviours[std::make_pair(particleClass, particle_class)];
-                perf_attraction_factor = behavior.attraction;
-                perf_repulsion_factor = behavior.repulsion;
-                perf_attraction_threshold_distance = behavior.attraction_distance;
-                perf_repulsion_maximum_distance = behavior.repulsion_distance;
+                ParticleBehavior* behavior = m_ParticleBehaviors[std::make_pair(particleClass, particle_class)];
+                perf_attraction_factor = behavior->attraction;
+                perf_repulsion_factor = behavior->repulsion;
+                perf_attraction_threshold_distance = behavior->attraction_distance;
+                perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
             // -- begin calculations --
@@ -1701,7 +1702,7 @@ void GraphicContext::DrawParticles(ParticleClass particleClass)
 
 void GraphicContext::InitBehaviors()
 {
-    m_ParticleBehaviours.clear();
+    m_ParticleBehaviors.clear();
 
 // float GraphicContext::repulsion_factor = 1.21f;
 // float GraphicContext::attraction_factor = 0.381f;
@@ -1710,77 +1711,77 @@ void GraphicContext::InitBehaviors()
 
     // --------------------- Class 1 ---------------------
     // How Class1 affect itself
-    ParticleBehaviour pb1_1;
-    pb1_1.attraction = 0.381f;
-    pb1_1.repulsion = 100.21f;
-    pb1_1.repulsion_distance = 10.23f;
-    pb1_1.attraction_distance = 100.0f;
+    ParticleBehavior* pb1_1 = new ParticleBehavior();
+    pb1_1->attraction = 0.381f;
+    pb1_1->repulsion = 100.21f;
+    pb1_1->repulsion_distance = 10.23f;
+    pb1_1->attraction_distance = 100.0f;
 
     // How Class 1 react to Class2
-    ParticleBehaviour pb1_2;
-    pb1_2.attraction = 2.0f;
-    pb1_2.repulsion = 2.0f;
-    pb1_2.repulsion_distance = 20.0f;
-    pb1_2.attraction_distance = 20.0f;
+    ParticleBehavior* pb1_2 = new ParticleBehavior();
+    pb1_2->attraction = 2.0f;
+    pb1_2->repulsion = 2.0f;
+    pb1_2->repulsion_distance = 20.0f;
+    pb1_2->attraction_distance = 20.0f;
 
     // How Class 1 react to Class3
-    ParticleBehaviour pb1_3;
-    pb1_3.attraction = 5.381f;
-    pb1_3.repulsion = 100.21f;
-    pb1_3.repulsion_distance = 10.23f;
-    pb1_3.attraction_distance = 200.0f;
+    ParticleBehavior* pb1_3 = new ParticleBehavior();
+    pb1_3->attraction = 5.381f;
+    pb1_3->repulsion = 100.21f;
+    pb1_3->repulsion_distance = 10.23f;
+    pb1_3->attraction_distance = 200.0f;
 
     // --------------------- Class 2 ---------------------
     // How Class2 affect itselfperf_attraction_factor
-    ParticleBehaviour pb2_2;
-    pb2_2.attraction = 5.381f;
-    pb2_2.repulsion = 100.0f;
-    pb2_2.repulsion_distance = 10.0f;
-    pb2_2.attraction_distance = 125.0f;
+    ParticleBehavior* pb2_2 = new ParticleBehavior();
+    pb2_2->attraction = 5.381f;
+    pb2_2->repulsion = 100.0f;
+    pb2_2->repulsion_distance = 10.0f;
+    pb2_2->attraction_distance = 125.0f;
 
     // How Class 2 react to Class1
-    ParticleBehaviour pb2_1;
-    pb2_1.attraction = 1.0f;
-    pb2_1.repulsion = 70.21f;
-    pb2_1.repulsion_distance = 200.0f;
-    pb2_1.attraction_distance = 0.0f;
+    ParticleBehavior* pb2_1 = new ParticleBehavior();
+    pb2_1->attraction = 1.0f;
+    pb2_1->repulsion = 70.21f;
+    pb2_1->repulsion_distance = 200.0f;
+    pb2_1->attraction_distance = 0.0f;
 
     // How Class 2 react to Class3
-    ParticleBehaviour pb2_3;
-    pb2_3.attraction = 5.381f;
-    pb2_3.repulsion = 100.21f;
-    pb2_3.repulsion_distance = 10.0f;
-    pb2_3.attraction_distance = 200.0f;
+    ParticleBehavior* pb2_3 = new ParticleBehavior();
+    pb2_3->attraction = 5.381f;
+    pb2_3->repulsion = 100.21f;
+    pb2_3->repulsion_distance = 10.0f;
+    pb2_3->attraction_distance = 200.0f;
 
     // --------------------- Class 3 ---------------------
     // How Class3 affect itself
-    ParticleBehaviour pb3_3;
-    pb3_3.attraction = 10.381f;
-    pb3_3.repulsion = 100.21f;
-    pb3_3.repulsion_distance = 2.0f;
-    pb3_3.attraction_distance = 10.0f;
+    ParticleBehavior* pb3_3 = new ParticleBehavior();
+    pb3_3->attraction = 10.381f;
+    pb3_3->repulsion = 100.21f;
+    pb3_3->repulsion_distance = 2.0f;
+    pb3_3->attraction_distance = 10.0f;
 
     // How Class 3 react to Class1
-    ParticleBehaviour pb3_1;
-    pb3_1.attraction = 0.0381f;
-    pb3_1.repulsion = 100.21f;
-    pb3_1.repulsion_distance = 30.0f;
-    pb3_1.attraction_distance = 700.0f;
+    ParticleBehavior* pb3_1 = new ParticleBehavior();
+    pb3_1->attraction = 0.0381f;
+    pb3_1->repulsion = 100.21f;
+    pb3_1->repulsion_distance = 30.0f;
+    pb3_1->attraction_distance = 700.0f;
 
     // How Class 3 react to Class2
-    ParticleBehaviour pb3_2;
-    pb3_2.attraction = 5.381f;
-    pb3_2.repulsion = 40.21f;
-    pb3_2.repulsion_distance = 2.0f;
-    pb3_2.attraction_distance = 150.0f;
+    ParticleBehavior* pb3_2 = new ParticleBehavior();
+    pb3_2->attraction = 5.381f;
+    pb3_2->repulsion = 40.21f;
+    pb3_2->repulsion_distance = 2.0f;
+    pb3_2->attraction_distance = 150.0f;
 
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_1)] =  pb1_1;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_2)] =  pb1_2;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_3)] =  pb1_3;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_2, PART_CLASS_2)] =  pb2_2;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_2, PART_CLASS_1)] =  pb2_1;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_2, PART_CLASS_3)] =  pb2_3;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_3)] =  pb3_3;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_1)] =  pb3_1;
-    m_ParticleBehaviours[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_2)] =  pb3_2;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_1)] =  pb1_1;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_2)] =  pb1_2;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_3)] =  pb1_3;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_2, PART_CLASS_2)] =  pb2_2;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_2, PART_CLASS_1)] =  pb2_1;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_2, PART_CLASS_3)] =  pb2_3;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_3)] =  pb3_3;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_1)] =  pb3_1;
+    m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_2)] =  pb3_2;
 }

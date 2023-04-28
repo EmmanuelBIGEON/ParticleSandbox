@@ -74,6 +74,8 @@ class GraphicContext
             float rangex_min = 0.0f, float rangex_max = GraphicContext::worldWidth, float rangey_min = 0.0f, float rangey_max = GraphicContext::worldHeight);
         void AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
 
+        ParticleBehavior* GetParticleBehavior(ParticleClass c1, ParticleClass c2);
+
         void SetColor_particles_type1(const glm::vec3& color) { PA1_color = color; }
         void SetColor_particles_type2(const glm::vec3& color) { PA2_color = color; }
         void SetColor_particles_type3(const glm::vec3& color) { PA3_color = color; }
@@ -86,6 +88,7 @@ class GraphicContext
         const int& GetNbParticles_type1() const { return m_nb_PA1; }
         const int& GetNbParticles_type2() const { return m_nb_PA2; }
         const int& GetNbParticles_type3() const { return m_nb_PA3; }
+
 
         Font* font_main;
         
@@ -191,9 +194,9 @@ class GraphicContext
         // used for calculation.
         std::vector<ParticleClass> m_ParticleClasses;
 
-        // List behaviour for each particle class, the left one is the source and the behavior affect how the right one affect the left one.
+        // List Behavior for each particle class, the left one is the source and the behavior affect how the right one affect the left one.
         // For instance, to give a behavior for particleClass1, define (PART_CLASS_1, PART_CLASS_1) and (PART_CLASS_1, PART_CLASS_2) and (PART_CLASS_1, PART_CLASS_3)
-        std::map<std::pair<ParticleClass, ParticleClass>, ParticleBehaviour> m_ParticleBehaviours;
+        std::map<std::pair<ParticleClass, ParticleClass>, ParticleBehavior*> m_ParticleBehaviors;
 
         // mutex for the particle adapters
         std::mutex m_ParticleAdaptersMutex;

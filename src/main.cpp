@@ -50,6 +50,7 @@ int main()
     DisplayArchSupport();
 #endif
 
+
     Application* app = Application::GetInstance();
     app->Run();
     return 0;
