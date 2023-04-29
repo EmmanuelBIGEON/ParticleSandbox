@@ -743,16 +743,20 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalarY_bottom_to_top)); // repetition of x and y on (bottom left transported to top right)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y + worldHeight)); // repetition of x and y on (bottom left transported to top right)
             }else{
                 // Top left corner.
                 __m256 scalarX_left_to_right = _mm256_add_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalarY_top_to_bottom)); // repetition of x and y on (top left transported to bottom right) 
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y - worldHeight)); // repetition of x and y on (top left transported to bottom right)
             }
         }else{
             if(*currentPA_y < (worldHeight / 2)){
@@ -761,16 +765,20 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
                 __m256 scalarY_bottom_to_top = _mm256_add_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalarY_bottom_to_top)); // repetition of x and y on (bottom right transported to top left)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y + worldHeight)); // repetition of x and y on (bottom right transported to top left)
             }else{
                 // Top right corner.
                 __m256 scalarX_right_to_left = _mm256_sub_ps(scalar_x, _mm256_set1_ps(worldWidth));
                 __m256 scalarY_top_to_bottom = _mm256_sub_ps(scalar_y, _mm256_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalarY_top_to_bottom)); // repetition of x and y on (top right transported to bottom left)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y - worldHeight)); // repetition of x and y on (top right transported to bottom left)
             }
         } 
         int sizeConfig = vec_scalarXY_config.size();
@@ -1092,16 +1100,20 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
                 __m128 scalarY_bottom_to_top = _mm_add_ps(scalar_y, _mm_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalarY_bottom_to_top)); // repetition of x and y on (bottom left transported to top right)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y + worldHeight)); // repetition of x and y on (bottom left transported to top right)
             }else{
                 // Top left corner.
                 __m128 scalarX_left_to_right = _mm_add_ps(scalar_x, _mm_set1_ps(worldWidth));
                 __m128 scalarY_top_to_bottom = _mm_sub_ps(scalar_y, _mm_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalar_y)); // repetition of x on (left transported to right)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_left_to_right, scalarY_top_to_bottom)); // repetition of x and y on (top left transported to bottom right)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y)); // repetition of x on (left transported to right)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x + worldWidth, *currentPA_y - worldHeight)); // repetition of x and y on (top left transported to bottom right)
             }
         }else{
             if(*currentPA_y < (worldHeight / 2)){
@@ -1110,16 +1122,20 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
                 __m128 scalarY_bottom_to_top = _mm_add_ps(scalar_y, _mm_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_bottom_to_top)); // repetition of y on (bottom transported to top)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalarY_bottom_to_top)); // repetition of x and y on (bottom right transported to top left)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y + worldHeight)); // repetition of y on (bottom transported to top)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y + worldHeight)); // repetition of x and y on (bottom right transported to top left)
             }else{
                 // Top right corner.
                 __m128 scalarX_right_to_left = _mm_sub_ps(scalar_x, _mm_set1_ps(worldWidth));
                 __m128 scalarY_top_to_bottom = _mm_sub_ps(scalar_y, _mm_set1_ps(worldHeight));
                 vec_scalarXY_config.push_back(std::make_pair(scalar_x, scalarY_top_to_bottom)); // repetition of y on (top transported to bottom)
                 vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalar_y)); // repetition of x on (right transported to left)
+                vec_scalarXY_config.push_back(std::make_pair(scalarX_right_to_left, scalarY_top_to_bottom)); // repetition of x and y on (top right transported to bottom left)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x, *currentPA_y - worldHeight)); // repetition of y on (top transported to bottom)
                 vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y)); // repetition of x on (right transported to left)
+                vec_x_y_config.push_back(std::make_pair(*currentPA_x - worldWidth, *currentPA_y - worldHeight)); // repetition of x and y on (top right transported to bottom left)
             }
         } 
         int sizeConfig = vec_scalarXY_config.size();
@@ -1526,20 +1542,24 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
                 // Bottom left corner.
                 XY_config.push_back(std::make_pair(xvalue, bottom_to_top)); // repetition of y on (top)
                 XY_config.push_back(std::make_pair(left_to_right, yvalue)); // repetition of x on (right)
+                XY_config.push_back(std::make_pair(left_to_right, bottom_to_top)); // repetition of x and y on (top right)
             }else{
                 // Top left corner.
                 XY_config.push_back(std::make_pair(xvalue, top_to_bottom)); // repetition of y on (top transported to bottom)
                 XY_config.push_back(std::make_pair(left_to_right, yvalue)); // repetition of x on (right)
+                XY_config.push_back(std::make_pair(left_to_right, top_to_bottom)); // repetition of x and y on (bottom right)
             }
         }else{
             if(yvalue < (worldHeight / 2)){
                 // Bottom right corner.
                 XY_config.push_back(std::make_pair(xvalue, bottom_to_top)); // repetition of y on (bottom)
                 XY_config.push_back(std::make_pair(right_to_left, yvalue)); // repetition of x on (left)
+                XY_config.push_back(std::make_pair(right_to_left, bottom_to_top)); // repetition of x and y on (top left)
             }else{
                 // Top right corner.
                 XY_config.push_back(std::make_pair(xvalue, top_to_bottom)); // repetition of y on (top transported to bottom)
                 XY_config.push_back(std::make_pair(right_to_left, yvalue)); // repetition of x on (left)
+                XY_config.push_back(std::make_pair(right_to_left, top_to_bottom)); // repetition of x and y on (bottom left)
             }
         } 
         int sizeConfig = XY_config.size();

@@ -70,3 +70,26 @@ namespace Particle_OPENGL
     }
 }
 
+void ParticleBehavior::Repulsion()
+{
+    this->attraction = 5.381f;
+    this->repulsion = 1.21f;
+    this->repulsion_distance = 700.23f;
+    this->attraction_distance = 0.0f;
+}
+
+void ParticleBehavior::Attraction()
+{
+    this->attraction = 5.381f;
+    this->repulsion = 100.21f;
+    this->repulsion_distance = 10.23f;
+    this->attraction_distance = 200.0f;
+}
+
+void ParticleBehavior::None()
+{
+    this->repulsion = 0.0f;
+    this->attraction = 0.0f;
+    this->repulsion_distance = 0.0f;
+    this->attraction_distance = 0.0f;
+}

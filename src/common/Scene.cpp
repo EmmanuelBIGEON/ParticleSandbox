@@ -191,12 +191,7 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
         behavior->attraction_distance = 200.0f;
     });
     matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
-    matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [behavior](){
-        behavior->attraction = 5.381f;
-        behavior->repulsion = 1.21f;
-        behavior->repulsion_distance = 700.23f;
-        behavior->attraction_distance = 0.0f;
-    });
+    matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [behavior](){behavior->Repulsion();});
 
     // matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
     // matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [](){std::cout << "State 3" << std::endl;});

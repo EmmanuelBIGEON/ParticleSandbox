@@ -60,4 +60,14 @@ struct ParticleBehavior
     float attraction;
     float repulsion_distance;
     float attraction_distance;
+
+        
+    // Setup a few preconfigured behaviors
+    void Repulsion();
+    void Attraction();
+    void None();
+
+
+
 };
+
