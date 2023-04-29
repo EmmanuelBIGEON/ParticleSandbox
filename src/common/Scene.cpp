@@ -202,9 +202,9 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
     float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
     float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
     float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
-    graphicContext->AddParticles(800, PART_CLASS_1, xmin, xmax, ymin, ymax);
-    graphicContext->AddParticles(800, PART_CLASS_2, xmin, xmax, ymin, ymax);
-    graphicContext->AddParticles(800, PART_CLASS_3, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(700, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(700, PART_CLASS_2, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(700, PART_CLASS_3, xmin, xmax, ymin, ymax);
     GraphicContext::behaviorDriven = true;
 
     return scene;

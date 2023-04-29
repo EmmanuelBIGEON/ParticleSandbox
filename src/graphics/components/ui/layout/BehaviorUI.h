@@ -3,6 +3,8 @@
 #include "../../../main/GraphicContext.h"
 #include "LayoutUI.h"
 
+#include "../../../../common/Signal.h"
+
 class RectangleAdapter;
 class ParticleMatrix;
 class Slider;
@@ -21,6 +23,9 @@ class BehaviorUI : public LayoutUI
         virtual void Update() override;
     private:
     
+        GraphicText* m_particlesCountText;
+        GraphicText* m_fpsText;
+
         RectangleAdapter* m_rectangleUI; // background of the UI
         ParticleMatrix* m_matrix;
         
@@ -29,6 +34,12 @@ class BehaviorUI : public LayoutUI
         GraphicText* label_movementintensity;
         Slider* slider_movementintensity;
 
+        // Create the slot here so they are destroyed on the destruction of the UI
+        Slot<int>* m_particleAddedSlot;
+
         int m_width;
         int m_height;
+        
+        int m_particlesCount;
+        int m_fps;
 };

@@ -6,9 +6,13 @@
 #include "../ParticleMatrix.h"
 #include "../Slider.h"
 
+#include "../../../../common/Application.h"
+
 #include <iostream>
 
-BehaviorUI::BehaviorUI(int width, int height) : m_rectangleUI(nullptr), m_matrix(nullptr), m_width(width), m_height(height)
+BehaviorUI::BehaviorUI(int width, int height) : m_rectangleUI(nullptr), m_matrix(nullptr), m_width(width), m_height(height),
+    label_particleradius(nullptr), slider_particleradius(nullptr), label_movementintensity(nullptr), slider_movementintensity(nullptr),
+    m_particlesCountText(nullptr), m_fpsText(nullptr), m_fps(0), m_particlesCount(0)
 {
 }
 
@@ -30,8 +34,16 @@ void BehaviorUI::Init(GraphicContext* context)
 
     // Start Drawing UI from top !
     float cursorY = GraphicContext::worldHeight;
-    cursorY -= 150.0f;
 
+    cursorY -= 10.0f;
+    std::string text = "Particles: " + std::to_string(0); 
+    std::string text2 = "FPS: " + std::to_string(0);
+    m_particlesCountText = new GraphicText(context, text.c_str(), glm::vec2(30.0f, cursorY), glm::vec2(30.0f + m_width, cursorY - 25));
+    m_particlesCountText->SetAlignment(TextAlign::ALIGN_LEFT);
+    cursorY -= context->font_main->GetSize();
+    m_fpsText = new GraphicText(context, text2.c_str(), glm::vec2(30.0f, cursorY), glm::vec2(30.0f + m_width,cursorY - 25));
+    m_fpsText->SetAlignment(TextAlign::ALIGN_LEFT);
+    cursorY -= 160.0f;
     m_matrix = new ParticleMatrix(glm::vec2(m_width/4.0f, cursorY));
     m_matrix->Init(context);
 
@@ -47,8 +59,24 @@ void BehaviorUI::Init(GraphicContext* context)
         Particle_OPENGL::LoadParticleVAO();
     });
     
+    // Connect the watcher to the context
+    m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)
+    {
+        m_particlesCount += nb;
+    });
+
 }
 
 void BehaviorUI::Update()
 {
+    m_fps = Application::fps;
+
+    std::string text = "Particles: ";
+    text += std::to_string(m_particlesCount);
+
+    std::string text2 = "FPS: ";
+    text2 += std::to_string(m_fps);
+
+    m_particlesCountText->SetText(text.c_str());
+    m_fpsText->SetText(text2.c_str());
 }

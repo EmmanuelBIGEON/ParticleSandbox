@@ -17,22 +17,17 @@ BasicUI::~BasicUI()
 
 void BasicUI::Init(GraphicContext* context)
 {
-    m_particlesCount = context->GetNbParticles_type1();
-    // Create the text
-    std::string text = "Particles: ";
-    text += std::to_string(m_particlesCount); 
 
-    std::string text2 = "FPS: ";
-    text2 += std::to_string(m_fps);
-
-    // -- Notice : The position calculation is horrible. --
-    // Need to find a better way to calculate.
-    // For now, some magic numbers are used.
     Rectangle r(Point(m_startingX, m_startingY), Point(m_startingX + m_width, m_startingY + m_height));
     m_rectangleUI = new RectangleAdapter(context, r);
     m_rectangleUI->SetColor(glm::vec3(0.2f, 0.2f, 0.2f));
     m_rectangleUI->SetOpacity(0.5f);
 
+    m_particlesCount =0;
+    std::string text = "Particles: ";
+    text += std::to_string(m_particlesCount); 
+    std::string text2 = "FPS: ";
+    text2 += std::to_string(m_fps);
     float cursorY = m_startingY + m_height;
     m_particlesCountText = new GraphicText(context, text.c_str(), glm::vec2(m_startingX, cursorY), glm::vec2(m_startingX + m_width, cursorY - 25));
     cursorY -= context->font_main->GetSize();
