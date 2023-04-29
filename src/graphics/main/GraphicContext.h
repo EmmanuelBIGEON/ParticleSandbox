@@ -74,6 +74,9 @@ class GraphicContext
             float rangex_min = 0.0f, float rangex_max = GraphicContext::worldWidth, float rangey_min = 0.0f, float rangey_max = GraphicContext::worldHeight);
         void AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
 
+        //! \brief Remove all particles 
+        void RemoveParticles();
+
         ParticleBehavior* GetParticleBehavior(ParticleClass c1, ParticleClass c2);
 
         void SetColor_particles_type1(const glm::vec3& color) { PA1_color = color; }

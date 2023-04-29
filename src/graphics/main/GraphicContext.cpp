@@ -1821,3 +1821,31 @@ const glm::vec3& GraphicContext::GetColorParticle(ParticleClass particleClass)
             return glm::vec3(1.0f, 1.0f, 1.0f);
     }
 }
+
+void GraphicContext::RemoveParticles()
+{
+    m_ParticleAdaptersMutex.lock();
+
+    delete[] m_PA1_posX;
+    delete[] m_PA1_posY;
+    delete[] m_PA1_mass;
+    delete[] m_PA1_velocityX;
+    delete[] m_PA1_velocityY;
+    m_nb_PA1 = 0;
+
+    delete[] m_PA2_posX;
+    delete[] m_PA2_posY;
+    delete[] m_PA2_mass;
+    delete[] m_PA2_velocityX;
+    delete[] m_PA2_velocityY;
+    m_nb_PA2 = 0;
+
+    delete[] m_PA3_posX;
+    delete[] m_PA3_posY;
+    delete[] m_PA3_mass;
+    delete[] m_PA3_velocityX;
+    delete[] m_PA3_velocityY;
+    m_nb_PA3 = 0;
+    
+    m_ParticleAdaptersMutex.unlock();
+}
