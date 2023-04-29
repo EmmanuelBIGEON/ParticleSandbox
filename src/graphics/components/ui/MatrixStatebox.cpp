@@ -5,8 +5,9 @@
 
 #include <glm/ext.hpp>
 
+float MatrixStatebox::padding = 5.0f;
 
-MatrixStatebox::MatrixStatebox(int m_dimSize) : m_dimSize(m_dimSize)
+MatrixStatebox::MatrixStatebox(int dimSize, const glm::vec2& position) : m_dimSize(dimSize), m_position(position)
 {
 }
 
@@ -28,17 +29,17 @@ void MatrixStatebox::Init(GraphicContext* context)
     }
 
     float sizeState = Statebox::sizeStatebox;
-    float padding = 5.0f;
     float posX,posY = 0.0f;
     // Create the stateboxes.
     for(int i = 0; i < m_dimSize; ++i)
     {
-        posX = (padding + sizeState) * i + padding;
+            posY = m_position.y + (padding + sizeState) * (m_dimSize - (i+1)) + padding;
         for(int j = 0; j < m_dimSize; ++j)
         {
-            posY = (padding + sizeState) * j + padding;
+            posX = m_position.x + (padding + sizeState) * j + padding;
             Statebox* statebox = new Statebox(context, glm::vec2(posX, posY));
             m_stateboxes[std::make_pair(i, j)] = statebox;
+            std::cout << "Created ! " << i << " " << j << std::endl;
         }
     }
 }
@@ -61,4 +62,23 @@ void MatrixStatebox::PrintDim()
 int MatrixStatebox::GetDim()
 {
     return m_dimSize;
+}
+
+float MatrixStatebox::GetWidth()
+{
+    return (m_dimSize * (padding + Statebox::sizeStatebox)) + padding;
+}
+
+float MatrixStatebox::GetHeight()
+{
+    return (m_dimSize * (padding + Statebox::sizeStatebox)) + padding;
+}
+
+void MatrixStatebox::PrintMap()
+{
+    // X Y ADRESS
+    for(auto it = m_stateboxes.begin(); it != m_stateboxes.end(); ++it)
+    {
+        std::cout << it->first.first << " " << it->first.second << " " << it->second << std::endl;
+    }
 }

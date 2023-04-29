@@ -1805,3 +1805,19 @@ void GraphicContext::InitBehaviors()
     m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_1)] =  pb3_1;
     m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_2)] =  pb3_2;
 }
+
+
+const glm::vec3& GraphicContext::GetColorParticle(ParticleClass particleClass)
+{
+    switch(particleClass)
+    {
+        case PART_CLASS_1:
+            return PA1_color;
+        case PART_CLASS_2:
+            return PA2_color;
+        case PART_CLASS_3:
+            return PA3_color;
+        default:
+            return glm::vec3(1.0f, 1.0f, 1.0f);
+    }
+}

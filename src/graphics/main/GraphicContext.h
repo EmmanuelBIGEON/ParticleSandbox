@@ -89,6 +89,9 @@ class GraphicContext
         const int& GetNbParticles_type2() const { return m_nb_PA2; }
         const int& GetNbParticles_type3() const { return m_nb_PA3; }
 
+        const std::vector<ParticleClass>& GetParticlesClasses() const { return m_ParticleClasses; }
+        const glm::vec3& GetColorParticle(ParticleClass particleClass);
+
 
         Font* font_main;
         

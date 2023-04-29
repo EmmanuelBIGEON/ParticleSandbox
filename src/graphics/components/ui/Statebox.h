@@ -28,6 +28,11 @@ class Statebox : public GraphicObject
         // RETURN: the next state id.
         int NextState();
 
+        //! Method used to trigger the action without waiting for the UI to receive a click.
+        //! Launch current state action if there is one.
+        //! Warning : Use this method only for special cases,  prioritize normal functionning.
+        void ManualTrigger();
+
         
         // Defined globally for all stateboxs
         static float sizeStatebox;

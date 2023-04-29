@@ -162,3 +162,10 @@ int Statebox::NextState()
 
     return res;
 }
+
+void Statebox::ManualTrigger()
+{
+    if(current_state == -1) return;
+    if(states_actions.find(current_state) != states_actions.end())
+        states_actions[current_state]();
+}

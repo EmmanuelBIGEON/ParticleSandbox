@@ -4,6 +4,8 @@
 
 #include "../../main/GraphicContext.h"
 
+#include <glm/ext.hpp>
+
 class Statebox;
 
 //! \class MatrixStatebox
@@ -11,7 +13,7 @@ class Statebox;
 class MatrixStatebox
 {
     public:
-        MatrixStatebox(int m_dimSize);
+        MatrixStatebox(int m_dimSize, const glm::vec2& position);
         ~MatrixStatebox();
 
         void Init(GraphicContext* context);
@@ -19,11 +21,18 @@ class MatrixStatebox
         Statebox* GetStatebox(int x, int y);
 
         void PrintDim();
-        int GetDim();
+        void PrintMap();
 
+        int GetDim();
+        float GetWidth();
+        float GetHeight();
+
+        static float padding;
     private:
 
+
         int m_dimSize;
+        glm::vec2 m_position;
 
         std::map<std::pair<int, int>, Statebox*> m_stateboxes;
 };
