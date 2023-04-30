@@ -151,7 +151,7 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, LayoutType::BEHAVIOR);
-    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->ConnectHandler(EVENT_HANDLER_UI);
 
     // Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
     // input->SetNumberOnly(true);

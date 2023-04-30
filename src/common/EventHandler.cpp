@@ -67,6 +67,26 @@ EventHandler_ParticleCreator::~EventHandler_ParticleCreator()
     m_Context->OnMouseReleased.Disconnect(m_SlotParticleCreator);
 }
 
+EventHandler_UI::EventHandler_UI(GraphicContext* context) : m_Context(context), m_SlotMoveParticles(nullptr)
+{
+    m_SlotMoveParticles = m_Context->OnKeyPressed.Connect([this](char key) {
+        if(key == 7) // left
+        {
+            m_Context->MoveParticles(-4.0f, 0.0f);
+        }else if(key == 6) // right
+        {
+            m_Context->MoveParticles(4.0f, 0.0f);
+        }else if(key == 8) // down
+        {
+            m_Context->MoveParticles(0.0f, -4.0f);
+        }else if(key == 9) // up
+        {
+            m_Context->MoveParticles(0.0f, 4.0f);
+        }
+    });
+    
+}
+
 
 //! \brief Create a particle on click
 void EventHandler_ParticleCreator::HandleEvent(const Event& event)
@@ -201,6 +221,7 @@ void EventHandler_UI::HandleEvent(const Event& event)
             char c = (char)value;
 
             m_Context->OnKeyPressed.Emit(c);
+            std:: cout << "key pressed : " << (int) c << std::endl;
         }
     }
 }

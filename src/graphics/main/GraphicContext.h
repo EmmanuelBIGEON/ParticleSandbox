@@ -95,7 +95,9 @@ class GraphicContext
         const std::vector<ParticleClass>& GetParticlesClasses() const { return m_ParticleClasses; }
         const glm::vec3& GetColorParticle(ParticleClass particleClass);
 
-
+        // Move particles, add x, y to all particles.
+        void MoveParticles(float x,  float y);
+        
         Font* font_main;
         
 
@@ -158,6 +160,7 @@ class GraphicContext
 
         // Simply draw the particles
         void DrawParticles(ParticleClass particleClass);
+
 
         // Instanciate behavior of particles
         void InitBehaviors();

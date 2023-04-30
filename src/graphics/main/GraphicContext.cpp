@@ -1925,3 +1925,28 @@ void GraphicContext::RemoveParticles()
     
     m_ParticleAdaptersMutex.unlock();
 }
+
+void GraphicContext::MoveParticles(float x,  float y)
+{
+    m_ParticleAdaptersMutex.lock();
+
+    for(int i = 0; i < m_nb_PA1; i++)
+    {
+        m_PA1_posX[i] += x;
+        m_PA1_posY[i] += y;
+    }
+
+    for(int i = 0; i < m_nb_PA2; i++)
+    {
+        m_PA2_posX[i] += x;
+        m_PA2_posY[i] += y;
+    }
+
+    for(int i = 0; i < m_nb_PA3; i++)
+    {
+        m_PA3_posX[i] += x;
+        m_PA3_posY[i] += y;
+    }
+
+    m_ParticleAdaptersMutex.unlock();
+}
