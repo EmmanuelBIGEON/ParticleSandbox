@@ -145,17 +145,15 @@ class GraphicContext
         //! Main function for rendering Particle, take particles of same class, and other class.
         // For now, act the same way for all the particles, but later, each class will have a behavior depending on the targeted class.
         void RenderParticles(ParticleClass particleClass);
+        void ComputeParticles_thread_avx2(ParticleClass particleClass, int start, int end);
 
         // In case AVX2 is not available and AVX available.
-        // This method will be use for WASM implementation as AVX2 is not available on WASM.
-        // https://emscripten.org/docs/porting/simd.html
+        // This method will be use for WASM implementation as AVX2 is not available on WASM. https://emscripten.org/docs/porting/simd.html
         void RenderParticles_without_avx2(ParticleClass particleClass);
+        void ComputeParticles_thread_avx(ParticleClass particleClass, int start, int end);
 
-        // incredibly slow method but, allow the program to run on all machines (using multithreading)
+        // incredibly slow method but, allow the program to run on all machines s
         void RenderParticles_without_avx(ParticleClass particleClass);
-
-        // Works with RenderParticles_without_avx
-        // Allow to render particles in a multithreaded way
         void ComputeParticles_thread(ParticleClass particleClass, int start, int end);
 
         // Simply draw the particles

@@ -646,20 +646,73 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 #ifdef _MSC_VER
     m_ParticleAdaptersMutex.lock();
     
+    // split particles size into 4
+    int nb_particles = 0;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            nb_particles = m_nb_PA1;
+            break;
+        case ParticleClass::PART_CLASS_2:
+            nb_particles = m_nb_PA2;
+            break;
+        case ParticleClass::PART_CLASS_3:
+            nb_particles = m_nb_PA3;
+            break;
+    }
+
+    int start_thread1 = 0;
+    int end_thread1 = nb_particles/3;
+    int start_thread2 = end_thread1;
+    int end_thread2 = 2*nb_particles/3;
+    int start_thread3 = end_thread2;
+    int end_thread3 = nb_particles;
+
+    std::thread thread1(&GraphicContext::ComputeParticles_thread_avx2, this, particleClass, start_thread1, end_thread1);
+    std::thread thread2(&GraphicContext::ComputeParticles_thread_avx2, this, particleClass, start_thread2, end_thread2);
+    std::thread thread3(&GraphicContext::ComputeParticles_thread_avx2, this, particleClass, start_thread3, end_thread3);
+
+    thread1.join();
+    thread2.join();
+    thread3.join();
+
+    m_ParticleAdaptersMutex.unlock();
+    
     shader_particle->Use();
     glBindVertexArray(Particle_OPENGL::pVAO);
-    
+
+    float* currentPA_x = nullptr;
+    float* currentPA_y = nullptr;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY; shader_particle->SetVec3("particleColor", PA1_color);break;
+        case ParticleClass::PART_CLASS_2:
+            currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY; shader_particle->SetVec3("particleColor", PA2_color); break;
+        case ParticleClass::PART_CLASS_3:
+            currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY; shader_particle->SetVec3("particleColor", PA3_color); break;
+    }
+
+    for(int i = 0; i < nb_particles; i++)
+    {
+        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
+    }
+    m_ParticleAdaptersMutex.unlock();
+#endif    
+}
+
+void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, int start, int end)
+{
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
     float* currentPA_mass = nullptr;
     float* currentPA_velX = nullptr;
     float* currentPA_velY = nullptr;
-    int currentPA_nb = 0;
     
     // Reduce time to access memory by advancing the cursor instead of always accessing the element of array.
     // Since the size of x and y are the same, we can use the same cursor for both.
     float* targetend_cursor = nullptr; 
-    float* currentend_cursor = nullptr;
 
     // resulting movement to apply to the particle
     float mvt_x = 0.0f;
@@ -680,34 +733,23 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     {
         case PART_CLASS_1:
         {
-            shader_particle->SetVec3("particleColor", PA1_color);
-            currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY;
-            currentPA_mass = m_PA1_mass;
-            currentPA_nb = m_nb_PA1;
-            currentend_cursor = m_PA1_posX + m_nb_PA1;
-            currentPA_velX = m_PA1_velocityX; currentPA_velY = m_PA1_velocityY;
+            currentPA_x = &m_PA1_posX[start]; currentPA_y = &m_PA1_posY[start];
+            currentPA_mass = &m_PA1_mass[start];
+            currentPA_velX = &m_PA1_velocityX[start]; currentPA_velY = &m_PA1_velocityY[start];
             break;
         }
         case PART_CLASS_2:
         {
-            shader_particle->SetVec3("particleColor", PA2_color);
-            
-            currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY;
-            currentPA_mass = m_PA2_mass;
-            currentPA_nb = m_nb_PA2;
-            currentend_cursor = m_PA2_posX + m_nb_PA2;
-            currentPA_velX = m_PA2_velocityX; currentPA_velY = m_PA2_velocityY;
+            currentPA_x = &m_PA2_posX[start]; currentPA_y = &m_PA2_posY[start];
+            currentPA_mass = &m_PA2_mass[start];
+            currentPA_velX = &m_PA2_velocityX[start]; currentPA_velY = &m_PA2_velocityY[start];
             break;
         }
         case PART_CLASS_3:
         {
-            shader_particle->SetVec3("particleColor", PA3_color);
-            
-            currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY;
-            currentPA_mass = m_PA3_mass;
-            currentPA_nb = m_nb_PA3;
-            currentend_cursor = m_PA3_posX + m_nb_PA3;
-            currentPA_velX = m_PA3_velocityX; currentPA_velY = m_PA3_velocityY;
+            currentPA_x = &m_PA3_posX[start]; currentPA_y = &m_PA3_posY[start];
+            currentPA_mass = &m_PA3_mass[start];
+            currentPA_velX = &m_PA3_velocityX[start]; currentPA_velY = &m_PA3_velocityY[start];
             break;
         }
     }
@@ -718,7 +760,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     int targetPA_nb = 0;
 
 
-    while(currentPA_x < currentend_cursor)
+    for(int i = start; i< end; i++)
     {
         // -- initialize configuration -- 
         // load scalar (current x and y)
@@ -977,17 +1019,12 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
         else if(*currentPA_y >= worldHeight)
             *currentPA_y = *currentPA_y - worldHeight;
 
-        shader_particle->SetVec2("shiftPos", glm::vec2(*currentPA_x, *currentPA_y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
-
         currentPA_x++;
         currentPA_y++;
         currentPA_velX++;
         currentPA_velY++;
     }
 
-    m_ParticleAdaptersMutex.unlock();
-#endif    
 }
 
 ParticleBehavior* GraphicContext::GetParticleBehavior(ParticleClass c1, ParticleClass c2)
@@ -999,9 +1036,62 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
 {
     m_ParticleAdaptersMutex.lock();
     
+    // split particles size into 4
+    int nb_particles = 0;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            nb_particles = m_nb_PA1;
+            break;
+        case ParticleClass::PART_CLASS_2:
+            nb_particles = m_nb_PA2;
+            break;
+        case ParticleClass::PART_CLASS_3:
+            nb_particles = m_nb_PA3;
+            break;
+    }
+
+    int start_thread1 = 0;
+    int end_thread1 = nb_particles/3;
+    int start_thread2 = end_thread1;
+    int end_thread2 = 2*nb_particles/3;
+    int start_thread3 = end_thread2;
+    int end_thread3 = nb_particles;
+
+    std::thread thread1(&GraphicContext::ComputeParticles_thread_avx, this, particleClass, start_thread1, end_thread1);
+    std::thread thread2(&GraphicContext::ComputeParticles_thread_avx, this, particleClass, start_thread2, end_thread2);
+    std::thread thread3(&GraphicContext::ComputeParticles_thread_avx, this, particleClass, start_thread3, end_thread3);
+
+    thread1.join();
+    thread2.join();
+    thread3.join();
+
+    m_ParticleAdaptersMutex.unlock();
+    
     shader_particle->Use();
     glBindVertexArray(Particle_OPENGL::pVAO);
-    
+
+    float* currentPA_x = nullptr;
+    float* currentPA_y = nullptr;
+    switch (particleClass)
+    {
+        case ParticleClass::PART_CLASS_1:
+            currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY; shader_particle->SetVec3("particleColor", PA1_color);break;
+        case ParticleClass::PART_CLASS_2:
+            currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY; shader_particle->SetVec3("particleColor", PA2_color); break;
+        case ParticleClass::PART_CLASS_3:
+            currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY; shader_particle->SetVec3("particleColor", PA3_color); break;
+    }
+
+    for(int i = 0; i < nb_particles; i++)
+    {
+        shader_particle->SetVec2("shiftPos", glm::vec2(currentPA_x[i], currentPA_y[i]));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
+    }
+}
+   
+void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, int start, int end)
+{
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
     float* currentPA_mass = nullptr;
@@ -1012,7 +1102,6 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
     // Reduce time to access memory by advancing the cursor instead of always accessing the element of array.
     // Since the size of x and y are the same, we can use the same cursor for both.
     float* targetend_cursor = nullptr; 
-    float* currentend_cursor = nullptr;
 
     // resulting movement to apply to the particle
     float mvt_x = 0.0f;
@@ -1031,35 +1120,24 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
     {
         case PART_CLASS_1:
         {
-            shader_particle->SetVec3("particleColor", PA1_color);
-            currentPA_x = m_PA1_posX; currentPA_y = m_PA1_posY;
-            currentPA_mass = m_PA1_mass;
-            currentPA_nb = m_nb_PA1;
-            currentend_cursor = m_PA1_posX + m_nb_PA1;
-            currentPA_velX = m_PA1_velocityX; currentPA_velY = m_PA1_velocityY;
+            currentPA_x = &m_PA1_posX[start]; currentPA_y = &m_PA1_posY[start];
+            currentPA_mass = &m_PA1_mass[start];
+            currentPA_velX = &m_PA1_velocityX[start]; currentPA_velY = &m_PA1_velocityY[start];
             break;
         }
         case PART_CLASS_2:
         {
-            shader_particle->SetVec3("particleColor", PA2_color);
-            
-            currentPA_x = m_PA2_posX; currentPA_y = m_PA2_posY;
-            currentPA_mass = m_PA2_mass;
-            currentPA_nb = m_nb_PA2;
-            currentend_cursor = m_PA2_posX + m_nb_PA2;
-            currentPA_velX = m_PA2_velocityX; currentPA_velY = m_PA2_velocityY;
+            currentPA_x = &m_PA2_posX[start]; currentPA_y = &m_PA2_posY[start];
+            currentPA_mass = &m_PA2_mass[start];
+            currentPA_velX = &m_PA2_velocityX[start]; currentPA_velY = &m_PA2_velocityY[start];
 
             break;
         }
         case PART_CLASS_3:
         {
-            shader_particle->SetVec3("particleColor", PA3_color);
-            
-            currentPA_x = m_PA3_posX; currentPA_y = m_PA3_posY;
-            currentPA_mass = m_PA3_mass;
-            currentPA_nb = m_nb_PA3;
-            currentend_cursor = m_PA3_posX + m_nb_PA3;
-            currentPA_velX = m_PA3_velocityX; currentPA_velY = m_PA3_velocityY;
+            currentPA_x = &m_PA3_posX[start]; currentPA_y = &m_PA3_posY[start];
+            currentPA_mass = &m_PA3_mass[start];
+            currentPA_velX = &m_PA3_velocityX[start]; currentPA_velY = &m_PA3_velocityY[start];
             break;
         }
     }
@@ -1070,14 +1148,11 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
     int targetPA_nb = 0;
 
     // prepare main variables
-    
     __m128 mm_zeros = _mm_set1_ps(0.0f);
     __m128 mm_minus = _mm_set1_ps(-1.0f);
 
-    while(currentPA_x < currentend_cursor)
+    for(int i = start; i< end; i++)
     {
-
-        
         // -- initialize configuration -- 
         // load scalar (current x and y)
         __m128 scalar_x = _mm_set1_ps(*currentPA_x);
@@ -1351,8 +1426,6 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             }
         }
 
-        std::cout << "mvt_x: " << mvt_x << " mvt_y: " << mvt_y << std::endl;
-        
         mvt_x *= movement_intensity;
         mvt_y *= movement_intensity;
 
@@ -1375,20 +1448,13 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             *currentPA_y = *currentPA_y + worldHeight;
         else if(*currentPA_y >= worldHeight)
             *currentPA_y = *currentPA_y - worldHeight;
-
-        shader_particle->SetVec2("shiftPos", glm::vec2(*currentPA_x, *currentPA_y));
-        glDrawArrays(GL_TRIANGLE_FAN, 0, Particle_OPENGL::pnbVertices);
-
         currentPA_x++;
         currentPA_y++;
         currentPA_velX++;
         currentPA_velY++;
     }
-
-    m_ParticleAdaptersMutex.unlock();
-    
 }
-   
+
 void GraphicContext::RenderParticles_without_avx(ParticleClass particleClass)
 {
     // std::cout << "rendering without AVX" << std::endl;
