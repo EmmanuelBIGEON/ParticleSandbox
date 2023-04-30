@@ -41,12 +41,12 @@ class BasicUI : public LayoutUI
         
         GraphicText* label_repulsion;
         Slider* slider_repulsion;
-        GraphicText* label_attraction;
-        Slider* slider_attraction;
+        GraphicText* label_force;
+        Slider* slider_force;
         GraphicText* label_repulsiondistance;
         Slider* slider_repulsiondistance;
-        GraphicText* label_attractiondistance;
-        Slider* slider_attractiondistance;
+        GraphicText* label_forcedistance;
+        Slider* slider_forcedistance;
         GraphicText* label_particleradius;
         Slider* slider_particleradius;
         GraphicText* label_movementintensity;

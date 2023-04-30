@@ -37,14 +37,14 @@ void BasicUI::Init(GraphicContext* context)
     label_repulsion = new GraphicText(context, "Repulsion", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_repulsion = new Slider(context, 0.0f, 1.4f, &GraphicContext::repulsion_factor, m_startingX+ 85.0f, cursorY- 20.0f);
     cursorY -= 75.0f;
-    label_attraction = new GraphicText(context, "Attraction", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_attraction = new Slider(context, 0.0f, 0.7f, &GraphicContext::attraction_factor, m_startingX+ 85.0f, cursorY -20.0f);
+    label_force = new GraphicText(context, "force", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
+    slider_force = new Slider(context, 0.0f, 0.7f, &GraphicContext::force_factor, m_startingX+ 85.0f, cursorY -20.0f);
     cursorY -= 80.0f;
     label_repulsiondistance = new GraphicText(context, "Repulsion Distance", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_repulsiondistance = new Slider(context, 0.0f, 200.0f, &GraphicContext::repulsion_maximum_distance, m_startingX+ 85.0f, cursorY -40.0f);
     cursorY -= 100.0f;
-    label_attractiondistance = new GraphicText(context, "Attraction Distance", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
-    slider_attractiondistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::attraction_threshold_distance, m_startingX+ 85.0f, cursorY -40.0f);
+    label_forcedistance = new GraphicText(context, "force Distance", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
+    slider_forcedistance = new Slider(context, 0.0f, 700.0f, &GraphicContext::force_threshold_distance, m_startingX+ 85.0f, cursorY -40.0f);
     cursorY -= 90.0f;
     label_particleradius = new GraphicText(context, "Particle Radius", glm::vec2(m_startingX+ 8.0f, cursorY+50.0f), glm::vec2(m_startingX + m_width, cursorY - 25.0f));
     slider_particleradius = new Slider(context, 0.0f, 10.0f, &particleRadius, m_startingX+ 85.0f, cursorY -10.0f);
@@ -115,17 +115,17 @@ void BasicUI::Update()
     repulsion += std::to_string(GraphicContext::repulsion_factor);
     label_repulsion->SetText(repulsion.c_str());
 
-    std::string attraction = "Attraction: ";
-    attraction += std::to_string(GraphicContext::attraction_factor);
-    label_attraction->SetText(attraction.c_str());
+    std::string force = "force: ";
+    force += std::to_string(GraphicContext::force_factor);
+    label_force->SetText(force.c_str());
 
     std::string repulsiondistance = "Repulsion Distance: ";
     repulsiondistance += std::to_string(GraphicContext::repulsion_maximum_distance);
     label_repulsiondistance->SetText(repulsiondistance.c_str());
 
-    std::string attractiondistance = "Attraction Distance: ";
-    attractiondistance += std::to_string(GraphicContext::attraction_threshold_distance);
-    label_attractiondistance->SetText(attractiondistance.c_str());
+    std::string forcedistance = "force Distance: ";
+    forcedistance += std::to_string(GraphicContext::force_threshold_distance);
+    label_forcedistance->SetText(forcedistance.c_str());
 
 
     m_particlesCountText->SetText(text.c_str());

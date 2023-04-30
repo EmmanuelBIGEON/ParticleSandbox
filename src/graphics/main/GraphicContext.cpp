@@ -70,9 +70,9 @@
 float GraphicContext::worldWidth = 1600.0f;
 float GraphicContext::worldHeight = 1200.0f;
 float GraphicContext::repulsion_factor = 1.21f;
-float GraphicContext::attraction_factor = 0.381f;
+float GraphicContext::force_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
-float GraphicContext::attraction_threshold_distance = 700.0f;
+float GraphicContext::force_threshold_distance = 700.0f;
 float GraphicContext::movement_intensity = 0.2f;
 glm::vec3 GraphicContext::PA1_color = glm::vec3(0.31, 0.51, 1.00);
 glm::vec3 GraphicContext::PA2_color = glm::vec3(1.00, 0.51, 0.31);
@@ -80,7 +80,7 @@ glm::vec3 GraphicContext::PA3_color = glm::vec3(0.31, 1.00, 0.51);
 bool GraphicContext::useVelocity = false;
 bool GraphicContext::behaviorDriven = false;
 
-#define LOSE_ACCELERATION_FACTOR 0.45f
+#define LOSE_ACCELERATION_FACTOR 0.7f
 
 GraphicContext::GraphicContext() 
     : okRendering(false), m_Objects(), needUpdate(true), m_ModelMatrix(), m_ProjectionMatrix(), m_ViewMatrix(), 
@@ -722,9 +722,9 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
     float worldWidthDividedBy2 = worldWidth / 2.0f;
     float worldHeightDividedBy2 = worldHeight / 2.0f;
     float perf_repulsion_factor = repulsion_factor;
-    float perf_attraction_factor = attraction_factor;
+    float perf_force_factor = force_factor;
     float perf_repulsion_maximum_distance = repulsion_maximum_distance;
-    float perf_attraction_threshold_distance = attraction_threshold_distance;
+    float perf_force_threshold_distance = force_threshold_distance;
 
     __m256 mm_zeros = _mm256_set1_ps(0.0f);
     __m256 mm_minus = _mm256_set1_ps(-1.0f);
@@ -859,17 +859,17 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
             {
                 // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
                 ParticleBehavior* behavior = m_ParticleBehaviors[std::make_pair(particleClass, particle_class)];
-                perf_attraction_factor = behavior->attraction;
+                perf_force_factor = behavior->force;
                 perf_repulsion_factor = behavior->repulsion;
-                perf_attraction_threshold_distance = behavior->attraction_distance;
+                perf_force_threshold_distance = behavior->force_distance;
                 perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
             // prepare main variables
-            __m256 mm_attraction_factor = _mm256_set1_ps(perf_attraction_factor);
+            __m256 mm_force_factor = _mm256_set1_ps(perf_force_factor);
             __m256 mm_repulsion_factor = _mm256_set1_ps(perf_repulsion_factor);
             __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(perf_repulsion_maximum_distance);
-            __m256 mm_attraction_threshold_distance = _mm256_set1_ps(perf_attraction_threshold_distance);
+            __m256 mm_force_threshold_distance = _mm256_set1_ps(perf_force_threshold_distance);
 
             // -- begin calculations --
             while(targetPA_x < targetend_cursor)
@@ -905,11 +905,11 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
                 __m256 direction_x = _mm256_blendv_ps(mm_zeros, _mm256_div_ps(sub_x, distance), mask_sqrt);
                 __m256 direction_y = _mm256_blendv_ps(mm_zeros, _mm256_div_ps(sub_y, distance), mask_sqrt);
 
-                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // Calculate the movement of the current particle, if force or repulsion depending
                 // on the distance between the current particle and the others
                 // apply minimum distance
-                __m256 attraction_x = _mm256_mul_ps(direction_x, mm_attraction_factor);
-                __m256 attraction_y = _mm256_mul_ps(direction_y, mm_attraction_factor);
+                __m256 force_x = _mm256_mul_ps(direction_x, mm_force_factor);
+                __m256 force_y = _mm256_mul_ps(direction_y, mm_force_factor);
 
                 // calculate repulsion 
                 // invert direction
@@ -919,10 +919,12 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
                 __m256 repulsion_y = _mm256_mul_ps(direction_y, mm_repulsion_factor);
 
                 // resulting movement mask
-                __m256 mask_attraction = _mm256_cmp_ps(distance, mm_attraction_threshold_distance, _CMP_LT_OQ);
+                __m256 mask_force = _mm256_cmp_ps(distance, mm_force_threshold_distance, _CMP_LT_OQ);
+                // if distance > repulsion threshold too
+                // mask_force = _mm256_and_ps(mask_force, _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_GT_OQ));
                 __m256 mask_repulsion = _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
-                __m256 mvt_x_tmp = _mm256_add_ps(_mm256_and_ps(mask_attraction, attraction_x), _mm256_and_ps(mask_repulsion, repulsion_x));
-                __m256 mvt_y_tmp = _mm256_add_ps(_mm256_and_ps(mask_attraction, attraction_y), _mm256_and_ps(mask_repulsion, repulsion_y));
+                __m256 mvt_x_tmp = _mm256_add_ps(_mm256_and_ps(mask_force, force_x), _mm256_and_ps(mask_repulsion, repulsion_x));
+                __m256 mvt_y_tmp = _mm256_add_ps(_mm256_and_ps(mask_force, force_y), _mm256_and_ps(mask_repulsion, repulsion_y));
 
                 float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
                 float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
@@ -975,10 +977,10 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
                     direction_x = sub_x/distance;
                     direction_y = sub_y/distance;
                 }
-                if(distance < perf_attraction_threshold_distance)
+                if(distance < perf_force_threshold_distance)
                 {
-                    mvt_x += direction_x* perf_attraction_factor;
-                    mvt_y += direction_y* perf_attraction_factor;
+                    mvt_x += direction_x* perf_force_factor;
+                    mvt_y += direction_y* perf_force_factor;
                 }
                 
                 if(distance < perf_repulsion_maximum_distance)
@@ -989,7 +991,7 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
                     mvt_x += direction_x* perf_repulsion_factor;
                     mvt_y += direction_y* perf_repulsion_factor;
                 }
-                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // Calculate the movement of the current particle, if force or repulsion depending
                 
                 targetPA_x++;
                 targetPA_y++;
@@ -1111,9 +1113,9 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
     float worldWidthDividedBy2 = worldWidth / 2.0f;
     float worldHeightDividedBy2 = worldHeight / 2.0f;
     float perf_repulsion_factor = repulsion_factor;
-    float perf_attraction_factor = attraction_factor;
+    float perf_force_factor = force_factor;
     float perf_repulsion_maximum_distance = repulsion_maximum_distance;
-    float perf_attraction_threshold_distance = attraction_threshold_distance;
+    float perf_force_threshold_distance = force_threshold_distance;
 
 
     switch(particleClass)
@@ -1249,16 +1251,16 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
             {
                 // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
                 ParticleBehavior* behavior = m_ParticleBehaviors[std::make_pair(particleClass, particle_class)];
-                perf_attraction_factor = behavior->attraction;
+                perf_force_factor = behavior->force;
                 perf_repulsion_factor = behavior->repulsion;
-                perf_attraction_threshold_distance = behavior->attraction_distance;
+                perf_force_threshold_distance = behavior->force_distance;
                 perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
-            __m128 mm_attraction_factor = _mm_set1_ps(perf_attraction_factor);
+            __m128 mm_force_factor = _mm_set1_ps(perf_force_factor);
             __m128 mm_repulsion_factor = _mm_set1_ps(perf_repulsion_factor);
             __m128 mm_repulsion_maximum_distance = _mm_set1_ps(perf_repulsion_maximum_distance);
-            __m128 mm_attraction_threshold_distance = _mm_set1_ps(perf_attraction_threshold_distance);
+            __m128 mm_force_threshold_distance = _mm_set1_ps(perf_force_threshold_distance);
 
 
             // -- begin calculations --
@@ -1313,11 +1315,11 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
                 __m128 direction_x = _mm_blendv_ps(mm_zeros, _mm_div_ps(sub_x, distance), mask_sqrt);
                 __m128 direction_y = _mm_blendv_ps(mm_zeros, _mm_div_ps(sub_y, distance), mask_sqrt);
 
-                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // Calculate the movement of the current particle, if force or repulsion depending
                 // on the distance between the current particle and the others
                 // apply minimum distance
-                __m128 attraction_x = _mm_mul_ps(direction_x, mm_attraction_factor);
-                __m128 attraction_y = _mm_mul_ps(direction_y, mm_attraction_factor);
+                __m128 force_x = _mm_mul_ps(direction_x, mm_force_factor);
+                __m128 force_y = _mm_mul_ps(direction_y, mm_force_factor);
 
                 // calculate repulsion 
                 // invert direction
@@ -1328,15 +1330,15 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
 
                 // resulting movement mask
 #ifdef __EMSCRIPTEN__
-                __m128 mask_attraction;
+                __m128 mask_force;
                 { 
                     
-                    __m128 temp1 = _mm_and_ps(distance, mm_attraction_threshold_distance);  
-                    __m128 temp2 = _mm_cmplt_ps(distance, mm_attraction_threshold_distance);
-                    mask_attraction = _mm_and_ps(temp1, temp2);
+                    __m128 temp1 = _mm_and_ps(distance, mm_force_threshold_distance);  
+                    __m128 temp2 = _mm_cmplt_ps(distance, mm_force_threshold_distance);
+                    mask_force = _mm_and_ps(temp1, temp2);
                 }
 #else
-                __m128 mask_attraction = _mm_cmp_ps(distance, mm_attraction_threshold_distance, _CMP_LT_OQ);
+                __m128 mask_force = _mm_cmp_ps(distance, mm_force_threshold_distance, _CMP_LT_OQ);
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -1350,8 +1352,8 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
 #else
                 __m128 mask_repulsion = _mm_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
 #endif
-                __m128 mvt_x_tmp = _mm_add_ps(_mm_and_ps(mask_attraction, attraction_x), _mm_and_ps(mask_repulsion, repulsion_x));
-                __m128 mvt_y_tmp = _mm_add_ps(_mm_and_ps(mask_attraction, attraction_y), _mm_and_ps(mask_repulsion, repulsion_y));
+                __m128 mvt_x_tmp = _mm_add_ps(_mm_and_ps(mask_force, force_x), _mm_and_ps(mask_repulsion, repulsion_x));
+                __m128 mvt_y_tmp = _mm_add_ps(_mm_and_ps(mask_force, force_y), _mm_and_ps(mask_repulsion, repulsion_y));
 
                 float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
                 float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
@@ -1405,10 +1407,10 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
                     direction_x = sub_x/distance;
                     direction_y = sub_y/distance;
                 }
-                if(distance < perf_attraction_threshold_distance)
+                if(distance < perf_force_threshold_distance)
                 {
-                    mvt_x += direction_x* perf_attraction_factor;
-                    mvt_y += direction_y* perf_attraction_factor;
+                    mvt_x += direction_x* perf_force_factor;
+                    mvt_y += direction_y* perf_force_factor;
                 }
                 
                 if(distance < perf_repulsion_maximum_distance)
@@ -1419,7 +1421,7 @@ void GraphicContext::ComputeParticles_thread_avx(ParticleClass particleClass, in
                     mvt_x += direction_x* perf_repulsion_factor;
                     mvt_y += direction_y* perf_repulsion_factor;
                 }
-                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // Calculate the movement of the current particle, if force or repulsion depending
                 
                 targetPA_x++;
                 targetPA_y++;
@@ -1591,9 +1593,9 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
     float* targetPA_mass = nullptr;
     int targetPA_nb = 0;
 
-    float perf_attraction_factor = GraphicContext::attraction_factor;
+    float perf_force_factor = GraphicContext::force_factor;
     float perf_repulsion_factor = GraphicContext::repulsion_factor;
-    float perf_attraction_threshold_distance = GraphicContext::attraction_threshold_distance;
+    float perf_force_threshold_distance = GraphicContext::force_threshold_distance;
     float perf_repulsion_maximum_distance = GraphicContext::repulsion_maximum_distance;
 
     for(int i = start; i< end; i++)
@@ -1648,8 +1650,8 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             mvt_y = currentPA_velY[i]; // velocity y
         }
 
-        float attraction_x = 0.0f; 
-        float attraction_y = 0.0f; 
+        float force_x = 0.0f; 
+        float force_y = 0.0f; 
         float repulsion_x = 0.0f;
         float repulsion_y = 0.0f;
 
@@ -1673,9 +1675,9 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
             {
                 // Careful ! If behavior driven make sure that the behavior is defined for the current particle class. No test for performance !
                 ParticleBehavior* behavior = m_ParticleBehaviors[std::make_pair(particleClass, particle_class)];
-                perf_attraction_factor = behavior->attraction;
+                perf_force_factor = behavior->force;
                 perf_repulsion_factor = behavior->repulsion;
-                perf_attraction_threshold_distance = behavior->attraction_distance;
+                perf_force_threshold_distance = behavior->force_distance;
                 perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
@@ -1713,19 +1715,19 @@ void GraphicContext::ComputeParticles_thread(ParticleClass particleClass, int st
                 float direction_x = sub_x / distance;
                 float direction_y = sub_y / distance;
 
-                // Calculate the movement of the current particle, if attraction or repulsion depending
+                // Calculate the movement of the current particle, if force or repulsion depending
                 // on the distance between the current particle and the others
-                attraction_x = 0.0f;
-                attraction_y = 0.0f;
+                force_x = 0.0f;
+                force_y = 0.0f;
                 repulsion_x = 0.0f;
                 repulsion_y = 0.0f;
 
-                if(distance < perf_attraction_threshold_distance)
+                if(distance < perf_force_threshold_distance)
                 {
-                    attraction_x = direction_x * perf_attraction_factor;
-                    attraction_y = direction_y * perf_attraction_factor;
-                    mvt_x += attraction_x;
-                    mvt_y += attraction_y;
+                    force_x = direction_x * perf_force_factor;
+                    force_y = direction_y * perf_force_factor;
+                    mvt_x += force_x;
+                    mvt_y += force_y;
                 }
 
 
@@ -1800,75 +1802,75 @@ void GraphicContext::InitBehaviors()
     m_ParticleBehaviors.clear();
 
 // float GraphicContext::repulsion_factor = 1.21f;
-// float GraphicContext::attraction_factor = 0.381f;
+// float GraphicContext::force_factor = 0.381f;
 // float GraphicContext::repulsion_maximum_distance = 19.23f;
-// float GraphicContext::attraction_threshold_distance = 700.0f;
+// float GraphicContext::force_threshold_distance = 700.0f;
 
     // --------------------- Class 1 ---------------------
     // How Class1 affect itself
     ParticleBehavior* pb1_1 = new ParticleBehavior();
-    pb1_1->attraction = 0.381f;
+    pb1_1->force = 0.381f;
     pb1_1->repulsion = 100.21f;
     pb1_1->repulsion_distance = 10.23f;
-    pb1_1->attraction_distance = 100.0f;
+    pb1_1->force_distance = 100.0f;
 
     // How Class 1 react to Class2
     ParticleBehavior* pb1_2 = new ParticleBehavior();
-    pb1_2->attraction = 2.0f;
-    pb1_2->repulsion = 2.0f;
-    pb1_2->repulsion_distance = 20.0f;
-    pb1_2->attraction_distance = 20.0f;
+    pb1_2->force = 2.0f;
+    pb1_2->repulsion = 10.0f;
+    pb1_2->repulsion_distance = 3.0f;
+    pb1_2->force_distance = 20.0f;
 
     // How Class 1 react to Class3
     ParticleBehavior* pb1_3 = new ParticleBehavior();
-    pb1_3->attraction = 5.381f;
+    pb1_3->force = 5.381f;
     pb1_3->repulsion = 100.21f;
     pb1_3->repulsion_distance = 10.23f;
-    pb1_3->attraction_distance = 200.0f;
+    pb1_3->force_distance = 200.0f;
 
     // --------------------- Class 2 ---------------------
-    // How Class2 affect itselfperf_attraction_factor
+    // How Class2 affect itselfperf_force_factor
     ParticleBehavior* pb2_2 = new ParticleBehavior();
-    pb2_2->attraction = 5.381f;
+    pb2_2->force = 5.381f;
     pb2_2->repulsion = 100.0f;
     pb2_2->repulsion_distance = 10.0f;
-    pb2_2->attraction_distance = 125.0f;
+    pb2_2->force_distance = 125.0f;
 
     // How Class 2 react to Class1
     ParticleBehavior* pb2_1 = new ParticleBehavior();
-    pb2_1->attraction = 1.0f;
+    pb2_1->force = 1.0f;
     pb2_1->repulsion = 70.21f;
     pb2_1->repulsion_distance = 200.0f;
-    pb2_1->attraction_distance = 0.0f;
+    pb2_1->force_distance = 0.0f;
 
     // How Class 2 react to Class3
     ParticleBehavior* pb2_3 = new ParticleBehavior();
-    pb2_3->attraction = 5.381f;
+    pb2_3->force = 5.381f;
     pb2_3->repulsion = 100.21f;
     pb2_3->repulsion_distance = 10.0f;
-    pb2_3->attraction_distance = 200.0f;
+    pb2_3->force_distance = 200.0f;
 
     // --------------------- Class 3 ---------------------
     // How Class3 affect itself
     ParticleBehavior* pb3_3 = new ParticleBehavior();
-    pb3_3->attraction = 10.381f;
+    pb3_3->force = 10.381f;
     pb3_3->repulsion = 100.21f;
     pb3_3->repulsion_distance = 2.0f;
-    pb3_3->attraction_distance = 10.0f;
+    pb3_3->force_distance = 10.0f;
 
     // How Class 3 react to Class1
     ParticleBehavior* pb3_1 = new ParticleBehavior();
-    pb3_1->attraction = 0.0381f;
+    pb3_1->force = 0.0381f;
     pb3_1->repulsion = 100.21f;
     pb3_1->repulsion_distance = 30.0f;
-    pb3_1->attraction_distance = 700.0f;
+    pb3_1->force_distance = 700.0f;
 
     // How Class 3 react to Class2
     ParticleBehavior* pb3_2 = new ParticleBehavior();
-    pb3_2->attraction = 5.381f;
+    pb3_2->force = 5.381f;
     pb3_2->repulsion = 40.21f;
     pb3_2->repulsion_distance = 2.0f;
-    pb3_2->attraction_distance = 150.0f;
+    pb3_2->force_distance = 150.0f;
 
     m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_1)] =  pb1_1;
     m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_1, PART_CLASS_2)] =  pb1_2;

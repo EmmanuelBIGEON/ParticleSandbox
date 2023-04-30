@@ -103,9 +103,9 @@ class GraphicContext
         static float worldWidth;
         static float worldHeight;
         static float repulsion_factor;
-        static float attraction_factor;
+        static float force_factor;
         static float repulsion_maximum_distance;
-        static float attraction_threshold_distance;
+        static float force_threshold_distance;
         static float movement_intensity; // Not really speed of simulation.. Movement factor.
         static glm::vec3 PA1_color;
         static glm::vec3 PA2_color;

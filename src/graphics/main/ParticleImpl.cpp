@@ -72,24 +72,39 @@ namespace Particle_OPENGL
 
 void ParticleBehavior::Repulsion()
 {
-    this->attraction = 5.381f;
-    this->repulsion = 5.81f;
-    this->repulsion_distance = 150.23f;
-    this->attraction_distance = 0.0f;
+    this->repulsion = 20.0f;
+    this->repulsion_distance = 10.0f;
+    this->force = -0.09f;
+    this->force_distance = 200.0f;
 }
 
 void ParticleBehavior::Attraction()
 {
-    this->attraction = 2.41f;
-    this->repulsion = 40.21f;
-    this->repulsion_distance = 10.23f;
-    this->attraction_distance = 300.0f;
+    this->repulsion = 20.0f;
+    this->repulsion_distance = 10.0f;
+    this->force = 0.05f;
+    this->force_distance = 700.0f;
 }
 
 void ParticleBehavior::None()
 {
-    this->repulsion = 2.0f;
-    this->attraction = 0.0f;
-    this->repulsion_distance = 20.0f;
-    this->attraction_distance = 0.0f;
+    this->repulsion = 20.0f;
+    this->repulsion_distance = 10.0f;
+    this->force = 0.0f;
+    this->force_distance = 0.0f;
+}
+
+void ParticleBehavior::Small_Repulsion()
+{
+    Repulsion();
+
+    this->force /= 2.0f;
+
+}
+
+void ParticleBehavior::Small_Attraction()
+{
+    Attraction();
+
+    this->force /= 2.0f;
 }

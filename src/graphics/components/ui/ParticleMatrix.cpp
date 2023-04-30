@@ -63,10 +63,15 @@ void ParticleMatrix::Init(GraphicContext* context)
             // stateid = statebox->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
             // statebox->AddStateAction(stateid, [i,j](){std::cout << "Repulsion " << i << " " << j << std::endl;});
 
+            
+            stateid = statebox->AddState(glm::vec3(0.5f, 0.0f, 0.0f));
+            statebox->AddStateAction(stateid, [behavior](){behavior->Small_Repulsion();});
             stateid = statebox->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
             statebox->AddStateAction(stateid, [behavior](){behavior->Repulsion();});
             stateid = statebox->AddState(glm::vec3(1.0f, 1.0f, 1.0f));
             statebox->AddStateAction(stateid, [behavior](){behavior->None();});
+            stateid = statebox->AddState(glm::vec3(0.0f, 0.5f, 0.0f));
+            statebox->AddStateAction(stateid, [behavior](){behavior->Small_Attraction();});
             stateid = statebox->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
             statebox->AddStateAction(stateid, [behavior](){behavior->Attraction();});
 

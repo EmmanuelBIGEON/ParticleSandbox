@@ -39,32 +39,32 @@ struct ParticleStruct
 // This struct is used in GraphicContext to define the Behavior between particles.
 struct ParticleBehavior
 {
+    float repulsion;
+    float force;
+    float repulsion_distance;
+    float force_distance;
     
-    ParticleBehavior(float repulsion, float attraction, float repulsion_distance, float attraction_distance)
+    ParticleBehavior(float repulsion, float force, float repulsion_distance, float force_distance)
     {
         this->repulsion = repulsion;
-        this->attraction = attraction;
+        this->force = force;
         this->repulsion_distance = repulsion_distance;
-        this->attraction_distance = attraction_distance;
+        this->force_distance = force_distance;
     }
 
     ParticleBehavior()
     {
         this->repulsion = 0.0f;
-        this->attraction = 0.0f;
+        this->force = 0.0f;
         this->repulsion_distance = 0.0f;
-        this->attraction_distance = 0.0f;
+        this->force_distance = 0.0f;
     }
     
-    float repulsion;
-    float attraction;
-    float repulsion_distance;
-    float attraction_distance;
-
-        
     // Setup a few preconfigured behaviors
     void Repulsion();
     void Attraction();
+    void Small_Repulsion();
+    void Small_Attraction();
     void None();
 
 
