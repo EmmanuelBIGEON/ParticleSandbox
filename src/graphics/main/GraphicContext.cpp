@@ -1036,6 +1036,7 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             currentPA_mass = m_PA1_mass;
             currentPA_nb = m_nb_PA1;
             currentend_cursor = m_PA1_posX + m_nb_PA1;
+            currentPA_velX = m_PA1_velocityX; currentPA_velY = m_PA1_velocityY;
             break;
         }
         case PART_CLASS_2:
@@ -1046,6 +1047,8 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             currentPA_mass = m_PA2_mass;
             currentPA_nb = m_nb_PA2;
             currentend_cursor = m_PA2_posX + m_nb_PA2;
+            currentPA_velX = m_PA2_velocityX; currentPA_velY = m_PA2_velocityY;
+
             break;
         }
         case PART_CLASS_3:
@@ -1056,6 +1059,7 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
             currentPA_mass = m_PA3_mass;
             currentPA_nb = m_nb_PA3;
             currentend_cursor = m_PA3_posX + m_nb_PA3;
+            currentPA_velX = m_PA3_velocityX; currentPA_velY = m_PA3_velocityY;
             break;
         }
     }
@@ -1066,10 +1070,7 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
     int targetPA_nb = 0;
 
     // prepare main variables
-    __m128 mm_attraction_factor = _mm_set1_ps(perf_attraction_factor);
-    __m128 mm_repulsion_factor = _mm_set1_ps(perf_repulsion_factor);
-    __m128 mm_repulsion_maximum_distance = _mm_set1_ps(perf_repulsion_maximum_distance);
-    __m128 mm_attraction_threshold_distance = _mm_set1_ps(perf_attraction_threshold_distance);
+    
     __m128 mm_zeros = _mm_set1_ps(0.0f);
     __m128 mm_minus = _mm_set1_ps(-1.0f);
 
@@ -1140,6 +1141,16 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
         } 
         int sizeConfig = vec_scalarXY_config.size();
 
+        // Apply current velocity to current particle.
+        if(useVelocity)
+        {
+            mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
+            mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR; 
+        }else
+        {
+            mvt_x = 0.0f;
+            mvt_y = 0.0f;
+        }
         // -- Prepare targeted data --
         for(auto particle_class : m_ParticleClasses)
         {
@@ -1169,16 +1180,11 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
                 perf_repulsion_maximum_distance = behavior->repulsion_distance;
             }
 
-            // Apply current velocity to current particle.
-            if(useVelocity)
-            {
-                mvt_x = *currentPA_velX * LOSE_ACCELERATION_FACTOR;
-                mvt_y = *currentPA_velY * LOSE_ACCELERATION_FACTOR; 
-            }else
-            {
-                mvt_x = 0.0f;
-                mvt_y = 0.0f;
-            }
+            __m128 mm_attraction_factor = _mm_set1_ps(perf_attraction_factor);
+            __m128 mm_repulsion_factor = _mm_set1_ps(perf_repulsion_factor);
+            __m128 mm_repulsion_maximum_distance = _mm_set1_ps(perf_repulsion_maximum_distance);
+            __m128 mm_attraction_threshold_distance = _mm_set1_ps(perf_attraction_threshold_distance);
+
 
             // -- begin calculations --
 
@@ -1291,6 +1297,7 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
 
             for(int j = 8*(targetPA_nb/8); j < targetPA_nb; j++)
             {
+                break;
                 // do the same thing than above
                 // Calculate the minimal distance considering the available configurations
                 // init distance, sub_x, sub_y
@@ -1343,6 +1350,8 @@ void GraphicContext::RenderParticles_without_avx2(ParticleClass particleClass)
                 targetPA_y++;
             }
         }
+
+        std::cout << "mvt_x: " << mvt_x << " mvt_y: " << mvt_y << std::endl;
         
         mvt_x *= movement_intensity;
         mvt_y *= movement_intensity;
@@ -1805,7 +1814,6 @@ void GraphicContext::InitBehaviors()
     m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_1)] =  pb3_1;
     m_ParticleBehaviors[std::make_pair<ParticleClass, ParticleClass>(PART_CLASS_3, PART_CLASS_2)] =  pb3_2;
 }
-
 
 const glm::vec3& GraphicContext::GetColorParticle(ParticleClass particleClass)
 {

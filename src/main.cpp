@@ -50,6 +50,8 @@ int main()
     DisplayArchSupport();
 #endif
 
+    g_bIsAVX2Supported = false;
+
 
     Application* app = Application::GetInstance();
     app->Run();
