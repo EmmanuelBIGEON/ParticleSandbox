@@ -5,6 +5,7 @@
 
 #include "../ParticleMatrix.h"
 #include "../Slider.h"
+#include "../Button.h"
 
 #include "../../../../common/Application.h"
 
@@ -35,7 +36,21 @@ void BehaviorUI::Init(GraphicContext* context)
     // Start Drawing UI from top !
     float cursorY = GraphicContext::worldHeight;
 
+    cursorY -= 40.0f;
+    
+    button_play = new Button(context, glm::vec2(30.0f, cursorY), glm::vec2(m_width/2, 30));
+    button_play->SetPathIcon("data/img/play.png");
+    button_play->SetInvertIconOnActive(true);
+    button_play->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
+
+    button_pause = new Button(context, glm::vec2(30.0f + m_width/2, cursorY), glm::vec2(m_width/2, 30));
+    button_pause->SetPathIcon("data/img/stop.png");
+    button_pause->SetInvertIconOnActive(true);
+    button_pause->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
+    button_play->SetActive(true);
+
     cursorY -= 10.0f;
+
     std::string text = "Particles: " + std::to_string(0); 
     std::string text2 = "FPS: " + std::to_string(0);
     m_particlesCountText = new GraphicText(context, text.c_str(), glm::vec2(30.0f, cursorY), glm::vec2(30.0f + m_width, cursorY - 25));
@@ -63,6 +78,24 @@ void BehaviorUI::Init(GraphicContext* context)
     m_particleAddedSlot = context->OnParticlesAdded.Connect([this](int nb)
     {
         m_particlesCount += nb;
+    });
+
+    
+    // connect play and stop
+    button_play->OnClick.Connect([this, context]()
+    {
+        button_play->SetActive(true);
+        button_pause->SetActive(false);
+
+        context->Resume();
+    });
+
+    button_pause->OnClick.Connect([this, context]()
+    {
+        button_play->SetActive(false);
+        button_pause->SetActive(true);
+
+        context->Pause();
     });
 
 }

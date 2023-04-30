@@ -9,6 +9,7 @@ class RectangleAdapter;
 class ParticleMatrix;
 class Slider;
 class GraphicText;
+class Button;
 
 //! \class BehaviorUI
 //! \brief This class is used to draw the UI for the behavior scene.
@@ -33,6 +34,9 @@ class BehaviorUI : public LayoutUI
         Slider* slider_particleradius;
         GraphicText* label_movementintensity;
         Slider* slider_movementintensity;
+
+        Button* button_play;
+        Button* button_pause;
 
         // Create the slot here so they are destroyed on the destruction of the UI
         Slot<int>* m_particleAddedSlot;
