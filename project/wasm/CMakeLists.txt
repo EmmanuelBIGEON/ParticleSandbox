@@ -72,6 +72,7 @@ set(SOURCES
     ../../src/graphics/components/adapters/CircleAdapter.cpp
     ../../src/graphics/components/adapters/PanickedCircle.cpp
     ../../src/graphics/components/adapters/WigglingCircle.cpp
+    ../../src/graphics/components/adapters/ParticleAdapter.cpp
     ../../src/graphics/components/common/GraphicText.cpp
     ../../src/graphics/components/common/GraphicImage.cpp
     ../../src/graphics/components/common/GraphicLine.cpp
@@ -82,6 +83,7 @@ set(SOURCES
     ../../src/graphics/components/ui/Checkbox.cpp
     ../../src/graphics/components/ui/Statebox.cpp
     ../../src/graphics/components/ui/MatrixStatebox.cpp
+    ../../src/graphics/components/ui/ParticleMatrix.cpp
 )
 
 add_executable(ParticleSandboxWasm ${SOURCES})

@@ -704,6 +704,7 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
 
 void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, int start, int end)
 {
+#ifdef _MSC_VER
     float* currentPA_x = nullptr;
     float* currentPA_y = nullptr;
     float* currentPA_mass = nullptr;
@@ -870,6 +871,7 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
             __m256 mm_repulsion_factor = _mm256_set1_ps(perf_repulsion_factor);
             __m256 mm_repulsion_maximum_distance = _mm256_set1_ps(perf_repulsion_maximum_distance);
             __m256 mm_force_threshold_distance = _mm256_set1_ps(perf_force_threshold_distance);
+            __m256 squared_threshold_distance = _mm256_mul_ps(mm_force_threshold_distance, mm_force_threshold_distance);
 
             // -- begin calculations --
             while(targetPA_x < targetend_cursor)
@@ -911,6 +913,17 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
                 __m256 force_x = _mm256_mul_ps(direction_x, mm_force_factor);
                 __m256 force_y = _mm256_mul_ps(direction_y, mm_force_factor);
 
+                // distance  from mm_force_threshold_distance
+                __m256 mask_repulsion = _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
+                // distance become distance from threshold
+                // distance = _mm256_sub_ps(mm_force_threshold_distance, distance);
+                // __m256 distMaxForce = _mm256_div_ps(_mm256_mul_ps(distance, distance),squared_threshold_distance);
+                
+                // __m256 force_x = _mm256_mul_ps(direction_x, mm_force_factor);
+                // __m256 force_y = _mm256_mul_ps(direction_y, mm_force_factor);
+                // force_x = _mm256_mul_ps(force_x, distMaxForce);
+                // force_y = _mm256_mul_ps(force_y, distMaxForce);
+
                 // calculate repulsion 
                 // invert direction
                 direction_x = _mm256_mul_ps(direction_x, mm_minus);
@@ -922,9 +935,9 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
                 __m256 mask_force = _mm256_cmp_ps(distance, mm_force_threshold_distance, _CMP_LT_OQ);
                 // if distance > repulsion threshold too
                 // mask_force = _mm256_and_ps(mask_force, _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_GT_OQ));
-                __m256 mask_repulsion = _mm256_cmp_ps(distance, mm_repulsion_maximum_distance, _CMP_LT_OQ);
                 __m256 mvt_x_tmp = _mm256_add_ps(_mm256_and_ps(mask_force, force_x), _mm256_and_ps(mask_repulsion, repulsion_x));
                 __m256 mvt_y_tmp = _mm256_add_ps(_mm256_and_ps(mask_force, force_y), _mm256_and_ps(mask_repulsion, repulsion_y));
+
 
                 float* mvt_x_tmp_ptr = (float*)&mvt_x_tmp;
                 float* mvt_y_tmp_ptr = (float*)&mvt_y_tmp;
@@ -1026,7 +1039,7 @@ void GraphicContext::ComputeParticles_thread_avx2(ParticleClass particleClass, i
         currentPA_velX++;
         currentPA_velY++;
     }
-
+#endif
 }
 
 ParticleBehavior* GraphicContext::GetParticleBehavior(ParticleClass c1, ParticleClass c2)
@@ -1841,7 +1854,7 @@ void GraphicContext::InitBehaviors()
     pb2_1->force = 1.0f;
     pb2_1->repulsion = 70.21f;
     pb2_1->repulsion_distance = 200.0f;
-    pb2_1->force_distance = 0.0f;
+    pb2_1->force_distance = 1000.0f;
 
     // How Class 2 react to Class3
     ParticleBehavior* pb2_3 = new ParticleBehavior();
