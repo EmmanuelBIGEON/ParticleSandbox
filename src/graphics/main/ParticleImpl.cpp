@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
-float particleRadius = 5.0f;
+float particleRadius = 3.0f;
 
 namespace Particle_OPENGL
 {
@@ -73,7 +73,7 @@ namespace Particle_OPENGL
 void ParticleBehavior::Repulsion()
 {
     this->repulsion = 100.0f;
-    this->repulsion_distance = 10.0f;
+    this->repulsion_distance = 15.0f;
     this->force = -5.0f;
     this->force_distance = 200.0f;
 }
@@ -81,15 +81,15 @@ void ParticleBehavior::Repulsion()
 void ParticleBehavior::Attraction()
 {
     this->repulsion = 100.0f;
-    this->repulsion_distance = 10.0f;
+    this->repulsion_distance = 15.0f;
     this->force = 1.5f;
-    this->force_distance = 700.0f;
+    this->force_distance = 200.0f;
 }
 
 void ParticleBehavior::None()
 {
     this->repulsion = 100.0f;
-    this->repulsion_distance = 10.0f;
+    this->repulsion_distance = 15.0f;
     this->force = 0.0f;
     this->force_distance = 0.0f;
 }

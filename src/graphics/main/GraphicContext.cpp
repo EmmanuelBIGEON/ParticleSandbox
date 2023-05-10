@@ -74,9 +74,9 @@ float GraphicContext::force_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
 float GraphicContext::force_threshold_distance = 700.0f;
 float GraphicContext::movement_intensity = 0.2f;
-glm::vec3 GraphicContext::PA1_color = glm::vec3(0.31, 0.51, 1.00);
-glm::vec3 GraphicContext::PA2_color = glm::vec3(1.00, 0.51, 0.31);
-glm::vec3 GraphicContext::PA3_color = glm::vec3(0.31, 1.00, 0.51);
+glm::vec3 GraphicContext::PA1_color = glm::vec3(0.51, 0.81, 1.00);
+glm::vec3 GraphicContext::PA2_color = glm::vec3(1.00, 0.81, 0.51);
+glm::vec3 GraphicContext::PA3_color = glm::vec3(0.51, 1.00, 0.81);
 bool GraphicContext::useVelocity = false;
 bool GraphicContext::behaviorDriven = false;
 

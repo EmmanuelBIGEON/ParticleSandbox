@@ -62,13 +62,13 @@ void BasicUI::Init(GraphicContext* context)
     button_play = new Button(context, glm::vec2(cursorX, cursorY), glm::vec2(m_width/2, 30));
     button_play->SetPathIcon("data/img/play.png");
     button_play->SetInvertIconOnActive(true);
-    button_play->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
+    button_play->SetActiveColor(glm::vec3(0.0f, 0.2f, 0.71f));
 
     cursorX += m_width/2;
     button_pause = new Button(context, glm::vec2(cursorX, cursorY), glm::vec2(m_width/2, 30));
     button_pause->SetPathIcon("data/img/stop.png");
     button_pause->SetInvertIconOnActive(true);
-    button_pause->SetActiveColor(glm::vec3(0.0f, 0.0f, 0.31f));
+    button_pause->SetActiveColor(glm::vec3(0.0f, 0.2f, 0.71f));
     button_play->SetActive(true);
 
     // update particle size

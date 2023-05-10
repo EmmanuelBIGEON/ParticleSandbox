@@ -72,16 +72,16 @@ EventHandler_UI::EventHandler_UI(GraphicContext* context) : m_Context(context), 
     m_SlotMoveParticles = m_Context->OnKeyPressed.Connect([this](char key) {
         if(key == 7) // left
         {
-            m_Context->MoveParticles(-4.0f, 0.0f);
+            m_Context->MoveParticles(-12.0f, 0.0f);
         }else if(key == 6) // right
         {
-            m_Context->MoveParticles(4.0f, 0.0f);
+            m_Context->MoveParticles(12.0f, 0.0f);
         }else if(key == 8) // down
         {
-            m_Context->MoveParticles(0.0f, -4.0f);
+            m_Context->MoveParticles(0.0f, -12.0f);
         }else if(key == 9) // up
         {
-            m_Context->MoveParticles(0.0f, 4.0f);
+            m_Context->MoveParticles(0.0f, 12.0f);
         }
     });
     

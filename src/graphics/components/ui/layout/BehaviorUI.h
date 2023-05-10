@@ -23,9 +23,6 @@ class BehaviorUI : public LayoutUI
         virtual void Init(GraphicContext* context) override;
         virtual void Update() override;
     private:
-    
-        GraphicText* m_particlesCountText;
-        GraphicText* m_fpsText;
 
         RectangleAdapter* m_rectangleUI; // background of the UI
         ParticleMatrix* m_matrix;
@@ -44,6 +41,4 @@ class BehaviorUI : public LayoutUI
         int m_width;
         int m_height;
         
-        int m_particlesCount;
-        int m_fps;
 };
