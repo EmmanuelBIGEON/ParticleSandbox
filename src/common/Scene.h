@@ -1,9 +1,11 @@
 #pragma once
 
 #include "../graphics/main/GraphicContext.h"
-#include "../graphics/util/BasicUI.h"
+#include "../graphics/components/ui/layout/BasicUI.h"
+#include "../graphics/components/ui/layout/BehaviorUI.h"
 
 #include "EventHandler.h"
+
 
 class Scene;
 
@@ -13,7 +15,7 @@ class Scene;
 class Scene
 {
     public:
-        Scene(GraphicContext* graphicContext, bool withUI = true);
+        Scene(GraphicContext* graphicContext, LayoutType layout = LayoutType::BASIC);
         virtual ~Scene();
 
         //! \brief Initialize the scene.
@@ -32,11 +34,15 @@ class Scene
         static Scene* CreateScene_3(GraphicContext* graphicContext);
 
         static Scene* CreateScene_Main(GraphicContext* graphicContext); // first scene the users sees.
+        static Scene* CreateScene_Behavior(GraphicContext* graphicContext); // scene used for behavior introduction
         static Scene* CreateScene_Text(GraphicContext* graphicContext); // scene used for Text testing.
         static Scene* CreateScene_Testing(GraphicContext* graphicContext); // scene used for testing.
+        static Scene* CreateScene_Wasm(GraphicContext* graphicContext); // scene used for wasm
 
     private:
 
         GraphicContext* m_GraphicContext;
-        BasicUI* m_BasicUI;
+
+        LayoutUI* m_UI;
+
 };

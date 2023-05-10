@@ -3,6 +3,7 @@
 #include "../../main/GraphicObject.h"
 #include "../../main/GraphicContext.h"
 #include "../../main/Shader.h"
+#include "../../../common/Signal.h"
 
 //! \class Slider
 //! \brief A class that creates a slider object to be displayed.
@@ -23,6 +24,10 @@ class Slider : public GraphicObject
         virtual void Draw() override;
 
         bool isHovered;
+
+        // Trigger any callbacks added to the slider. 
+        Signal<> OnValueChanged;
+        
     protected:    
         static float height;
         static float width;

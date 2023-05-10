@@ -62,12 +62,13 @@ class EventHandler_ParticleCreator : public EventHandler
 class EventHandler_UI : public EventHandler
 {
     public:
-        EventHandler_UI(GraphicContext* context) : m_Context(context) {}
+        EventHandler_UI(GraphicContext* context);
         virtual ~EventHandler_UI() {}
 
         virtual void HandleEvent(const Event& event);
     private: 
         GraphicContext* m_Context;
+        Slot<char>* m_SlotMoveParticles;
 };
 
 // (Be careful, for optimization purpose, it won't be tested if it's value is null)

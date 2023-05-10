@@ -6,6 +6,7 @@
 #include "../graphics/components/adapters/CircleAdapter.h"
 #include "../graphics/components/adapters/PanickedCircle.h"
 #include "../graphics/components/adapters/WigglingCircle.h"
+#include "../graphics/components/adapters/ParticleAdapter.h"
 #include "../graphics/components/common/GraphicText.h"
 #include "../graphics/components/common/GraphicImage.h"
 #include "../graphics/components/common/GraphicLine.h"
@@ -14,9 +15,14 @@
 
 #include "../graphics/components/ui/Button.h"
 #include "../graphics/components/ui/Input.h"
+#include "../graphics/components/ui/Checkbox.h"
+#include "../graphics/components/ui/Statebox.h"
+#include "../graphics/components/ui/MatrixStatebox.h"
+#include "../graphics/components/ui/ParticleMatrix.h"
+
+#include "../graphics/main/ParticleImpl.h"
 
 #include "EventHandler.h"
-
 
 #ifdef __EMSCRIPTEN__
 #include <GLES3/gl3.h>
@@ -30,12 +36,22 @@
 // use lowp vector2
 typedef glm::tvec2<GLbyte, glm::lowp> lowp_vec2;
 
-Scene::Scene(GraphicContext* graphicContext, bool withUI) : m_GraphicContext(graphicContext), m_BasicUI(nullptr)
+Scene::Scene(GraphicContext* graphicContext, LayoutType layout) : m_GraphicContext(graphicContext), m_UI(nullptr)
 {
-    if (withUI)
+    switch(layout)
     {
-        m_BasicUI = new BasicUI(0.0f, GraphicContext::worldHeight - 500.0f, 170.0f, 500.0f);
-        m_BasicUI->Init(graphicContext);
+        case LayoutType::BASIC:
+        {
+            m_UI = new BasicUI(0.0f, GraphicContext::worldHeight - 600.0f, 170.0f, 600.0f);
+            m_UI->Init(graphicContext);
+            break;
+        }
+        case LayoutType::BEHAVIOR:
+        {
+            m_UI = new BehaviorUI(200.0f, 600.0f);
+            m_UI->Init(graphicContext);
+            break;
+        }
     }
 }
 
@@ -53,8 +69,8 @@ void Scene::Init()
 
 void Scene::Update()
 {
-    if(m_BasicUI)
-        m_BasicUI->Update();
+    if(m_UI)
+        m_UI->Update();
         
     m_GraphicContext->Render();
 }
@@ -78,16 +94,52 @@ Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
     float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
     float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
 
-    // graphicContext->AddParticles(1600, PART_CLASS_1, xmin, xmax, ymin, ymax);
-    // graphicContext->AddParticles(100, PART_CLASS_2, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(500, PART_CLASS_1, xmin, xmax, ymin, ymax);
+
     return scene;
 }
 
+Scene* Scene::CreateScene_Behavior(GraphicContext* graphicContext)
+{
+    Scene* scene = new Scene(graphicContext, LayoutType::BEHAVIOR);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
 
+    float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
+    float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
+    float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
+    float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
+
+    graphicContext->AddParticles(300, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    // graphicContext->AddParticles(300, PART_CLASS_2, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(300, PART_CLASS_3, xmin, xmax, ymin, ymax);
+
+    GraphicContext::behaviorDriven = true;
+
+    return scene;
+}
+
+Scene* Scene::CreateScene_Wasm(GraphicContext* graphicContext)
+{
+    Scene* scene = new Scene(graphicContext,LayoutType::NONE);
+    scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+
+    float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
+    float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
+    float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
+    float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
+
+    graphicContext->AddParticles(280, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    // graphicContext->AddParticles(300, PART_CLASS_2, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(280, PART_CLASS_3, xmin, xmax, ymin, ymax);
+
+    GraphicContext::behaviorDriven = true;
+
+    return scene;
+}
 
 Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, false);
+    Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
     Button* button3 = new Button(graphicContext, glm::vec2(400.0f, 300.0f), glm::vec2(200.0f, 50.0f), glm::vec3(0.2f, 0.2f, 0.2f), "");
     button3->SetPathIcon("data/img/play.png");
@@ -96,22 +148,71 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
     return scene;
 }
 
-
 Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, false);
+    Scene* scene = new Scene(graphicContext, LayoutType::BEHAVIOR);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
-    Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
-    input->SetNumberOnly(true);
-    input->SetMaxSize(5);
+    // Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
+    // input->SetNumberOnly(true);
+    // input->SetMaxSize(5);
+
+    // Checkbox* checkbox = new Checkbox(graphicContext, &GraphicContext::useVelocity,glm::vec2(700.0f, 700.0f));
+
+    // ParticleAdapter* adapter = new ParticleAdapter(graphicContext, glm::vec2(400.0f, 400.0f), glm::vec3(0.2f, 0.8f, 0.2f));
+    // Statebox* statebox = new Statebox(graphicContext, glm::vec2(400.0f, 400.0f));
+    // int id_state = statebox->AddState(glm::vec3(0.2f, 0.8f, 0.2f));
+    // statebox->AddStateAction(id_state, [](){std::cout << "State 1" << std::endl;});
+    // id_state = statebox->AddState(glm::vec3(0.8f, 0.2f, 0.2f));
+    // statebox->AddStateAction(id_state, [](){std::cout << "State 2" << std::endl;});
+    // id_state = statebox->AddState(glm::vec3(0.2f, 0.2f, 0.8f));
+    // statebox->AddStateAction(id_state, [](){std::cout << "State 3" << std::endl;});
+
+
+    // MatrixStatebox* matrixStatebox = new MatrixStatebox(3, glm::vec2(0.0f, 0.0f));
+    // matrixStatebox->Init(graphicContext);
+
+    // ParticleBehavior* behavior = graphicContext->GetParticleBehavior(ParticleClass::PART_CLASS_1, ParticleClass::PART_CLASS_3);
+
+    // matrixStatebox->GetStatebox(0,0)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
+    // matrixStatebox->GetStatebox(0,0)->AddStateAction(0, [](){std::cout << "State 1" << std::endl;});
+    // matrixStatebox->GetStatebox(1,1)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
+    // matrixStatebox->GetStatebox(1,1)->AddStateAction(0, [](){std::cout << "State 2" << std::endl;});
+    // matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 0.0f, 1.0f));
+    // matrixStatebox->GetStatebox(2,2)->AddStateAction(0, [behavior](){
+    //     behavior->attraction = 0.0f;
+    //     behavior->repulsion = 0.0f;
+    //     behavior->attraction_distance = 0.0f;
+    //     behavior->repulsion_distance = 0.0f;
+    // });
+    // matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
+    // matrixStatebox->GetStatebox(2,2)->AddStateAction(1, [behavior](){
+    //     behavior->attraction = 5.381f;
+    //     behavior->repulsion = 100.21f;
+    //     behavior->repulsion_distance = 10.23f;
+    //     behavior->attraction_distance = 200.0f;
+    // });
+    // matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(0.0f, 1.0f, 0.0f));
+    // matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [behavior](){behavior->Repulsion();});
+
+    // matrixStatebox->GetStatebox(2,2)->AddState(glm::vec3(1.0f, 0.0f, 0.0f));
+    // matrixStatebox->GetStatebox(2,2)->AddStateAction(2, [](){std::cout << "State 3" << std::endl;});
+
+    float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
+    float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
+    float ymin = GraphicContext::worldHeight / 2.0f - 300.0f;
+    float ymax = GraphicContext::worldHeight / 2.0f + 300.0f;
+    graphicContext->AddParticles(700, PART_CLASS_1, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(700, PART_CLASS_2, xmin, xmax, ymin, ymax);
+    graphicContext->AddParticles(700, PART_CLASS_3, xmin, xmax, ymin, ymax);
+    GraphicContext::behaviorDriven = true;
 
     return scene;
 }
 
 Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
 {
-    Scene* scene = new Scene(graphicContext, false);
+    Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
 
     glm::vec3 color = glm::vec3(0.2f, 0.2f, 0.2f);

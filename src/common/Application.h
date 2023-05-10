@@ -21,8 +21,11 @@ class Application
         // see Scene.h for details about scene and their purpose.
 
         void LoadScene_Main();
+        void LoadScene_Behavior();
         void LoadScene_Text();
         void LoadScene_Testing();
+        void LoadScene_Wasm();
+        
         void LoadScene_1();
         void LoadScene_3();
 

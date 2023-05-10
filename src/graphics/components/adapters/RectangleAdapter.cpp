@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #endif
 
-
+#include <iostream>
 
 RectangleAdapter::RectangleAdapter(GraphicContext* context, const Rectangle& rectangle) : GraphicObject(context, SHADER_BASIC),
  m_Rectangle(rectangle), m_Color(glm::vec3(0.0f, 1.0f, 1.0f)), m_Alpha(1.0f), m_VAO(0), m_VBO(0), m_EBO(0)
@@ -20,7 +20,6 @@ RectangleAdapter::RectangleAdapter(GraphicContext* context, glm::vec2 p1, glm::v
     m_Shader = context->GetShader(SHADER_BASIC);
     m_Rectangle = Rectangle(p1, p2);
 }
-
 
  RectangleAdapter::~RectangleAdapter()
 {

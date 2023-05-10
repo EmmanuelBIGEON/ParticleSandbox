@@ -41,6 +41,7 @@ void Window::Display(Application* app)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     GLFWwindow* window = glfwCreateWindow(Application::viewportWidth, Application::viewportHeight, "ParticleSandbox", NULL, NULL);
     if (window == NULL)

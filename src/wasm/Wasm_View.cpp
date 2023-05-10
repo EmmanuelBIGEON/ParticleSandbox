@@ -70,20 +70,22 @@ Wasm_View::Wasm_View() : m_windowpixelratio(1)
     EM_ASM(specialHTMLTargets["!canvas"] = Module.canvas);
     const char* aTargetId = "!canvas";
     emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onResizeCallback);
-    emscripten_set_mousedown_callback  (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_mouseup_callback    (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_mousemove_callback  (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_dblclick_callback   (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_click_callback      (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_mouseenter_callback (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_mouseleave_callback (aTargetId, this, toUseCapture, onMouseCallback);
-    emscripten_set_wheel_callback      (aTargetId, this, toUseCapture, onWheelCallback);
-    emscripten_set_touchstart_callback (aTargetId, this, toUseCapture, onTouchCallback);
-    emscripten_set_touchend_callback   (aTargetId, this, toUseCapture, onTouchCallback);
-    emscripten_set_touchmove_callback  (aTargetId, this, toUseCapture, onTouchCallback);
-    emscripten_set_touchcancel_callback(aTargetId, this, toUseCapture, onTouchCallback);
-    emscripten_set_keydown_callback    (EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onKeyDownCallback);
-    emscripten_set_keyup_callback      (EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onKeyUpCallback);
+
+    // Listener blocking page input ! No need anyway. Need to find a solution
+    // emscripten_set_mousedown_callback  (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_mouseup_callback    (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_mousemove_callback  (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_dblclick_callback   (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_click_callback      (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_mouseenter_callback (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_mouseleave_callback (aTargetId, this, toUseCapture, onMouseCallback);
+    // emscripten_set_wheel_callback      (aTargetId, this, toUseCapture, onWheelCallback);
+    // emscripten_set_touchstart_callback (aTargetId, this, toUseCapture, onTouchCallback);
+    // emscripten_set_touchend_callback   (aTargetId, this, toUseCapture, onTouchCallback);
+    // emscripten_set_touchmove_callback  (aTargetId, this, toUseCapture, onTouchCallback);
+    // emscripten_set_touchcancel_callback(aTargetId, this, toUseCapture, onTouchCallback);
+    // emscripten_set_keydown_callback    (EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onKeyDownCallback);
+    // emscripten_set_keyup_callback      (EMSCRIPTEN_EVENT_TARGET_WINDOW, this, toUseCapture, onKeyUpCallback);
 
 }
 Wasm_View::~Wasm_View(){}

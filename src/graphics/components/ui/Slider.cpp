@@ -1,7 +1,13 @@
 #include "Slider.h"
 
 #include <iostream>
+
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 
 #define REFVALUE *m_referencedValue
 
@@ -132,6 +138,9 @@ void Slider::OnMouseMoved(float x, float y)
         isHovered = true; 
         m_IsUpdated = false;
 
+        // Trigger any callbacks added to the slider. 
+        OnValueChanged.Emit();
+
     }else 
     {
         if (x > m_boundingBoxCursor[0] && x < m_boundingBoxCursor[2] &&
@@ -154,7 +163,6 @@ bool Slider::OnMouseReleased(float x, float y)
 {
     if(isPressed)
     {
-        std::cout << "Rekelsed" << std::endl;
         isPressed = false;
         return true;
     }

@@ -21,7 +21,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2 -msse3 -mssse3 -msse4.1 -ms
 # 1 = -O1
 # 2 = -O2
 # 3 = -O3 (highest optimization level)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O0") 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3") 
 
 # Load necessary files into the WASM data. (shaders and images) 
 # ../../src/graphics/shaders@/shaders meaning the shaders folder is binded to the /shaders folder in the WASM Virtual File System)
@@ -38,14 +38,15 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --extern-post-js ../wasmlo
 # - Need  Cross Origin Opener Policy (COOP) and Cross Origin Embedder Policy (COEP) -
 # - To make it work without too much work on setting up the HTTP Server, it is disabled. -
 # ---
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_PTHREADS") # Multithread
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s PTHREAD_POOL_SIZE=4") # Max number of threads
-# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_PTHREADS") # using threads
-# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s PTHREAD_POOL_SIZE=4")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_PTHREADS") # Multithread
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s PTHREAD_POOL_SIZE=4") # Max number of threads
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_PTHREADS") # using threads
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s PTHREAD_POOL_SIZE=4")
 
 
 set(SOURCES
     ../../src/wasm_main.cpp
+    ../../src/arch_support.cpp
 
     ../../src/wasm/Wasm_View.cpp
     
@@ -62,7 +63,8 @@ set(SOURCES
     ../../src/graphics/main/Font.cpp
     ../../src/graphics/main/ParticleImpl.cpp
 
-    ../../src/graphics/util/BasicUI.cpp
+    ../../src/graphics/components/ui/layout/BasicUI.cpp
+    ../../src/graphics/components/ui/layout/BehaviorUI.cpp
 
     ../../src/graphics/components/adapters/TriangleAdapter.cpp
     ../../src/graphics/components/adapters/AdvancedRectangle.cpp
@@ -70,11 +72,18 @@ set(SOURCES
     ../../src/graphics/components/adapters/CircleAdapter.cpp
     ../../src/graphics/components/adapters/PanickedCircle.cpp
     ../../src/graphics/components/adapters/WigglingCircle.cpp
+    ../../src/graphics/components/adapters/ParticleAdapter.cpp
     ../../src/graphics/components/common/GraphicText.cpp
     ../../src/graphics/components/common/GraphicImage.cpp
     ../../src/graphics/components/common/GraphicLine.cpp
     ../../src/graphics/components/common/BezierCurve.cpp
     ../../src/graphics/components/ui/Button.cpp
+    ../../src/graphics/components/ui/Input.cpp
+    ../../src/graphics/components/ui/Slider.cpp
+    ../../src/graphics/components/ui/Checkbox.cpp
+    ../../src/graphics/components/ui/Statebox.cpp
+    ../../src/graphics/components/ui/MatrixStatebox.cpp
+    ../../src/graphics/components/ui/ParticleMatrix.cpp
 )
 
 add_executable(ParticleSandboxWasm ${SOURCES})
@@ -84,6 +93,7 @@ target_link_libraries(ParticleSandboxWasm PRIVATE ${LIB_DIR}/freetype/2.10.0/lib
 
 install(TARGETS ParticleSandboxWasm DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ParticleSandboxWasm.wasm DESTINATION ${CMAKE_INSTALL_PREFIX}) 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ParticleSandboxWasm.worker.js DESTINATION ${CMAKE_INSTALL_PREFIX}) 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ParticleSandboxWasm.data DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # from source dir

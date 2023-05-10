@@ -22,78 +22,36 @@ int main()
     // initialize rand with timestamp.
     srand(time(NULL));
 
-    // check for support of AVX 512 
-    // The program guess that 256 is available. 
-    // The application won't work on a computer that doesn't support at least 256.
-    // TODO : check for support of 512, and if ok, implement it in the application for better performance.
+// Strange ! AVX seems available when the cpu says no.. maybe detection of arch malfunctionning.
+#if 0
+    // test a AVX command
+    float avxvalue = 4.0f;
+    __m128 avx = _mm_set1_ps(avxvalue);
+    // basic operation
+    __m128 avxresult = _mm_add_ps(avx, avx);
+    // store the result in a float array
+    float result[4];
+    _mm_store_ps(result, avxresult);
+    // display the result
+    std::cout << "AVX result : " << result[0] << " " << result[1] << " " << result[2] << " " << result[3] << std::endl;
+#endif
 
+#ifdef _MSC_VER
     // Check for AVX support
     int cpuInfo[4];
     __cpuid(cpuInfo, 1);
-    bool avxSupported = cpuInfo[2] & (1 << 28);
-
-    if (avxSupported) {
-        // AVX is supported
-        g_bIsAVXSupported = true;
-    } else {
-        // AVX is not supported
-        g_bIsAVXSupported = false;
-    }
-
-    // check for AVX2 support
+    g_bIsAVXSupported = cpuInfo[2] & (1 << 28);
     __cpuid(cpuInfo, 7);
-    bool avx2Supported = cpuInfo[1] & (1 << 5);
-
-    if (avx2Supported) {
-        // AVX2 is supported
-        g_bIsAVX2Supported = true;
-    } else {
-        // AVX2 is not supported
-        g_bIsAVX2Supported = false;
-    }
-
-    // check for AVX512 support
-    __cpuid(cpuInfo, 7);
-    bool avx512Supported = cpuInfo[1] & (1 << 16);
-
-    if (avx512Supported) {
-        // AVX512 is supported
-        g_bIsAVX512Supported = true;
-    } else {
-        // AVX512 is not supported
-        g_bIsAVX512Supported = false;
-    }
-
-    // check for SSSE3 support
-    __cpuid(cpuInfo, 1);
-    bool ssse3Supported = cpuInfo[2] & (1 << 9);
-
-    if (ssse3Supported) {
-        // SSSE3 is supported
-        g_bIsSSSE3Supported = true;
-    } else {
-        // SSSE3 is not supported
-        g_bIsSSSE3Supported = false;
-    }
-
-    // check for SSSE4 support
-    __cpuid(cpuInfo, 1);
-    bool ssse4Supported = cpuInfo[2] & (1 << 19);
-
-    if (ssse4Supported) {
-        // SSSE4 is supported
-        g_bIsSSSE4Supported = true;
-    } else {
-        // SSSE4 is not supported
-        g_bIsSSSE4Supported = false;
-    }
-
+    g_bIsAVX2Supported = cpuInfo[1] & (1 << 5);
+    g_bIsAVX512Supported = cpuInfo[1] & (1 << 16);
+    g_bIsSSSE3Supported = cpuInfo[2] & (1 << 9);
+    g_bIsSSSE4Supported = cpuInfo[2] & (1 << 19);
+    
     DisplayArchSupport();
-
+#endif
 
     Application* app = Application::GetInstance();
     app->Run();
-
     return 0;
 }
 

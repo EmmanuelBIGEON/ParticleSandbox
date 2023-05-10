@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <mutex>
+#include <map>
 #include <glm/ext.hpp>
 
 #include "../../common/Signal.h"
@@ -73,6 +74,11 @@ class GraphicContext
             float rangex_min = 0.0f, float rangex_max = GraphicContext::worldWidth, float rangey_min = 0.0f, float rangey_max = GraphicContext::worldHeight);
         void AddParticles(const std::vector<ParticleStruct>& particles, ParticleClass particleClass = ParticleClass::PART_CLASS_1);
 
+        //! \brief Remove all particles 
+        void RemoveParticles();
+
+        ParticleBehavior* GetParticleBehavior(ParticleClass c1, ParticleClass c2);
+
         void SetColor_particles_type1(const glm::vec3& color) { PA1_color = color; }
         void SetColor_particles_type2(const glm::vec3& color) { PA2_color = color; }
         void SetColor_particles_type3(const glm::vec3& color) { PA3_color = color; }
@@ -86,6 +92,12 @@ class GraphicContext
         const int& GetNbParticles_type2() const { return m_nb_PA2; }
         const int& GetNbParticles_type3() const { return m_nb_PA3; }
 
+        const std::vector<ParticleClass>& GetParticlesClasses() const { return m_ParticleClasses; }
+        const glm::vec3& GetColorParticle(ParticleClass particleClass);
+
+        // Move particles, add x, y to all particles.
+        void MoveParticles(float x,  float y);
+        
         Font* font_main;
         
 
@@ -93,12 +105,15 @@ class GraphicContext
         static float worldWidth;
         static float worldHeight;
         static float repulsion_factor;
-        static float attraction_factor;
+        static float force_factor;
         static float repulsion_maximum_distance;
-        static float attraction_threshold_distance;
+        static float force_threshold_distance;
+        static float movement_intensity; // Not really speed of simulation.. Movement factor.
         static glm::vec3 PA1_color;
         static glm::vec3 PA2_color;
         static glm::vec3 PA3_color;
+        static bool useVelocity;
+        static bool behaviorDriven;
 
         //! \brief Signal emitted when the mouse is moved.
         //! Allowing UI elements to connect to it.
@@ -132,16 +147,23 @@ class GraphicContext
         //! Main function for rendering Particle, take particles of same class, and other class.
         // For now, act the same way for all the particles, but later, each class will have a behavior depending on the targeted class.
         void RenderParticles(ParticleClass particleClass);
+        void ComputeParticles_thread_avx2(ParticleClass particleClass, int start, int end);
 
-        // incredibly slow method but, allow the program to run on all machines (using multithreading)
+        // In case AVX2 is not available and AVX available.
+        // This method will be use for WASM implementation as AVX2 is not available on WASM. https://emscripten.org/docs/porting/simd.html
+        void RenderParticles_without_avx2(ParticleClass particleClass);
+        void ComputeParticles_thread_avx(ParticleClass particleClass, int start, int end);
+
+        // incredibly slow method but, allow the program to run on all machines s
         void RenderParticles_without_avx(ParticleClass particleClass);
-
-        // Works with RenderParticles_without_avx
-        // Allow to render particles in a multithreaded way
         void ComputeParticles_thread(ParticleClass particleClass, int start, int end);
 
         // Simply draw the particles
         void DrawParticles(ParticleClass particleClass);
+
+
+        // Instanciate behavior of particles
+        void InitBehaviors();
         
         bool okRendering;
         bool needUpdate;
@@ -157,19 +179,31 @@ class GraphicContext
         float* m_PA1_posX;
         float* m_PA1_posY;
         float* m_PA1_mass; // not used, maybe later
+        float* m_PA1_velocityX;
+        float* m_PA1_velocityY;
         int m_nb_PA1;
 
         float* m_PA2_posX;
         float* m_PA2_posY;
         float* m_PA2_mass; // not used, maybe later
+        float* m_PA2_velocityX;
+        float* m_PA2_velocityY;
         int m_nb_PA2;
 
         float* m_PA3_posX;
         float* m_PA3_posY;
         float* m_PA3_mass; // not used, maybe later
+        float* m_PA3_velocityX;
+        float* m_PA3_velocityY;
         int m_nb_PA3;
 
+        // List of all the particle classes 
+        // used for calculation.
         std::vector<ParticleClass> m_ParticleClasses;
+
+        // List Behavior for each particle class, the left one is the source and the behavior affect how the right one affect the left one.
+        // For instance, to give a behavior for particleClass1, define (PART_CLASS_1, PART_CLASS_1) and (PART_CLASS_1, PART_CLASS_2) and (PART_CLASS_1, PART_CLASS_3)
+        std::map<std::pair<ParticleClass, ParticleClass>, ParticleBehavior*> m_ParticleBehaviors;
 
         // mutex for the particle adapters
         std::mutex m_ParticleAdaptersMutex;
