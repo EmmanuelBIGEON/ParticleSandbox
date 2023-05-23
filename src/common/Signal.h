@@ -54,7 +54,12 @@ class Signal
         //! \brief Deactivate a slot temporarily
         //! It should work if you only use the SetActive method on the slot you connected.
         //! This is merely another way to achieve the same result.
-        void Deactivate(Slot<Args...>* slot);
+        void DeactivateSlot(Slot<Args...>* slot);
+
+        //! \brief Activate a slot
+        //! It should work if you only use the SetActive method on the slot you connected.
+        //! This is merely another way to achieve the same result.
+        void Slot(Slot<Args...>* slot);
 
         //! \brief Clears all connections to the signal
         virtual void ClearConnections();
@@ -143,9 +148,15 @@ void Signal<Args...>::Disconnect(Slot<Args...>* slot)
 }
 
 template <typename... Args>
-void Signal<Args...>::Deactivate(Slot<Args...>* slot)
+void Signal<Args...>::DeactivateSlot(Slot<Args...>* slot)
 {
     slot->SetActive(false);
+}
+
+template <typename... Args>
+void Signal<Args...>::ActivateSlot(Slot<Args...>* slot)
+{
+    slot->SetActive(true);
 }
 
 template <typename... Args>
