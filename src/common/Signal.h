@@ -59,7 +59,7 @@ class Signal
         //! \brief Activate a slot
         //! It should work if you only use the SetActive method on the slot you connected.
         //! This is merely another way to achieve the same result.
-        void Slot(Slot<Args...>* slot);
+        void ActivateSlot(Slot<Args...>* slot);
 
         //! \brief Clears all connections to the signal
         virtual void ClearConnections();
