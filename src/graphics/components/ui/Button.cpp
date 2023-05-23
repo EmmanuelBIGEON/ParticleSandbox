@@ -10,7 +10,8 @@
 
 Button::Button(GraphicContext* context, const glm::vec2& position, const glm::vec2& size, const glm::vec3& color, const std::string& text)
     : GraphicObject(context, SHADER_BUTTON), m_Pos(position), m_Size(size), m_Color(color), m_Text(text), m_isHovered(false), beingClicked(false),
-    m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr), m_isActive(false), m_ImageObject(nullptr), m_ActiveColor(color), m_InvertIconOnActive(false)
+    m_VAO(0), m_VBO(0), m_EBO(0), m_TextObject(nullptr), m_isActive(false), m_ImageObject(nullptr), m_ActiveColor(color), m_InvertIconOnActive(false),
+    display(true), m_closeRangeButton(false), m_rangeButtonDistance(200.0f), m_onMouseMovedSlot(nullptr), m_onMousePressedSlot(nullptr), m_onMouseReleasedSlot(nullptr)
 {
     m_Shader = m_Context->GetShader(SHADER_BUTTON);
 
@@ -33,11 +34,14 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
     float image_posy = m_Pos.y + m_Size.y / 2 - 12.5f;
     m_ImageObject = new GraphicImage(m_Context, "", image_posx, image_posy, 25.0f, 25.0f);
 
+    float rangeposx = m_Pos.x + m_Size.x / 2 - 12.5f;
+    float rangeposy = m_Pos.y + m_Size.y / 2 - 12.5f;
+
     
 
     // Connect to mouve move of the context
 
-    m_Context->OnMouseMoved.Connect([this](float x, float y)
+    m_onMouseMovedSlot = m_Context->OnMouseMoved.Connect([this, rangeposx, rangeposy](float x, float y)
     {
         if(x > m_Pos.x && x < m_Pos.x + m_Size.x && 
            y > m_Pos.y && y < m_Pos.y + m_Size.y)
@@ -58,9 +62,26 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
                     m_TextObject->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
             }
         }
+
+        if(m_closeRangeButton)
+        {
+            float distance = sqrt(pow(x - rangeposx, 2) + pow(y - rangeposy, 2));
+            if(distance > m_rangeButtonDistance)
+            {
+                display = false;
+                m_ImageObject->SetToBeDisplayed(false);
+                m_TextObject->SetToBeDisplayed(false);
+            }
+            else
+            {
+                display = true;
+                m_ImageObject->SetToBeDisplayed(true);
+                m_TextObject->SetToBeDisplayed(true);
+            }
+        }
     });
 
-    m_Context->OnMousePressed.Connect([this](float x, float y)
+    m_onMousePressedSlot = m_Context->OnMousePressed.Connect([this](float x, float y)
     {
         if(x > m_Pos.x && x < m_Pos.x + m_Size.x && 
            y > m_Pos.y && y < m_Pos.y + m_Size.y)
@@ -71,7 +92,7 @@ Button::Button(GraphicContext* context, const glm::vec2& position, const glm::ve
         }   
     });
 
-    m_Context->OnMouseReleased.Connect([this](float x, float y)
+    m_onMouseReleasedSlot = m_Context->OnMouseReleased.Connect([this](float x, float y)
     {
         if(beingClicked)
         {
@@ -122,18 +143,21 @@ void Button::Update()
 
 void Button::Draw()
 {
-    glBindVertexArray(m_VAO);
-    if(m_isActive)
+    if(display)
     {
-        m_Shader->SetVec3("buttonColor", m_ActiveColor);
-    }else
-    {
-        if(m_isHovered)
-            m_Shader->SetVec3("buttonColor", m_HoveringColor);
-        else
-            m_Shader->SetVec3("buttonColor", m_Color);
+        glBindVertexArray(m_VAO);
+        if(m_isActive)
+        {
+            m_Shader->SetVec3("buttonColor", m_ActiveColor);
+        }else
+        {
+            if(m_isHovered)
+                m_Shader->SetVec3("buttonColor", m_HoveringColor);
+            else
+                m_Shader->SetVec3("buttonColor", m_Color);
+        }
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
 }
 
@@ -158,6 +182,7 @@ void Button::SetColor(const glm::vec3& color)
 void Button::SetText(const std::string& text)
 {
     m_Text = text;
+    m_TextObject->SetText(text);
     m_IsUpdated = false;
 }
 
@@ -197,4 +222,47 @@ void Button::SetActiveColor(const glm::vec3& color)
 void Button::SetInvertIconOnActive(bool invertIconOnActive)
 {
     m_InvertIconOnActive = invertIconOnActive;
+}
+
+void Button::SetRangeButton(bool closeRangeButton)
+{
+    m_closeRangeButton = closeRangeButton;
+    if(m_closeRangeButton)
+    {
+        m_ImageObject->SetToBeDisplayed(false);
+        m_TextObject->SetToBeDisplayed(false);
+        display = false;
+    }else 
+    {
+        m_ImageObject->SetToBeDisplayed(true);
+        m_TextObject->SetToBeDisplayed(true);
+        display = true;
+    }
+}
+
+void Button::SetRangeButtonDistance(float distance)
+{
+    m_rangeButtonDistance = distance;
+}
+
+void Button::SetToBeDisplayed(bool toBeDisplayed)
+{
+    m_IsToBeDisplayed = toBeDisplayed;
+
+    if(m_IsToBeDisplayed)
+    {
+        m_onMouseMovedSlot->SetActive(true);
+        m_onMousePressedSlot->SetActive(true);
+        m_onMouseReleasedSlot->SetActive(true);
+        if(m_TextObject) m_TextObject->SetToBeDisplayed(true);
+        if(m_ImageObject) m_ImageObject->SetToBeDisplayed(true);
+    }else 
+    {
+        m_onMouseMovedSlot->SetActive(false);
+        m_onMousePressedSlot->SetActive(false);
+        m_onMouseReleasedSlot->SetActive(false);
+        if(m_TextObject) m_TextObject->SetToBeDisplayed(false);
+        if(m_ImageObject) m_ImageObject->SetToBeDisplayed(false);
+    }
+    
 }

@@ -17,12 +17,13 @@ float Slider::width = 130.0f;
 Slider::Slider(GraphicContext* context, float min, float max, float* value, float x, float y)
     : GraphicObject(context,SHADER_UI), m_Min(min), m_Max(max), m_referencedValue(value), m_shiftX(x), m_shiftY(y),
      m_EBO(0), m_VAO(0), m_VBO(0), isHovered(false), isPressed(false),
-     m_shiftCursorX(0.0f), m_shiftCursorY(0.0f), m_VAO_cursor(0), m_VBO_cursor(0), m_EBO_cursor(0)
+     m_shiftCursorX(0.0f), m_shiftCursorY(0.0f), m_VAO_cursor(0), m_VBO_cursor(0), m_EBO_cursor(0),
+     m_OnMouseMovedSlot(nullptr), m_OnMousePressedSlot(nullptr), m_OnMouseReleasedSlot(nullptr)
 {
     m_Shader = context->GetShader(AvailableShader::SHADER_UI);
-    m_Context->OnMouseMoved.Connect([this](float x, float y) { OnMouseMoved(x, y);});
-    m_Context->OnMousePressed.Connect([this](float x, float y) { OnMousePressed(x, y);});
-    m_Context->OnMouseReleased.Connect([this](float x, float y) { if(OnMouseReleased(x, y)) m_Context->OnMouseReleased.PreventDefault();});
+    m_OnMouseMovedSlot = m_Context->OnMouseMoved.Connect([this](float x, float y) { OnMouseMoved(x, y);});
+    m_OnMousePressedSlot = m_Context->OnMousePressed.Connect([this](float x, float y) { OnMousePressed(x, y);});
+    m_OnMouseReleasedSlot = m_Context->OnMouseReleased.Connect([this](float x, float y) { if(OnMouseReleased(x, y)) m_Context->OnMouseReleased.PreventDefault();});
 }
 
 Slider::~Slider()
@@ -168,5 +169,23 @@ bool Slider::OnMouseReleased(float x, float y)
     }
     isPressed = false;
     return false;
+    
+}
+
+void Slider::SetToBeDisplayed(bool toBeDisplayed)
+{
+    m_IsToBeDisplayed = toBeDisplayed;
+
+    if(m_IsToBeDisplayed)
+    {
+        m_OnMouseMovedSlot->SetActive(true);
+        m_OnMousePressedSlot->SetActive(true);
+        m_OnMouseReleasedSlot->SetActive(true);
+    }else 
+    {
+        m_OnMouseMovedSlot->SetActive(false);
+        m_OnMousePressedSlot->SetActive(false);
+        m_OnMouseReleasedSlot->SetActive(false);
+    }
     
 }

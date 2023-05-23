@@ -12,7 +12,8 @@
 #include <iostream>
 
 BehaviorUI::BehaviorUI(int width, int height) : m_rectangleUI(nullptr), m_matrix(nullptr), m_width(width), m_height(height),
-    label_particleradius(nullptr), slider_particleradius(nullptr), label_movementintensity(nullptr), slider_movementintensity(nullptr)
+    label_particleradius(nullptr), slider_particleradius(nullptr), label_movementintensity(nullptr), slider_movementintensity(nullptr),
+    button_hideui(nullptr), button_play(nullptr), button_pause(nullptr), m_displayed(true)
 {
 }
 
@@ -46,8 +47,16 @@ void BehaviorUI::Init(GraphicContext* context)
     button_pause->SetPathIcon("data/img/stop.png");
     button_pause->SetInvertIconOnActive(true);
     button_pause->SetActiveColor(glm::vec3(0.0f, 0.2f, 0.71f));
+    
+    button_hideui = new Button(context, glm::vec2(0.0f, 0.0f), glm::vec2(150, 50));
+    button_hideui->SetText("Toggle UI");
+    button_hideui->SetRangeButton(true);
+    button_hideui->SetRangeButtonDistance(200.0f);
 
-    button_play->SetActive(true);
+    
+
+    
+    button_play->SetActive(true); // guess that the application is running by default. Might be wrong.
 
     cursorY -= 35.0f;
     label_particleradius = new GraphicText(context, "Particle Radius", glm::vec2(7.0f, cursorY+50.0f), glm::vec2(20.0f + m_width, cursorY - 25.0f));
@@ -86,8 +95,40 @@ void BehaviorUI::Init(GraphicContext* context)
         context->Pause();
     });
 
+    button_hideui->OnClick.Connect([this, context]()
+    {
+        m_displayed = !m_displayed;
+        ToggleDisplayed(m_displayed);
+    });
+
 }
 
 void BehaviorUI::Update()
 {
+}
+
+void BehaviorUI::ToggleDisplayed(bool displayed)
+{
+    if (displayed)
+    {
+        if (m_rectangleUI != nullptr) m_rectangleUI->SetToBeDisplayed(true);
+        if (label_particleradius != nullptr) label_particleradius->SetToBeDisplayed(true);
+        if (slider_particleradius != nullptr) slider_particleradius->SetToBeDisplayed(true);
+        if (label_movementintensity != nullptr) label_movementintensity->SetToBeDisplayed(true);
+        if (slider_movementintensity != nullptr) slider_movementintensity->SetToBeDisplayed(true);
+        if (button_play != nullptr) button_play->SetToBeDisplayed(true);
+        if (button_pause != nullptr) button_pause->SetToBeDisplayed(true);
+        if (m_matrix != nullptr) m_matrix->ToggleDisplay(true);
+    }
+    else
+    {
+        if (m_rectangleUI != nullptr) m_rectangleUI->SetToBeDisplayed(false);
+        if (label_particleradius != nullptr) label_particleradius->SetToBeDisplayed(false);
+        if (slider_particleradius != nullptr) slider_particleradius->SetToBeDisplayed(false);
+        if (label_movementintensity != nullptr) label_movementintensity->SetToBeDisplayed(false);
+        if (slider_movementintensity != nullptr) slider_movementintensity->SetToBeDisplayed(false);
+        if (button_play != nullptr) button_play->SetToBeDisplayed(false);
+        if (button_pause != nullptr) button_pause->SetToBeDisplayed(false);
+        if (m_matrix != nullptr) m_matrix->ToggleDisplay(false);
+    }
 }

@@ -79,6 +79,8 @@ Scene* Scene::CreateScene_1(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_TEST);
+    scene->m_Id = Noscene;
+
     TriangleAdapter* adapter = new TriangleAdapter(graphicContext, Triangle(Point(0.0f, 0.0f), Point(0.0f, 800.f), Point(400.0f, 200.0f)));
     RectangleAdapter* adapter2 = new RectangleAdapter(graphicContext, Rectangle(Point(0.0f, 0.0f), Point(400.0f, 200.0f)));
     return scene;
@@ -88,6 +90,7 @@ Scene* Scene::CreateScene_Main(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->m_Id = Scene_Main;
 
     float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
     float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
@@ -103,6 +106,7 @@ Scene* Scene::CreateScene_Behavior(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, LayoutType::BEHAVIOR);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->m_Id = Scene_Behavior;
 
     float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
     float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
@@ -122,6 +126,7 @@ Scene* Scene::CreateScene_Wasm(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext,LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_PARTICLE_CREATOR);
+    scene->m_Id = Noscene;
 
     float xmin = GraphicContext::worldWidth / 2.0f - 300.0f;
     float xmax = GraphicContext::worldWidth / 2.0f + 300.0f;
@@ -141,6 +146,8 @@ Scene* Scene::CreateScene_3(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
+    scene->m_Id = Noscene;
+
     Button* button3 = new Button(graphicContext, glm::vec2(400.0f, 300.0f), glm::vec2(200.0f, 50.0f), glm::vec3(0.2f, 0.2f, 0.2f), "");
     button3->SetPathIcon("data/img/play.png");
     button3->SetColor(glm::vec3(0.2f, 0.2f, 0.4f));
@@ -152,6 +159,7 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, LayoutType::BEHAVIOR);
     scene->ConnectHandler(EVENT_HANDLER_UI);
+    scene->m_Id = Scene_Testing;
 
     // Input* input = new Input(graphicContext, "100", 600.0f,700.0f);
     // input->SetNumberOnly(true);
@@ -206,6 +214,7 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
     graphicContext->AddParticles(700, PART_CLASS_2, xmin, xmax, ymin, ymax);
     graphicContext->AddParticles(700, PART_CLASS_3, xmin, xmax, ymin, ymax);
     GraphicContext::behaviorDriven = true;
+    graphicContext->Pause();
 
     return scene;
 }
@@ -214,6 +223,7 @@ Scene* Scene::CreateScene_Text(GraphicContext* graphicContext)
 {
     Scene* scene = new Scene(graphicContext, LayoutType::NONE);
     scene->ConnectHandler(EVENT_HANDLER_UI);
+    scene->m_Id = Scene_Text;
 
     glm::vec3 color = glm::vec3(0.2f, 0.2f, 0.2f);
 

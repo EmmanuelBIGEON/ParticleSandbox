@@ -37,6 +37,10 @@ class Button : public GraphicObject
         void SetPathIcon(const std::string& pathicon);
         void SetIconWidth(float width);
         void SetIconHeight(float height);
+
+        // I define a range button as i button that only appear is the mouse is close to it
+        void SetRangeButton(bool closeRangeButton);
+        void SetRangeButtonDistance(float distance);
         
 
         //! \brief Set the text of the button.
@@ -44,6 +48,8 @@ class Button : public GraphicObject
 
         //! \brief Set the hovering color of the button.
         void SetHoveringColor(const glm::vec3& color);
+
+        virtual void SetToBeDisplayed(bool toBeDisplayed) override;
 
         void SetActive(bool active);
         void SetActiveColor(const glm::vec3& color);
@@ -84,4 +90,13 @@ class Button : public GraphicObject
         bool m_InvertIconOnActive;
 
         bool beingClicked;
+
+        bool m_closeRangeButton;
+        float m_rangeButtonDistance;
+
+        bool display;
+
+        Slot<float,float>* m_onMouseMovedSlot;
+        Slot<float,float>* m_onMousePressedSlot;
+        Slot<float,float>* m_onMouseReleasedSlot;
 };

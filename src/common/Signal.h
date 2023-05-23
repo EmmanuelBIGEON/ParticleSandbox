@@ -16,6 +16,9 @@ class Slot
         Slot(Signal<Args...>* signal, std::function<void(Args...)> function);
         virtual ~Slot();
 
+        void SetActive(bool active) { m_active = active;}
+        bool isActive() const { return m_active;}
+
         void Call(Args... args);
 
     protected: 
@@ -24,6 +27,8 @@ class Slot
 
         // function pointer tempalted
         std::function<void(Args...)> m_Function;
+
+        bool m_active;
 };
 
 //! \class Signal
@@ -46,6 +51,11 @@ class Signal
         //! Use in destructor of slot
         virtual void Disconnect(Slot<Args...>* slot);
 
+        //! \brief Deactivate a slot temporarily
+        //! It should work if you only use the SetActive method on the slot you connected.
+        //! This is merely another way to achieve the same result.
+        void Deactivate(Slot<Args...>* slot);
+
         //! \brief Clears all connections to the signal
         virtual void ClearConnections();
 
@@ -61,7 +71,7 @@ class Signal
 
 
 template <typename... Args>
-Slot<Args...>::Slot(Signal<Args...>* signal, std::function<void(Args...)> function) : m_Signal(signal), m_Function(function)
+Slot<Args...>::Slot(Signal<Args...>* signal, std::function<void(Args...)> function) : m_Signal(signal), m_Function(function), m_active(true)
 {
 }
 
@@ -98,6 +108,8 @@ void Signal<Args...>::Emit(Args... args)
 {
     for(Slot<Args...>* slot : m_Slots)
     {
+        if(!slot->isActive()) continue;
+
         slot->Call(std::forward<Args>(args)...);
 
         // Stop the execution of the signal if PreventDefault().
@@ -128,6 +140,12 @@ void Signal<Args...>::Disconnect(Slot<Args...>* slot)
             break;
         }
     }
+}
+
+template <typename... Args>
+void Signal<Args...>::Deactivate(Slot<Args...>* slot)
+{
+    slot->SetActive(false);
 }
 
 template <typename... Args>

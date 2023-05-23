@@ -2,7 +2,7 @@
 
 
 GraphicObject::GraphicObject(GraphicContext* context, AvailableShader shaderIndex) 
-    : Object(), m_Context(context), m_ShaderIndex(shaderIndex), m_IsUpdated(false)
+    : Object(), m_Context(context), m_ShaderIndex(shaderIndex), m_IsUpdated(false), m_IsToBeDisplayed(true)
 {
     context->Register(this);
 }
@@ -25,4 +25,9 @@ void GraphicObject::Draw()
 int GraphicObject::GetShaderIndex() const
 {
     return m_ShaderIndex;
+}
+
+void GraphicObject::SetToBeDisplayed(bool toBeDisplayed)
+{
+    m_IsToBeDisplayed = toBeDisplayed;
 }

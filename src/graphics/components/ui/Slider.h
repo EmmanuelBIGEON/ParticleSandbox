@@ -23,6 +23,8 @@ class Slider : public GraphicObject
         virtual void Update() override;
         virtual void Draw() override;
 
+        virtual void SetToBeDisplayed(bool toBeDisplayed) override;
+
         bool isHovered;
 
         // Trigger any callbacks added to the slider. 
@@ -64,4 +66,8 @@ class Slider : public GraphicObject
         float m_boundingBoxCursor[4];
 
         Shader* m_Shader;
+
+        Slot<float, float>* m_OnMouseMovedSlot;
+        Slot<float, float>* m_OnMousePressedSlot;
+        Slot<float, float>* m_OnMouseReleasedSlot;
 };

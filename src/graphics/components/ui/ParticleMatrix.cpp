@@ -100,3 +100,9 @@ void ParticleMatrix::Init(GraphicContext* context)
 void ParticleMatrix::Update()
 {
 }
+
+void ParticleMatrix::ToggleDisplay(bool displayed)
+{
+    if(m_matStatebox) m_matStatebox->ToggleDisplay(displayed);
+    for(auto it = m_particles.begin(); it != m_particles.end(); ++it) (*it)->SetToBeDisplayed(displayed);
+}

@@ -86,6 +86,7 @@ void Application::CreateWindow()
         // LoadScene_Main();
         // LoadScene_Behavior();
         LoadScene_Testing();
+        // LoadScene_Text();
         
     });
 

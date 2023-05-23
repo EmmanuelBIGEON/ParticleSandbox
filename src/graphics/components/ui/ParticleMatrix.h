@@ -22,6 +22,7 @@ class ParticleMatrix
         void Init(GraphicContext* context);
         void Update();
 
+        void ToggleDisplay(bool displayed);
     private:
 
         MatrixStatebox* m_matStatebox;

@@ -20,6 +20,8 @@ class BehaviorUI : public LayoutUI
         BehaviorUI(int width, int height);
         ~BehaviorUI();
 
+        void ToggleDisplayed(bool displayed);
+
         virtual void Init(GraphicContext* context) override;
         virtual void Update() override;
     private:
@@ -34,11 +36,14 @@ class BehaviorUI : public LayoutUI
 
         Button* button_play;
         Button* button_pause;
+        Button* button_hideui;
 
         // Create the slot here so they are destroyed on the destruction of the UI
         Slot<int>* m_particleAddedSlot;
 
         int m_width;
         int m_height;
+
+        bool m_displayed;
         
 };

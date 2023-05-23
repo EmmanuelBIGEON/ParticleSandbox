@@ -74,9 +74,9 @@ float GraphicContext::force_factor = 0.381f;
 float GraphicContext::repulsion_maximum_distance = 19.23f;
 float GraphicContext::force_threshold_distance = 700.0f;
 float GraphicContext::movement_intensity = 0.2f;
-glm::vec3 GraphicContext::PA1_color = glm::vec3(0.51, 0.81, 1.00);
-glm::vec3 GraphicContext::PA2_color = glm::vec3(1.00, 0.81, 0.51);
-glm::vec3 GraphicContext::PA3_color = glm::vec3(0.51, 1.00, 0.81);
+glm::vec3 GraphicContext::PA1_color = glm::vec3(0.51, 0.51, 1.00);
+glm::vec3 GraphicContext::PA2_color = glm::vec3(1.00, 0.51, 0.51);
+glm::vec3 GraphicContext::PA3_color = glm::vec3(0.51, 1.00, 0.51);
 bool GraphicContext::useVelocity = false;
 bool GraphicContext::behaviorDriven = false;
 
@@ -252,6 +252,9 @@ void GraphicContext::Render()
 
     for(auto object : m_Objects)
     {
+        // Do not calculate the object to spare the CPU
+        if(!object->IsDisplayable()) continue;
+
         switch(object->GetShaderIndex())
         {
             case SHADER_BASIC:
@@ -301,6 +304,7 @@ void GraphicContext::Render()
                 break;
             }
         }
+
         object->Draw();
     }
 }
@@ -676,8 +680,6 @@ void GraphicContext::RenderParticles(ParticleClass particleClass)
     thread2.join();
     thread3.join();
 
-    m_ParticleAdaptersMutex.unlock();
-    
     shader_particle->Use();
     glBindVertexArray(Particle_OPENGL::pVAO);
 

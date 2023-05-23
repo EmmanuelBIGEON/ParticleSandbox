@@ -20,6 +20,9 @@ class GraphicObject : public Object
         //! \brief Draw the object.
         virtual void Draw();
 
+        virtual void SetToBeDisplayed(bool toBeDisplayed);
+        bool IsDisplayable() const { return m_IsToBeDisplayed;}
+
         //! Give the identifier of the shader used by the object.
         int GetShaderIndex() const;
 
@@ -32,4 +35,5 @@ class GraphicObject : public Object
 
         bool m_IsUpdated;
         // bool m_IsDrawn; // maybe later
+        bool m_IsToBeDisplayed;
 };

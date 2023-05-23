@@ -82,3 +82,11 @@ void MatrixStatebox::PrintMap()
         std::cout << it->first.first << " " << it->first.second << " " << it->second << std::endl;
     }
 }
+
+void MatrixStatebox::ToggleDisplay(bool displayed)
+{
+    for(auto it = m_stateboxes.begin(); it != m_stateboxes.end(); ++it)
+    {
+        it->second->SetToBeDisplayed(displayed);
+    }
+}

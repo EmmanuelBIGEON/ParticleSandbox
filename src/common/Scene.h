@@ -6,6 +6,15 @@
 
 #include "EventHandler.h"
 
+enum SceneId
+{
+    Noscene,
+    Scene_Main,
+    Scene_Behavior,
+    Scene_Text,
+    Scene_Testing
+};
+
 
 class Scene;
 
@@ -25,6 +34,9 @@ class Scene
         //! \brief Update the scene.
         //! Won't check if the scene is initialized.
         virtual void Update();
+
+        //! \brief Return the scene identifier defined in enum SceneId
+        SceneId GetSceneId() { return m_Id;}
         
         //! \brief Connect a handler to the scene.
         //! Notice: Destroy the previous Handler
@@ -42,7 +54,7 @@ class Scene
     private:
 
         GraphicContext* m_GraphicContext;
-
+        SceneId m_Id;
         LayoutUI* m_UI;
 
 };

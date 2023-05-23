@@ -27,6 +27,8 @@ class MatrixStatebox
         float GetWidth();
         float GetHeight();
 
+        void ToggleDisplay(bool displayed);
+
         static float padding;
     private:
 

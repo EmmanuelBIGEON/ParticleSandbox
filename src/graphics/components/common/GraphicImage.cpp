@@ -153,11 +153,11 @@ void GraphicImage::Update()
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
 
+        m_imageloaded = true;
         }else{
             std::cout << "Failed to load texture" << std::endl;
         }
         stbi_image_free(data);
-        m_imageloaded = true;
     }
 
 
@@ -166,14 +166,13 @@ void GraphicImage::Update()
 
 void GraphicImage::Draw() 
 {
-    if(!m_IsUpdated && m_imageloaded)
+    if(!m_IsUpdated || !m_imageloaded)
         return;
     // std::cout << "GraphicImage::Draw() : " << m_Path << std::endl;
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_Texture);
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 }
 
 void GraphicImage::SetPosition(float x, float y)
