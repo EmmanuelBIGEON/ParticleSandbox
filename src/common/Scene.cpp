@@ -214,7 +214,6 @@ Scene* Scene::CreateScene_Testing(GraphicContext* graphicContext)
     graphicContext->AddParticles(700, PART_CLASS_2, xmin, xmax, ymin, ymax);
     graphicContext->AddParticles(700, PART_CLASS_3, xmin, xmax, ymin, ymax);
     GraphicContext::behaviorDriven = true;
-    graphicContext->Pause();
 
     return scene;
 }

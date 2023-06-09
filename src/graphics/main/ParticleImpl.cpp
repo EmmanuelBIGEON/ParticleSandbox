@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
-float particleRadius = 3.0f;
+float particleRadius = 4.5f;
 
 namespace Particle_OPENGL
 {
